@@ -106,6 +106,12 @@ describe('save', () => {
     expect(() => deserialize(JSON.stringify(corrupt), ctx)).toThrow(/corrupt/);
   });
 
+  it('rejects a save made with a different map', () => {
+    const other: Scenario = { ...scenario, owner: [...scenario.owner, 1], controller: [...scenario.controller, 1] };
+    const text = serialize(newGame(1, other));
+    expect(() => deserialize(text, ctx)).toThrow(/different version of the map/);
+  });
+
   it('upgrades a version 1 save by adding the 1302 map', () => {
     const v1 = { format: 'interregnum-save', saveVersion: 1, state: { saveVersion: 1, seed: 5, rng: [1, 2, 3, 4], day: 3650, speed: 3, paused: false } };
     const s = deserialize(JSON.stringify(v1), ctx);

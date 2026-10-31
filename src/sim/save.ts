@@ -57,6 +57,10 @@ export function deserialize(text: string, ctx: MigrationContext): GameState {
   }
   const state = migrate(file.state as unknown as Record<string, unknown>, file.saveVersion, ctx) as unknown as GameState;
   validate(state);
+  // Province ids index into the map; a save from a different map would scramble ownership.
+  if (state.provinces.length !== ctx.scenario.owner.length) {
+    throw new SaveError('This save was made with a different version of the map and cannot be loaded');
+  }
   return state;
 }
 
