@@ -177,14 +177,83 @@ for (let y = 0; y < H; y++) {
   }
 }
 
-const BUCKETS = 64; // larger than the biggest single step cost (16 * 1.4 * WASTELAND_SLOWDOWN + 1)
-const buckets: number[][] = Array.from({ length: BUCKETS }, () => []);
-for (const p of seedQueue) buckets[0]!.push(p);
-let pending = seedQueue.length;
 const DIRS: [number, number, boolean][] = [
   [1, 0, false], [-1, 0, false], [0, 1, false], [0, -1, false],
   [1, 1, true], [1, -1, true], [-1, 1, true], [-1, -1, true],
 ];
+// Corridors (data/map/corridors.yaml): thin strips of settled land between two seeds, e.g. a caravan
+// route between oases or a coastal road along a desert shore. Each strip follows the shortest path over
+// land (so it hugs coasts instead of crossing bays), optionally through waypoints. Wasteland may not enter
+// a strip and settled provinces may follow it past their radius, so the two ends grow towards each other.
+const CORRIDOR_HALF_WIDTH_PX = 3;
+const CORRIDOR_SEARCH_MARGIN_PX = 150;
+const corridor = new Uint8Array(W * H);
+{
+  const seedAt = new Map<string, number>();
+  for (const d of defs) {
+    const s = seedPixel.get(d.id);
+    if (s) seedAt.set(d.key, s[1] * W + s[0]);
+  }
+  const nearestLand = (lat: number, lon: number): number => {
+    const [px, py] = lonLatToPixel(projection, lon, lat);
+    const p = snap(px, py, 1);
+    if (p === null) throw new Error(`corridor waypoint ${lat},${lon}: no land nearby`);
+    return p;
+  };
+  /** Shortest 8-connected path over land from a to b, searched inside their bounding box plus a margin. */
+  const landPath = (a: number, b: number): number[] => {
+    const ax = a % W, ay = (a - ax) / W, bx = b % W, by = (b - bx) / W;
+    const x0 = Math.max(0, Math.min(ax, bx) - CORRIDOR_SEARCH_MARGIN_PX);
+    const x1 = Math.min(W - 1, Math.max(ax, bx) + CORRIDOR_SEARCH_MARGIN_PX);
+    const y0 = Math.max(0, Math.min(ay, by) - CORRIDOR_SEARCH_MARGIN_PX);
+    const y1 = Math.min(H - 1, Math.max(ay, by) + CORRIDOR_SEARCH_MARGIN_PX);
+    const prev = new Map<number, number>([[a, -1]]);
+    const queue = [a];
+    for (let i = 0; i < queue.length && !prev.has(b); i++) {
+      const p = queue[i]!;
+      const x = p % W, y = (p - x) / W;
+      for (const [dx, dy] of DIRS) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < x0 || ny < y0 || nx > x1 || ny > y1) continue;
+        const q = ny * W + nx;
+        if (!land[q] || prev.has(q)) continue;
+        prev.set(q, p);
+        queue.push(q);
+      }
+    }
+    if (!prev.has(b)) return [];
+    const path: number[] = [];
+    for (let p = b; p !== -1; p = prev.get(p)!) path.push(p);
+    return path;
+  };
+  // Each entry is [keyA, keyB] or [keyA, keyB, [[lat, lon], ...]] with waypoints the path must pass.
+  const pairs = (parse(readFileSync('data/map/corridors.yaml', 'utf8')) ?? []) as [string, string, [number, number][]?][];
+  for (const [a, b, via = []] of pairs) {
+    const pa = seedAt.get(a);
+    const pb = seedAt.get(b);
+    if (pa === undefined || pb === undefined) throw new Error(`corridor ${a} - ${b}: unknown seed key`);
+    const stops = [pa, ...via.map(([lat, lon]) => nearestLand(lat, lon)), pb];
+    for (let s = 0; s + 1 < stops.length; s++) {
+      const path = landPath(stops[s]!, stops[s + 1]!);
+      if (!path.length) throw new Error(`corridor ${a} - ${b}: no land path`);
+      for (const p of path) {
+        const cx = p % W, cy = (p - cx) / W;
+        for (let dy = -CORRIDOR_HALF_WIDTH_PX; dy <= CORRIDOR_HALF_WIDTH_PX; dy++) {
+          for (let dx = -CORRIDOR_HALF_WIDTH_PX; dx <= CORRIDOR_HALF_WIDTH_PX; dx++) {
+            if (dx * dx + dy * dy > CORRIDOR_HALF_WIDTH_PX ** 2) continue;
+            const x = cx + dx, y = cy + dy;
+            if (x >= 0 && y >= 0 && x < W && y < H && land[y * W + x]) corridor[y * W + x] = 1;
+          }
+        }
+      }
+    }
+  }
+}
+
+const BUCKETS = 64; // larger than the biggest single step cost (16 * 1.4 * WASTELAND_SLOWDOWN + 1)
+const buckets: number[][] = Array.from({ length: BUCKETS }, () => []);
+for (const p of seedQueue) buckets[0]!.push(p);
+let pending = seedQueue.length;
 for (let d = 0; pending > 0; d++) {
   const bucket = buckets[d % BUCKETS]!;
   while (bucket.length) {
@@ -206,7 +275,8 @@ for (let d = 0; pending > 0; d++) {
       const base = diagonal ? Math.round(terrainCost[q]! * 1.4) : terrainCost[q]!;
       const step = slow[id] ? base * WASTELAND_SLOWDOWN : base;
       const nd = d + step;
-      if (nd >= dist[q]! || nd > maxCost[id]!) continue;
+      if (corridor[q] && slow[id]) continue;
+      if (nd >= dist[q]! || (nd > maxCost[id]! && !corridor[q])) continue;
       dist[q] = nd;
       owner[q] = id;
       buckets[nd % BUCKETS]!.push(q);
@@ -328,7 +398,7 @@ if (existsSync(BOUNDARY_DIR)) {
   }
   for (let p = 0; p < W * H; p++) {
     const t = target[district[p]!]!;
-    if (t && land[p]) owner[p] = t;
+    if (t && land[p] && !corridor[p]) owner[p] = t; // corridors keep the province that grew along them
   }
   console.log(`Snapped ${snappedDistricts} of ${districtCount} districts to provinces.`);
 }

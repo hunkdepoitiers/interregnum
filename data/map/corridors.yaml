@@ -1,0 +1,37 @@
+# Thin strips of settled land joining two provinces (by seed key) across desert: caravan routes between
+# oases and coastal roads along empty shores. An optional third element lists [lat, lon] waypoints
+# that steer the strip around water. tools/seed-map.ts grows the two provinces along the strip.
+# Egypt's western oases
+- [siwa, sullum]
+- [siwa, bahriya]
+- [bahriya, fayyum]
+- [bahriya, farafra]
+- [farafra, dakhla]
+- [dakhla, kharga]
+- [kharga, asyut]
+- [kharga, selima]
+- [jabal_quzlum, aswan]
+# Libyan and Marmarican coast
+- [misrata, sirte]
+- [sirte, ajdabiya]
+- [sullum, baretun]
+- [marsa_matruh, alexandria]
+# Hejaz and Najd
+- [ayla, tabuk]
+- [tabuk, wajh]
+- [tabuk, tayma]
+- [wajh, hejra]
+- [wadi_al_qura, khaybar]
+- [khaybar, medina]
+- [medina, mecca]
+- [yanbu, mecca]
+- [ta_if, bisha]
+- [sirhan, al_jawf]
+- [al_jawf, ha_il]
+- [tayma, ha_il]
+- [ha_il, qasim]
+- [qasim, yamama]
+- [yamama, al_hasa]
+- [kazima, qatif]
+- [al_hasa, qatar]
+- [al_hasa, dhafra]
