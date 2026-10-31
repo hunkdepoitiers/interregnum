@@ -2575,9 +2575,61 @@
 - { id: 2573, key: north_norwegian_sea, name: "Northern Norwegian Sea", kind: sea, color: "#135efb" }
 - { id: 2574, key: vestfjord, name: "Vestfjorden", kind: sea, color: "#063db6" }
 - { id: 2575, key: trondheim_sea, name: "Coast of Trondelag", kind: sea, color: "#2f7ea6" }
-- { id: 2576, key: lake_1, name: "Lake 1", kind: lake, color: "#1976b1" }
-- { id: 2577, key: lake_onega, name: "Onega", kind: lake, color: "#0767f3" }
-- { id: 2578, key: lake_ladoga, name: "Ladoga", kind: lake, color: "#1853ad" }
-- { id: 2579, key: lake_vanern, name: "Vänern", kind: lake, color: "#0056ee" }
-- { id: 2580, key: lake_peipus, name: "Peipus", kind: lake, color: "#2b3cc8" }
-- { id: 2581, key: lake_vattern, name: "Vättern", kind: lake, color: "#1193e9" }
+- { id: 2576, key: mtn_cantabrian_mountains, name: "Cantabrian Mountains", kind: mountain, color: "#675857" }
+- { id: 2577, key: mtn_pyrenees, name: "Pyrenees", kind: mountain, color: "#6a615b" }
+- { id: 2578, key: mtn_sierra_de_gredos, name: "Sierra de Gredos", kind: mountain, color: "#5d5950" }
+- { id: 2579, key: mtn_sierra_de_guadarrama, name: "Sierra de Guadarrama", kind: mountain, color: "#5d5355" }
+- { id: 2580, key: mtn_serra_da_estrela, name: "Serra da Estrela", kind: mountain, color: "#685b54" }
+- { id: 2581, key: mtn_sierra_nevada, name: "Sierra Nevada", kind: mountain, color: "#756e6d" }
+- { id: 2582, key: mtn_western_alps, name: "Western Alps", kind: mountain, color: "#6c655c" }
+- { id: 2583, key: mtn_pennine_alps, name: "Pennine Alps", kind: mountain, color: "#766c66" }
+- { id: 2584, key: mtn_bernese_alps, name: "Bernese Alps", kind: mountain, color: "#605954" }
+- { id: 2585, key: mtn_rhaetian_alps, name: "Rhaetian Alps", kind: mountain, color: "#6a5b56" }
+- { id: 2586, key: mtn_hohe_tauern, name: "Hohe Tauern", kind: mountain, color: "#594b49" }
+- { id: 2587, key: mtn_dolomites, name: "Dolomites", kind: mountain, color: "#615b4e" }
+- { id: 2588, key: mtn_julian_alps, name: "Julian Alps", kind: mountain, color: "#635b52" }
+- { id: 2589, key: mtn_tatra, name: "Tatra", kind: mountain, color: "#655b52" }
+- { id: 2590, key: mtn_eastern_carpathians, name: "Eastern Carpathians", kind: mountain, color: "#685e5e" }
+- { id: 2591, key: mtn_southern_carpathians, name: "Southern Carpathians", kind: mountain, color: "#626057" }
+- { id: 2592, key: mtn_balkan_mountains, name: "Balkan Mountains", kind: mountain, color: "#635752" }
+- { id: 2593, key: mtn_rila_and_pirin, name: "Rila and Pirin", kind: mountain, color: "#736865" }
+- { id: 2594, key: mtn_prokletije, name: "Prokletije", kind: mountain, color: "#79706c" }
+- { id: 2595, key: mtn_pindus, name: "Pindus", kind: mountain, color: "#73645b" }
+- { id: 2596, key: mtn_olympus, name: "Olympus", kind: mountain, color: "#807668" }
+- { id: 2597, key: mtn_apennines, name: "Apennines", kind: mountain, color: "#5d4d47" }
+- { id: 2598, key: mtn_jotunheimen_and_dovre, name: "Jotunheimen and Dovre", kind: mountain, color: "#766b6c" }
+- { id: 2599, key: mtn_hardangervidda, name: "Hardangervidda", kind: mountain, color: "#5f5150" }
+- { id: 2600, key: mtn_kjolen, name: "Kjolen", kind: mountain, color: "#554d47" }
+- { id: 2601, key: mtn_greater_caucasus, name: "Greater Caucasus", kind: mountain, color: "#5e554d" }
+- { id: 2602, key: mtn_pontic_alps, name: "Pontic Alps", kind: mountain, color: "#5a534b" }
+- { id: 2603, key: mtn_taurus_mountains, name: "Taurus Mountains", kind: mountain, color: "#625953" }
+- { id: 2604, key: mtn_amanus_mountains, name: "Amanus Mountains", kind: mountain, color: "#79756c" }
+- { id: 2605, key: mtn_ararat, name: "Ararat", kind: mountain, color: "#756f6c" }
+- { id: 2606, key: mtn_zagros_mountains, name: "Zagros Mountains", kind: mountain, color: "#5d4d4b" }
+- { id: 2607, key: mtn_alborz_mountains, name: "Alborz Mountains", kind: mountain, color: "#5e5c58" }
+- { id: 2608, key: mtn_mount_lebanon, name: "Mount Lebanon", kind: mountain, color: "#73706c" }
+- { id: 2609, key: mtn_sinai_mountains, name: "Sinai Mountains", kind: mountain, color: "#504744" }
+- { id: 2610, key: mtn_high_atlas, name: "High Atlas", kind: mountain, color: "#514b4a" }
+- { id: 2611, key: mtn_anti_atlas, name: "Anti-Atlas", kind: mountain, color: "#605851" }
+- { id: 2612, key: mtn_middle_atlas, name: "Middle Atlas", kind: mountain, color: "#5b514d" }
+- { id: 2613, key: mtn_rif, name: "Rif", kind: mountain, color: "#69645e" }
+- { id: 2614, key: mtn_djurdjura, name: "Djurdjura", kind: mountain, color: "#625753" }
+- { id: 2615, key: mtn_aures, name: "Aures", kind: mountain, color: "#615957" }
+- { id: 2616, key: lake_1, name: "Lake 1", kind: lake, color: "#2b58ae" }
+- { id: 2617, key: lake_onega, name: "Onega", kind: lake, color: "#2b81d0" }
+- { id: 2618, key: lake_ladoga, name: "Ladoga", kind: lake, color: "#244bc5" }
+- { id: 2619, key: lake_vanern, name: "Vänern", kind: lake, color: "#2f62f5" }
+- { id: 2620, key: lake_peipus, name: "Peipus", kind: lake, color: "#1c42ab" }
+- { id: 2621, key: lake_vattern, name: "Vättern", kind: lake, color: "#255cbc" }
+- { id: 2622, key: lake_constance, name: "Constance", kind: lake, color: "#0783a6" }
+- { id: 2623, key: lake_balaton, name: "Balaton", kind: lake, color: "#073fad" }
+- { id: 2624, key: lake_geneva, name: "Geneva", kind: lake, color: "#2f60c5" }
+- { id: 2625, key: lake_garda, name: "Garda", kind: lake, color: "#117ace" }
+- { id: 2626, key: lake_scutari, name: "Scutari", kind: lake, color: "#038da2" }
+- { id: 2627, key: lake_ohrid, name: "Ohrid", kind: lake, color: "#2694d6" }
+- { id: 2628, key: lake_prespa, name: "Prespa", kind: lake, color: "#043fe0" }
+- { id: 2629, key: lake_sevan, name: "Sevan", kind: lake, color: "#3043f6" }
+- { id: 2630, key: lake_tuz, name: "Tuz", kind: lake, color: "#2361b2" }
+- { id: 2631, key: lake_van, name: "Van", kind: lake, color: "#2382bb" }
+- { id: 2632, key: lake_urmia, name: "Urmia", kind: lake, color: "#207bfa" }
+- { id: 2633, key: lake_dead_sea, name: "Dead Sea", kind: lake, color: "#0a8bd9" }

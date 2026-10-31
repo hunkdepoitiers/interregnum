@@ -13,6 +13,7 @@ const KIND_COLOR: Record<Exclude<ProvinceKind, 'land'>, Rgb> = {
   sea: [44, 74, 104],
   lake: [58, 98, 130],
   wasteland: [128, 118, 100],
+  mountain: [92, 84, 78],
 };
 
 export function hexToRgb(hex: string): Rgb {
@@ -41,7 +42,7 @@ export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null
 
   for (const p of map.provinces) {
     if (p.kind !== 'land') {
-      const alpha = p.kind === 'wasteland' ? 255 : 128;
+      const alpha = p.kind === 'wasteland' || p.kind === 'mountain' ? 255 : 128;
       put(0, p.id, KIND_COLOR[p.kind], alpha);
       put(1, p.id, KIND_COLOR[p.kind], alpha);
       continue;

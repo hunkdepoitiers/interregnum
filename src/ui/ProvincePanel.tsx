@@ -2,7 +2,9 @@ import { world } from '../bridge/client';
 import { hasRealms, mapData, selected, selectProvince } from './App';
 import { RealmLink } from './RealmPanel';
 
-const KIND_LABEL = { land: 'Land province', sea: 'Sea zone', wasteland: 'Wasteland (impassable)', lake: 'Lake' };
+const KIND_LABEL = {
+  land: 'Land province', sea: 'Sea zone', wasteland: 'Wasteland (impassable)', mountain: 'Mountains (impassable)', lake: 'Lake',
+};
 
 export function ProvincePanel() {
   const map = mapData.value;

@@ -147,6 +147,52 @@ for (const [kind, rows] of groups) {
   }
 }
 
+// --- 2b. Impassable mountain ranges (data/map/mountains.yaml) ------------------------------------
+// Each range is a polyline with a width in km. Its pixels become a fixed 'mountain' province: it does not
+// grow, nothing grows into it, and district snapping leaves it alone. Gaps between lines are passes.
+const mountainMask = new Uint8Array(W * H);
+{
+  type Range = { name: string; width_km: number; lines: [number, number][][] };
+  const ranges = (parse(readFileSync('data/map/mountains.yaml', 'utf8')) ?? []) as Range[];
+  const kmPerPxM = ((projection.north - projection.south) * 111.32) / H;
+  const seedPixels = new Set<number>();
+  for (const [, [x, y]] of seedPixel) seedPixels.add(y * W + x);
+  for (const range of ranges) {
+    const id = defs.length + 1;
+    const key = 'mtn_' + range.name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    defs.push({ id, key, name: range.name, kind: 'mountain' });
+    medium[id] = 1;
+    maxCost[id] = 0;
+    slow[id] = true;
+    const r = Math.max(1, range.width_km / kmPerPxM / 2);
+    let first = -1;
+    for (const line of range.lines) {
+      const pts = line.map(([lat, lon]) => lonLatToPixel(projection, lon, lat));
+      for (let s = 0; s + 1 < pts.length; s++) {
+        const [x0, y0] = pts[s]!;
+        const [x1, y1] = pts[s + 1]!;
+        const steps = Math.ceil(Math.hypot(x1 - x0, y1 - y0));
+        for (let i = 0; i <= steps; i++) {
+          const cx = x0 + ((x1 - x0) * i) / steps;
+          const cy = y0 + ((y1 - y0) * i) / steps;
+          for (let y = Math.floor(cy - r); y <= Math.ceil(cy + r); y++) {
+            for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) {
+              if (x < 0 || y < 0 || x >= W || y >= H || (x - cx) ** 2 + (y - cy) ** 2 > r * r) continue;
+              const p = y * W + x;
+              if (!land[p] || seedPixels.has(p) || owner[p]! > 0) continue;
+              owner[p] = id;
+              dist[p] = 0;
+              mountainMask[p] = 1;
+              if (first < 0) first = p;
+            }
+          }
+        }
+      }
+    }
+    if (first >= 0) seedPixel.set(id, [first % W, Math.floor(first / W)]);
+  }
+}
+
 // --- 3. Noise-weighted multi-source growth (Dial's algorithm) ---------------------------------
 // Each step costs 10 (straight) or 14 (diagonal) times a smooth noise factor, so borders wander
 // like real ones instead of forming straight Voronoi lines. A seed with a radius stops growing at
@@ -324,13 +370,18 @@ for (let start = 0; start < W * H; start++) {
   let id: number;
   if (m === 1) {
     id = nearestLandProvince(start % W, Math.floor(start / W));
-  } else if (comp.length >= MIN_LAKE_PIXELS) {
-    lakeCount++;
-    id = defs.length + 1;
+  } else if (comp.length >= MIN_LAKE_PIXELS || comp.some((p) => waterName[p]! > 0)) {
+    // Named lakes from water.yaml are kept whatever their size; pieces of one named lake share a province.
     const named = water[comp.map((p) => waterName[p]!).find((n) => n > 0)! - 1]?.name;
     const slug = named?.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_');
-    const key = slug ? 'lake_' + slug : `lake_${lakeCount}`;
-    defs.push({ id, key, name: named ?? `Lake ${lakeCount}`, kind: 'lake' });
+    const existing = slug ? defs.find((d) => d.key === 'lake_' + slug) : undefined;
+    if (existing) {
+      id = existing.id;
+    } else {
+      lakeCount++;
+      id = defs.length + 1;
+      defs.push({ id, key: slug ? 'lake_' + slug : `lake_${lakeCount}`, name: named ?? `Lake ${lakeCount}`, kind: 'lake' });
+    }
   } else {
     id = touching || nearestLandProvince(start % W, Math.floor(start / W));
     for (const p of comp) land[p] = 1;
@@ -398,7 +449,8 @@ if (existsSync(BOUNDARY_DIR)) {
   }
   for (let p = 0; p < W * H; p++) {
     const t = target[district[p]!]!;
-    if (t && land[p] && !corridor[p]) owner[p] = t; // corridors keep the province that grew along them
+    // Corridors keep the province that grew along them; mountains are never snapped away.
+    if (t && land[p] && !corridor[p] && !mountainMask[p]) owner[p] = t;
   }
   console.log(`Snapped ${snappedDistricts} of ${districtCount} districts to provinces.`);
 }
@@ -446,13 +498,88 @@ if (existsSync(BOUNDARY_DIR)) {
   console.log(`Merged ${merged} stranded fragments into neighbouring provinces.`);
 }
 
+// --- 4d. Every settled province reachable by land ------------------------------------------------
+// Mountains and deserts can wall in a valley that was reachable in reality. For each group of settled
+// provinces cut off from the main landmass, cut the shortest pass (fewest mountain or wasteland pixels)
+// to the main landmass and give it to the walled-in province. Islands have no land path and stay islands.
+{
+  const PASS_HALF_WIDTH_PX = 2;
+  const MAX_PASS_PX = 400;
+  const settled = (o: number) => o > 0 && medium[o] === 1 && !slow[o];
+  const parent = Array.from({ length: defs.length + 1 }, (_, i) => i);
+  const find = (i: number): number => (parent[i] === i ? i : (parent[i] = find(parent[i]!)));
+  const union = (a: number, b: number) => { parent[find(a)] = find(b); };
+  for (let p = 0; p < W * H; p++) {
+    const o = owner[p]!;
+    if (!settled(o)) continue;
+    const x = p % W;
+    if (x + 1 < W && settled(owner[p + 1]!) && owner[p + 1] !== o) union(o, owner[p + 1]!);
+    if (p + W < W * H && settled(owner[p + W]!) && owner[p + W] !== o) union(o, owner[p + W]!);
+  }
+  const size = new Map<number, number>();
+  for (const d of defs) if (settled(d.id)) size.set(find(d.id), (size.get(find(d.id)) ?? 0) + 1);
+  const mainRoot = [...size].sort((a, b) => b[1] - a[1])[0]![0];
+
+  let passes = 0;
+  for (const d of defs) {
+    if (!settled(d.id) || find(d.id) === find(mainRoot)) continue;
+    const root = find(d.id);
+    // 0-1 BFS from every pixel of this group; stepping onto a non-settled land pixel costs 1.
+    const cost = new Map<number, number>();
+    const prev = new Map<number, number>();
+    const deque: number[] = [];
+    for (let p = 0; p < W * H; p++) {
+      if (settled(owner[p]!) && find(owner[p]!) === root) { cost.set(p, 0); prev.set(p, -1); deque.push(p); }
+    }
+    let target = -1;
+    let head = 0;
+    const front: number[] = [];
+    while (head < deque.length || front.length) {
+      const p = front.length ? front.pop()! : deque[head++]!;
+      const c = cost.get(p)!;
+      if (c > MAX_PASS_PX) break;
+      if (settled(owner[p]!) && find(owner[p]!) === find(mainRoot)) { target = p; break; }
+      for (const q of neighbours(p)) {
+        if (!land[q]) continue;
+        const step = settled(owner[q]!) ? 0 : 1;
+        if (cost.has(q) && cost.get(q)! <= c + step) continue;
+        cost.set(q, c + step);
+        prev.set(q, p);
+        if (step === 0) front.push(q); else deque.push(q);
+      }
+    }
+    if (target < 0) continue; // an island
+    let from = target;
+    while (prev.get(from)! !== -1) from = prev.get(from)!;
+    const passOwner = owner[from]!;
+    for (let p = target; p !== -1; p = prev.get(p)!) {
+      if (settled(owner[p]!)) continue;
+      const cx = p % W, cy = (p - cx) / W;
+      for (let dy = -PASS_HALF_WIDTH_PX; dy <= PASS_HALF_WIDTH_PX; dy++) {
+        for (let dx = -PASS_HALF_WIDTH_PX; dx <= PASS_HALF_WIDTH_PX; dx++) {
+          const x = cx + dx, y = cy + dy;
+          if (x < 0 || y < 0 || x >= W || y >= H) continue;
+          const q = y * W + x;
+          if (land[q] && !settled(owner[q]!)) owner[q] = passOwner;
+        }
+      }
+    }
+    union(root, mainRoot);
+    passes++;
+  }
+  console.log(`Cut ${passes} passes to walled-in provinces.`);
+}
+
 // --- 5. Colours and output --------------------------------------------------------------------
 const rng = createRng(1302);
 const used = new Set<number>([0]);
 function pick(kind: ProvinceKind): number {
   for (;;) {
     let r: number, g: number, b: number;
-    if (kind === 'sea' || kind === 'lake') {
+    if (kind === 'mountain') {
+      const base = 70 + nextInt(rng, 40);
+      r = base + 10 + nextInt(rng, 10); g = base + nextInt(rng, 10); b = base - 5 + nextInt(rng, 10);
+    } else if (kind === 'sea' || kind === 'lake') {
       r = nextInt(rng, 50); g = 60 + nextInt(rng, 90); b = 160 + nextInt(rng, 96);
     } else if (kind === 'wasteland') {
       const base = 120 + nextInt(rng, 50);

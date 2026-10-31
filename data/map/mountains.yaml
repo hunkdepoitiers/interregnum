@@ -1,0 +1,187 @@
+# Impassable mountain ranges, traced from the CK3 terrain map mode (dark, red-rimmed peaks).
+# Each range: a name, a width in km and one or more polylines of [lat, lon]. tools/seed-map.ts paints them
+# as fixed 'mountain' provinces. Leave a gap between lines wherever a historical pass crosses the range.
+
+# ---------------------------------------------------------------- Iberia
+- name: Cantabrian Mountains
+  width_km: 22
+  lines:
+    - [[43.00, -6.80], [43.05, -6.10], [43.10, -5.40], [43.05, -4.70]]
+- name: Pyrenees              # Roncesvalles (west) and the Cerdanya and coastal routes (east) stay open
+  width_km: 26
+  lines:
+    - [[42.90, -0.95], [42.78, -0.30], [42.68, 0.40], [42.62, 1.10]]
+- name: Sierra de Gredos
+  width_km: 20
+  lines:
+    - [[40.25, -5.75], [40.30, -5.25], [40.35, -4.85]]
+- name: Sierra de Guadarrama   # the Somosierra pass between the two lines
+  width_km: 18
+  lines:
+    - [[40.70, -4.25], [40.85, -3.95]]
+    - [[41.05, -3.70], [41.20, -3.30]]
+- name: Serra da Estrela
+  width_km: 18
+  lines:
+    - [[40.40, -7.75], [40.25, -7.45], [40.10, -7.10]]
+- name: Sierra Nevada
+  width_km: 16
+  lines:
+    - [[37.07, -3.55], [37.08, -3.10], [37.05, -2.75]]
+
+# ---------------------------------------------------------------- The Alps
+- name: Western Alps          # Mont Cenis (45.25 N) and the Great St Bernard (45.87 N) stay open
+  width_km: 24
+  lines:
+    - [[44.25, 7.05], [44.55, 6.90], [44.90, 6.90], [45.10, 7.00]]
+    - [[45.40, 6.95], [45.75, 6.90]]
+- name: Pennine Alps          # the Simplon between this and the Bernese Alps
+  width_km: 24
+  lines:
+    - [[45.95, 7.35], [45.98, 7.80], [46.15, 8.00]]
+- name: Bernese Alps
+  width_km: 20
+  lines:
+    - [[46.40, 7.20], [46.50, 7.70], [46.55, 8.15]]
+- name: Rhaetian Alps         # the St Gotthard (8.57 E) west and the Brenner (11.5 E) east stay open
+  width_km: 24
+  lines:
+    - [[46.50, 8.85], [46.45, 9.40], [46.55, 10.00], [46.80, 10.50], [46.85, 11.15]]
+- name: Hohe Tauern
+  width_km: 26
+  lines:
+    - [[47.00, 11.90], [47.10, 12.50], [47.08, 13.10], [47.15, 13.60]]
+- name: Dolomites
+  width_km: 16
+  lines:
+    - [[46.40, 11.70], [46.45, 12.10]]
+- name: Julian Alps
+  width_km: 14
+  lines:
+    - [[46.40, 13.55], [46.35, 13.95]]
+
+# ---------------------------------------------------------------- Carpathians, Balkans, Italy
+- name: Tatra
+  width_km: 18
+  lines:
+    - [[49.18, 19.70], [49.20, 20.30]]
+- name: Eastern Carpathians
+  width_km: 20
+  lines:
+    - [[48.25, 24.20], [47.85, 24.80], [47.40, 25.30]]
+- name: Southern Carpathians  # the Red Tower pass (Olt, 24.27 E) between the two lines
+  width_km: 22
+  lines:
+    - [[45.35, 22.70], [45.40, 23.30], [45.50, 23.85]]
+    - [[45.58, 24.45], [45.60, 25.00], [45.50, 25.40]]
+- name: Balkan Mountains      # the Shipka pass (25.33 E) between the two lines
+  width_km: 16
+  lines:
+    - [[42.75, 24.10], [42.75, 25.00]]
+    - [[42.75, 25.65], [42.80, 26.20]]
+- name: Rila and Pirin
+  width_km: 16
+  lines:
+    - [[42.20, 23.40], [41.80, 23.45], [41.55, 23.55]]
+- name: Prokletije
+  width_km: 16
+  lines:
+    - [[42.50, 19.55], [42.60, 20.10]]
+- name: Pindus
+  width_km: 18
+  lines:
+    - [[40.10, 20.95], [39.75, 21.15], [39.30, 21.40]]
+- name: Olympus
+  width_km: 12
+  lines:
+    - [[40.15, 22.30], [40.00, 22.40]]
+- name: Apennines             # northern ridge above Tuscany and the Gran Sasso
+  width_km: 14
+  lines:
+    - [[44.25, 10.35], [44.10, 10.85]]
+    - [[42.55, 13.20], [42.40, 13.70]]
+
+# ---------------------------------------------------------------- Scandinavia
+- name: Jotunheimen and Dovre
+  width_km: 50
+  lines:
+    - [[60.60, 7.40], [61.40, 8.20], [62.20, 9.40]]
+- name: Hardangervidda
+  width_km: 40
+  lines:
+    - [[60.00, 7.00], [60.25, 7.70]]
+- name: Kjolen                # the Scandinavian spine; Trondheim-Jamtland road open at 63.3 N
+  width_km: 40
+  lines:
+    - [[63.70, 12.60], [64.60, 13.80], [65.80, 15.00], [66.80, 16.20]]
+    - [[67.40, 17.20], [68.20, 18.60], [69.00, 20.20]]
+
+# ---------------------------------------------------------------- Caucasus and Anatolia
+- name: Greater Caucasus      # the Darial gorge (44.6 E) and the Derbent shore stay open
+  width_km: 40
+  lines:
+    - [[43.55, 40.30], [43.25, 41.60], [42.95, 43.10], [42.80, 44.30]]
+    - [[42.65, 44.90], [42.30, 45.80], [41.95, 46.80], [41.55, 47.80]]
+- name: Pontic Alps
+  width_km: 18
+  lines:
+    - [[40.85, 40.80], [41.05, 41.45]]
+- name: Taurus Mountains      # the Cilician Gates (34.78 E) between the two lines
+  width_km: 22
+  lines:
+    - [[36.75, 31.90], [37.00, 32.60], [37.20, 33.40], [37.35, 34.30]]
+    - [[37.45, 35.10], [37.75, 35.80], [38.05, 36.50]]
+- name: Amanus Mountains
+  width_km: 14
+  lines:
+    - [[36.60, 36.15], [37.05, 36.45]]
+- name: Ararat
+  width_km: 16
+  lines:
+    - [[39.70, 44.30], [39.65, 44.60]]
+
+# ---------------------------------------------------------------- Iran and the Levant
+- name: Zagros Mountains      # the Khorasan road via Hulwan (34.4 N) stays open
+  width_km: 40
+  lines:
+    - [[37.10, 44.70], [36.40, 45.40], [35.70, 46.10], [35.00, 46.50]]
+    - [[33.90, 47.40], [33.20, 48.30], [32.50, 49.30], [31.60, 50.30], [30.70, 51.20]]
+- name: Alborz Mountains
+  width_km: 30
+  lines:
+    - [[36.70, 49.60], [36.30, 50.60], [36.00, 51.70], [35.95, 52.60], [36.10, 53.50]]
+- name: Mount Lebanon
+  width_km: 12
+  lines:
+    - [[34.40, 36.05], [33.90, 35.85], [33.60, 35.70]]
+- name: Sinai Mountains
+  width_km: 20
+  lines:
+    - [[28.95, 33.70], [28.45, 33.95]]
+
+# ---------------------------------------------------------------- Maghreb
+- name: High Atlas            # the Tizi n'Tichka pass (7.4 W) between the two lines
+  width_km: 34
+  lines:
+    - [[30.90, -8.90], [31.10, -8.10], [31.20, -7.70]]
+    - [[31.40, -7.05], [31.70, -6.20], [32.10, -5.30], [32.40, -4.50]]
+- name: Anti-Atlas
+  width_km: 24
+  lines:
+    - [[29.90, -9.00], [30.20, -8.20], [30.50, -7.30]]
+- name: Middle Atlas
+  width_km: 22
+  lines:
+    - [[33.20, -5.30], [33.60, -4.60], [33.95, -4.10]]
+- name: Rif
+  width_km: 16
+  lines:
+    - [[35.05, -5.15], [34.95, -4.35]]
+- name: Djurdjura
+  width_km: 14
+  lines:
+    - [[36.45, 3.95], [36.48, 4.45]]
+- name: Aures
+  width_km: 18
+  lines:
+    - [[35.20, 6.20], [35.35, 6.75]]

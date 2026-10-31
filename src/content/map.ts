@@ -22,7 +22,8 @@ export function lonLatToPixel(p: Projection, lon: number, lat: number): [number,
   return [(lon - p.west) * k * scale, (p.north - lat) * scale];
 }
 
-export const provinceKinds = ['land', 'sea', 'wasteland', 'lake'] as const;
+/** wasteland = impassable desert or taiga; mountain = impassable range (data/map/mountains.yaml). */
+export const provinceKinds = ['land', 'sea', 'wasteland', 'mountain', 'lake'] as const;
 export type ProvinceKind = (typeof provinceKinds)[number];
 
 export const definitionSchema = z.object({
