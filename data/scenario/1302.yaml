@@ -589,7 +589,8 @@ realms:
     government: feudal_monarchy
     color: "#2f9f6f"
     capital: tarnovo
-    provinces: [tarnovo, preslav, sofia, lovech, nikopol, varna, silistra, sliven]
+    provinces: [tarnovo, preslav, sofia, lovech, nikopol, varna, silistra, sliven,
+      kabyle, beroe]
   - key: vidin
     name: Despotate of Vidin
     rank: duchy
@@ -613,7 +614,8 @@ realms:
     provinces: [constantinople, rhaedestos, bizye, arkadiopolis, adrianople, kypsela, mosynopolis, drama,
       christoupolis, serres, thessalonica, chalkidiki, vodena, veria, kastoria, ohrid, berat, valona, plovdiv,
       mesembria, anchialos, gallipoli, lemnos, lesbos, chios, samos, kos, rhodes, mystras, monemvasia, chalcedon,
-      nicomedia, sakarya, nicaea, bursa, troad, abydos, philadelphia, smyrna, ephesus, heraclea]
+      nicomedia, sakarya, nicaea, bursa, troad, abydos, philadelphia, smyrna, ephesus, heraclea,
+      brysis, ainos, aytos, haskovo, smolyan, hadrianoi, lebedos]
   - key: epirus
     name: Despotate of Epirus
     rank: duchy
@@ -650,7 +652,8 @@ realms:
     government: feudal_monarchy
     color: "#d4c06a"
     capital: nicosia
-    provinces: [nicosia, famagusta]
+    provinces: [nicosia, famagusta,
+      soloi]
 
   # ---------------------------------------------------------------- Anatolia
   - key: ottomans
@@ -687,7 +690,8 @@ realms:
     government: beylik
     color: "#5f7f3f"
     capital: kutahya
-    provinces: [kutahya, usak, kula, denizli, kibyratis]
+    provinces: [kutahya, usak, kula, denizli, kibyratis,
+      hermos]
   - key: sahib_ata
     name: Sahib Ata Beylik
     rank: county
@@ -701,14 +705,16 @@ realms:
     government: beylik
     color: "#3f9fa6"
     capital: milas
-    provinces: [milas, mugla, aphrodisias, makri, lycia]
+    provinces: [milas, mugla, aphrodisias, makri, lycia,
+      patara]
   - key: hamid
     name: Hamid Beylik
     rank: county
     government: beylik
     color: "#6fcf9f"
     capital: egirdir
-    provinces: [egirdir, burdur, antalya, serik]
+    provinces: [egirdir, burdur, antalya, serik,
+      pamphylia]
   - key: eshref
     name: Eshref Beylik
     rank: county
@@ -722,7 +728,8 @@ realms:
     government: beylik
     color: "#3a6a8f"
     capital: karaman
-    provinces: [karaman, isaura, ermenek, eregli, alanya, anamur]  # Alanya and Anamur: GUESS
+    provinces: [karaman, isaura, ermenek, eregli, alanya, anamur,
+      trachea]  # Alanya and Anamur: GUESS
   - key: candar
     name: Candar Beylik
     rank: county
@@ -745,14 +752,16 @@ realms:
     capital: konya
     overlord: ilkhanate  # Mesud II, a Mongol puppet
     provinces: [konya, aksaray, nevsehir, kayseri, kirsehir, nigde, ankara, corum, amasya, tokat, niksar, sivas,
-      samsun, divrigi, karahisar_east, vezirkopru, zile, bozok, kochisar, gurun, goksun, gordion]
+      samsun, divrigi, karahisar_east, vezirkopru, zile, bozok, kochisar, gurun, goksun, gordion,
+      thebasion, pteria, charsianon, tzamandos, azysia, colopene]
   - key: trebizond
     name: Empire of Trebizond
     rank: empire
     government: feudal_monarchy
     color: "#d07ab0"
     capital: trebizond
-    provinces: [trebizond, rize, kerasous]
+    provinces: [trebizond, rize, kerasous,
+      chaldia, matzouka, tibarenia, chalybia]
   - key: cilicia
     name: Armenian Kingdom of Cilicia
     rank: kingdom
@@ -760,7 +769,8 @@ realms:
     color: "#d9774a"
     capital: sis
     overlord: ilkhanate
-    provinces: [sis, adana, tarsus, ayas, silifke]
+    provinces: [sis, adana, tarsus, ayas, silifke,
+      anazarbus, issus]
 
   # ---------------------------------------------------------------- The great powers of the east
   - key: mamluks
@@ -775,7 +785,8 @@ realms:
       farafra, dakhla, kharga, selima, farama, arish, sinai, firaun, ajdabiya, barca, cyrenaica, makhil, derna,
       tobruk, sullum, marsa_matruh, gaza, ramla, hebron, jerusalem, nablus, acre, safed, tyre, sidon, ajloun,
       hauran, kerak, maan, ayla, madyan, tabuk, tayma, wajh, wadi_al_qura, khaybar, medina, yanbu, damascus, baalbek, homs, hama, palmyra, tripoli_levant, tartus, latakia, maarra, aleppo, antioch, ayntab,
-      bira, marash, rahba]
+      bira, marash, rahba,
+      dawsar, manbij, cyrrhestica, qinnasrin, sukhna, qaryatayn]
   - key: mecca
     name: Sharifate of Mecca
     rank: duchy
@@ -797,7 +808,8 @@ realms:
       raqqa, baquba, khanaqin, baghdad, hilla, kufa, wasit, basra, ahvaz, shushtar, behbahan, kazerun, shiraz,
       lorestan, kermanshah, hamadan, isfahan, kashan, rayy, qazvin, sultaniyya, gilan, talesh, mazandaran, tabriz,
       maragha, urmia, ardabil, mughan, nakhichevan, siunik, karabakh, dvin, ani, arran, shirvan, baku, quba,
-      derbent]
+      derbent,
+      satala, derzene, speri, dzopk, degik, anzitene, mesopotamia_theme, ingilene, kogovit, bagrevand, basean, arsharunik, hark, aghiovit, moks, andzevatsik, amadiya, tall_basma, harran, upper_khabur, khabur, athur, haditha]
   - key: georgia
     name: Kingdom of Georgia
     rank: kingdom
@@ -805,14 +817,16 @@ realms:
     color: "#b34d4d"
     capital: tiflis
     overlord: ilkhanate
-    provinces: [tiflis, kakheti]
+    provinces: [tiflis, kakheti,
+      shirak, lori, hereti]
   - key: imereti
     name: Kingdom of Imereti
     rank: kingdom
     government: feudal_monarchy
     color: "#e8607a"
     capital: kutaisi
-    provinces: [kutaisi, abkhazia]
+    provinces: [kutaisi, abkhazia,
+      guria, egrisi]
   - key: samtskhe
     name: Principality of Samtskhe
     rank: county
@@ -820,7 +834,8 @@ realms:
     color: "#7ac0b0"
     capital: samtskhe
     overlord: ilkhanate
-    provinces: [samtskhe]
+    provinces: [samtskhe,
+      tao, artaani, klarjeti]
   - key: golden_horde
     name: Golden Horde
     rank: empire
