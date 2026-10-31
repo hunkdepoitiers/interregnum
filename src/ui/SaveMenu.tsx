@@ -1,4 +1,4 @@
-import { day, getSaveText, loadSaveText } from '../bridge/client';
+import { getSaveText, loadSaveText, status } from '../bridge/client';
 import { gunzipIfNeeded, gzip, platform } from '../platform';
 import { dayToDate } from '../sim/calendar';
 import { showToast } from './App';
@@ -15,7 +15,7 @@ async function guard(label: string, fn: () => Promise<string | void>) {
 }
 
 function fileName() {
-  const d = dayToDate(day.value);
+  const d = dayToDate(status.value.day);
   const pad = (n: number) => String(n).padStart(2, '0');
   return `interregnum-${d.year}-${pad(d.month)}-${pad(d.day)}.json.gz`;
 }

@@ -3,10 +3,12 @@ import type { Command } from '../sim/commands';
 import type { Speed } from '../sim/state';
 import type { FromWorker, ToWorker } from '../worker/protocol';
 
-/** Main-thread handle on the simulation worker. The UI reads these signals and never touches sim state. */
-export const day = signal(0);
-export const speed = signal<Speed>(2);
-export const paused = signal(true);
+/**
+ * Main-thread handle on the simulation worker. The UI reads this signal and never touches sim state.
+ * One object signal, replaced on every status message: with separate signals per field, a component
+ * only re-rendered when the day changed, so pause/speed changes showed one update late.
+ */
+export const status = signal<{ day: number; speed: Speed; paused: boolean }>({ day: 0, speed: 2, paused: true });
 
 const worker = new Worker(new URL('../worker/sim.worker.ts', import.meta.url), { type: 'module' });
 const pending = new Map<number, (msg: FromWorker) => void>();
@@ -15,9 +17,7 @@ let nextRequestId = 1;
 worker.onmessage = (e: MessageEvent<FromWorker>) => {
   const msg = e.data;
   if (msg.type === 'status') {
-    day.value = msg.day;
-    speed.value = msg.speed;
-    paused.value = msg.paused;
+    status.value = { day: msg.day, speed: msg.speed, paused: msg.paused };
     return;
   }
   pending.get(msg.requestId)?.(msg);

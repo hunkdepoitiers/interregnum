@@ -1,5 +1,5 @@
 import { useEffect } from 'preact/hooks';
-import { command, day, paused, speed } from '../bridge/client';
+import { command, status } from '../bridge/client';
 import { dayToDate, formatDate } from '../sim/calendar';
 import type { Speed } from '../sim/state';
 
@@ -22,29 +22,29 @@ export function TopBar() {
 
   return (
     <header class="topbar panel">
-      <span class="date">{formatDate(dayToDate(day.value))}</span>
+      <span class="date">{formatDate(dayToDate(status.value.day))}</span>
       <button
         class="playpause"
         title="Pause / resume (Space)"
-        aria-label={paused.value ? 'Resume' : 'Pause'}
+        aria-label={status.value.paused ? 'Resume' : 'Pause'}
         onClick={() => command({ type: 'togglePause' })}
       >
-        {paused.value ? '▶' : '❚❚'}
+        {status.value.paused ? '▶' : '❚❚'}
       </button>
       <span class="speeds" role="group" aria-label="Game speed">
         {SPEEDS.map((s) => (
           <button
             key={s}
-            class={s <= speed.value ? 'on' : ''}
+            class={s <= status.value.speed ? 'on' : ''}
             title={`Speed ${s} (key ${s})`}
-            aria-pressed={s === speed.value}
+            aria-pressed={s === status.value.speed}
             onClick={() => command({ type: 'setSpeed', speed: s })}
           >
             {s}
           </button>
         ))}
       </span>
-      {paused.value && <span class="paused-label">Paused</span>}
+      {status.value.paused && <span class="paused-label">Paused</span>}
     </header>
   );
 }
