@@ -1,0 +1,522 @@
+[
+  {
+    "iso": "PRT",
+    "level": "ADM2",
+    "units": 311,
+    "license": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+    "source": "Wikipedia",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/90a1d52/releaseData/gbOpen/PRT/ADM2/geoBoundaries-PRT-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "ESP",
+    "level": "ADM2",
+    "units": 52,
+    "license": "National Institute of Statistics (INE) Data License",
+    "source": "El Instituto Nacional de Estadstica",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ESP/ADM2/geoBoundaries-ESP-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "AND",
+    "level": "ADM1",
+    "units": 7,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AND/ADM1/geoBoundaries-AND-ADM1_simplified.geojson"
+  },
+  {
+    "iso": "FRA",
+    "level": "ADM2",
+    "units": 96,
+    "license": "Etalab Open License 2.0",
+    "source": "Institut national de l'information géographique et forestière (IGN-F)",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FRA/ADM2/geoBoundaries-FRA-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "MCO",
+    "level": "ADM2",
+    "units": 9,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MCO/ADM2/geoBoundaries-MCO-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "GBR",
+    "level": "ADM2",
+    "units": 216,
+    "license": "Open Government Licence v3.0",
+    "source": "Office for National Statistics Open Geography Portal",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GBR/ADM2/geoBoundaries-GBR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "IRL",
+    "level": "ADM2",
+    "units": 166,
+    "license": "Creative Commons Attribution 4.0 (CC BY 4.0)",
+    "source": "Ordce Survey Ireland",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IRL/ADM2/geoBoundaries-IRL-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "BEL",
+    "level": "ADM2",
+    "units": 11,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "Statistics Belgium",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BEL/ADM2/geoBoundaries-BEL-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "NLD",
+    "level": "ADM2",
+    "units": 344,
+    "license": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+    "source": "National Georegister",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NLD/ADM2/geoBoundaries-NLD-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "LUX",
+    "level": "ADM2",
+    "units": 105,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Public Domain",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LUX/ADM2/geoBoundaries-LUX-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "DEU",
+    "level": "ADM2",
+    "units": 38,
+    "license": "Data license Germany - Attribution - Version 2.0",
+    "source": "Federal Agency for Cartography and Geodesy",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DEU/ADM2/geoBoundaries-DEU-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "DNK",
+    "level": "ADM2",
+    "units": 98,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DNK/ADM2/geoBoundaries-DNK-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "NOR",
+    "level": "ADM2",
+    "units": 431,
+    "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "source": "Geonorge, Mapping Authority of Norway",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/NOR/ADM2/geoBoundaries-NOR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "SWE",
+    "level": "ADM2",
+    "units": 290,
+    "license": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SWE/ADM2/geoBoundaries-SWE-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "FIN",
+    "level": "ADM2",
+    "units": 70,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/FIN/ADM2/geoBoundaries-FIN-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "EST",
+    "level": "ADM2",
+    "units": 215,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/EST/ADM2/geoBoundaries-EST-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "LVA",
+    "level": "ADM2",
+    "units": 589,
+    "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "source": "Valsts zemes dienests",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LVA/ADM2/geoBoundaries-LVA-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "LTU",
+    "level": "ADM2",
+    "units": 60,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LTU/ADM2/geoBoundaries-LTU-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "POL",
+    "level": "ADM2",
+    "units": 380,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "Geoboundaries, OpenStreetMap",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/POL/ADM2/geoBoundaries-POL-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "CZE",
+    "level": "ADM2",
+    "units": 77,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CZE/ADM2/geoBoundaries-CZE-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "SVK",
+    "level": "ADM2",
+    "units": 79,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SVK/ADM2/geoBoundaries-SVK-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "AUT",
+    "level": "ADM2",
+    "units": 94,
+    "license": "Creative Commons Attribution-ShareAlike 2.0",
+    "source": "Federal Office for Metrology and Survey, Austria, Derived from ADM4 layer",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AUT/ADM2/geoBoundaries-AUT-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "CHE",
+    "level": "ADM2",
+    "units": 169,
+    "license": "Federal Office of Topography swisstopo License",
+    "source": "Federal Office of Topography swisstopo",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CHE/ADM2/geoBoundaries-CHE-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "LIE",
+    "level": "ADM1",
+    "units": 11,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LIE/ADM1/geoBoundaries-LIE-ADM1_simplified.geojson"
+  },
+  {
+    "iso": "ITA",
+    "level": "ADM2",
+    "units": 20,
+    "license": "Creative Commons Attribution 3.0 License",
+    "source": "ISTAT, National Institute of Statistics",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ITA/ADM2/geoBoundaries-ITA-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "SMR",
+    "level": "ADM1",
+    "units": 9,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SMR/ADM1/geoBoundaries-SMR-ADM1_simplified.geojson"
+  },
+  {
+    "iso": "MLT",
+    "level": "ADM1",
+    "units": 68,
+    "license": "Public Domain",
+    "source": "geoBoundaries, d-maps.com",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MLT/ADM1/geoBoundaries-MLT-ADM1_simplified.geojson"
+  },
+  {
+    "iso": "SVN",
+    "level": "ADM2",
+    "units": 213,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SVN/ADM2/geoBoundaries-SVN-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "HRV",
+    "level": "ADM2",
+    "units": 560,
+    "license": "Creative Commons Attribution-ShareAlike 2.0",
+    "source": "Open Street Map, geoBoundaries",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/HRV/ADM2/geoBoundaries-HRV-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "BIH",
+    "level": "ADM2",
+    "units": 12,
+    "license": "Public Domain",
+    "source": "Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/f549eab/releaseData/gbOpen/BIH/ADM2/geoBoundaries-BIH-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "SRB",
+    "level": "ADM2",
+    "units": 145,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SRB/ADM2/geoBoundaries-SRB-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "MNE",
+    "level": "ADM1",
+    "units": 23,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MNE/ADM1/geoBoundaries-MNE-ADM1_simplified.geojson"
+  },
+  {
+    "iso": "XKX",
+    "level": "ADM2",
+    "units": 38,
+    "license": "Creative Commons Attribution-ShareAlike 2.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/XKX/ADM2/geoBoundaries-XKX-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "ALB",
+    "level": "ADM2",
+    "units": 37,
+    "license": "Creative Commons Attribution 2.5 Generic",
+    "source": "geoBoundaries, Albania districts blank 2.svg",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ALB/ADM2/geoBoundaries-ALB-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "MKD",
+    "level": "ADM2",
+    "units": 84,
+    "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "source": "EuroGeographics, Regional IM Working Group - Europe",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MKD/ADM2/geoBoundaries-MKD-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "GRC",
+    "level": "ADM2",
+    "units": 14,
+    "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "source": "EuroGeoGraphics, Regional IM Working Group - Europe",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GRC/ADM2/geoBoundaries-GRC-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "BGR",
+    "level": "ADM2",
+    "units": 265,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikimedia",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BGR/ADM2/geoBoundaries-BGR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "ROU",
+    "level": "ADM2",
+    "units": 3235,
+    "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "source": "Agentia Nationala de Cadastru si Publicitate Imobiliara",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ROU/ADM2/geoBoundaries-ROU-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "MDA",
+    "level": "ADM1",
+    "units": 37,
+    "license": "Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)",
+    "source": "UNHCR, OCHA FISS",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MDA/ADM1/geoBoundaries-MDA-ADM1_simplified.geojson"
+  },
+  {
+    "iso": "UKR",
+    "level": "ADM2",
+    "units": 495,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UKR/ADM2/geoBoundaries-UKR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "BLR",
+    "level": "ADM2",
+    "units": 118,
+    "license": "Creative Commons Attribution 3.0 License",
+    "source": "geoBoundaries, CIESIN",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/BLR/ADM2/geoBoundaries-BLR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "RUS",
+    "level": "ADM2",
+    "units": 2328,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RUS/ADM2/geoBoundaries-RUS-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "HUN",
+    "level": "ADM2",
+    "units": 198,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/HUN/ADM2/geoBoundaries-HUN-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "TUR",
+    "level": "ADM2",
+    "units": 999,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, OSM Boundaries",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUR/ADM2/geoBoundaries-TUR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "CYP",
+    "level": "ADM2",
+    "units": 612,
+    "license": "Creative Commons Attribution-ShareAlike 3.0 Unported",
+    "source": "Wikipedia, Cyprus Department of Land Registry and Geometry",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/CYP/ADM2/geoBoundaries-CYP-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "GEO",
+    "level": "ADM2",
+    "units": 68,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GEO/ADM2/geoBoundaries-GEO-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "ARM",
+    "level": "ADM2",
+    "units": 39,
+    "license": "Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)",
+    "source": "Government of Armenia, OCHA ROCCA",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ARM/ADM2/geoBoundaries-ARM-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "AZE",
+    "level": "ADM2",
+    "units": 79,
+    "license": "Creative Commons Attribution-ShareAlike 3.0 Unported",
+    "source": "Wikipedia",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/AZE/ADM2/geoBoundaries-AZE-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "IRN",
+    "level": "ADM2",
+    "units": 432,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IRN/ADM2/geoBoundaries-IRN-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "IRQ",
+    "level": "ADM2",
+    "units": 101,
+    "license": "Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)",
+    "source": "Iraq Central Statistics Office, OCHA Iraq",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IRQ/ADM2/geoBoundaries-IRQ-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "SYR",
+    "level": "ADM2",
+    "units": 61,
+    "license": "Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)",
+    "source": "United Nations Cartographic Section (UNCS) and United Nations Office for the Coordination of Humanitarian Affairs (UNOCHA), OCHA ROSC",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SYR/ADM2/geoBoundaries-SYR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "LBN",
+    "level": "ADM2",
+    "units": 26,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikipedia",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LBN/ADM2/geoBoundaries-LBN-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "ISR",
+    "level": "ADM2",
+    "units": 15,
+    "license": "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ISR/ADM2/geoBoundaries-ISR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "PSE",
+    "level": "ADM2",
+    "units": 16,
+    "license": "Creative Commons Attribution 4.0 (CC BY 4.0)",
+    "source": "Open Data Watch",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/PSE/ADM2/geoBoundaries-PSE-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "JOR",
+    "level": "ADM2",
+    "units": 52,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/JOR/ADM2/geoBoundaries-JOR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "SAU",
+    "level": "ADM2",
+    "units": 147,
+    "license": "Creative Commons Attribution-ShareAlike 2.0",
+    "source": "geoBoundaries, OpenStreetMap",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SAU/ADM2/geoBoundaries-SAU-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "KWT",
+    "level": "ADM2",
+    "units": 138,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KWT/ADM2/geoBoundaries-KWT-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "EGY",
+    "level": "ADM2",
+    "units": 365,
+    "license": "Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)",
+    "source": "OCHA ROMENA/HDX, Central Agency for Public Mobilization and Statistics (CAPMAS)",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/EGY/ADM2/geoBoundaries-EGY-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "LBY",
+    "level": "ADM1",
+    "units": 22,
+    "license": "Public Domain",
+    "source": "Natural Earth",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/LBY/ADM1/geoBoundaries-LBY-ADM1_simplified.geojson"
+  },
+  {
+    "iso": "TUN",
+    "level": "ADM2",
+    "units": 264,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUN/ADM2/geoBoundaries-TUN-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "DZA",
+    "level": "ADM2",
+    "units": 48,
+    "license": "Public Domain",
+    "source": "geoBoundaries, Wikimedia Commons",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/DZA/ADM2/geoBoundaries-DZA-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "MAR",
+    "level": "ADM2",
+    "units": 75,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/MAR/ADM2/geoBoundaries-MAR-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "KAZ",
+    "level": "ADM2",
+    "units": 174,
+    "license": "Open Data Commons Open Database License 1.0",
+    "source": "OpenStreetMap, Wambacher",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/KAZ/ADM2/geoBoundaries-KAZ-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "TKM",
+    "level": "ADM2",
+    "units": 66,
+    "license": "Creative Commons Attribution-ShareAlike 3.0 Unported",
+    "source": "CIESIN",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TKM/ADM2/geoBoundaries-TKM-ADM2_simplified.geojson"
+  },
+  {
+    "iso": "SDN",
+    "level": "ADM2",
+    "units": 189,
+    "license": "Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)",
+    "source": "OCHA ROSEA, Information Management Working Group",
+    "url": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/SDN/ADM2/geoBoundaries-SDN-ADM2_simplified.geojson"
+  }
+]

@@ -125,3 +125,16 @@ ul.plain { list-style: none; margin: 0; padding: 0; }
   .mapmodes { bottom: 60px; left: 8px; }
   .side-panel { bottom: 108px; }
 }
+
+.credits {
+  position: absolute;
+  right: 14px;
+  bottom: 58px;
+  font-size: 11px;
+  color: rgba(240, 228, 202, 0.75);
+  text-decoration: none;
+}
+.credits:hover { color: #fff4e0; text-decoration: underline; }
+@media (max-width: 640px) {
+  .credits { right: auto; left: 8px; bottom: 104px; font-size: 10px; }
+}

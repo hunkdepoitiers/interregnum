@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint .",
-    "seed-map": "tsx tools/seed-map.ts"
+    "seed-map": "tsx tools/seed-map.ts",
+    "fetch-boundaries": "tsx tools/fetch-boundaries.ts"
   },
   "dependencies": {
     "@preact/signals": "2.11.4",

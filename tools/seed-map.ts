@@ -6,7 +6,7 @@
  *
  * Usage: npm run seed-map [-- --force]   (refuses to overwrite an existing provinces.png without --force)
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { parse } from 'yaml';
 import { lonLatToPixel, projectionSchema, projectionSize, seedsSchema, type ProvinceKind } from '../src/content/map';
@@ -33,7 +33,8 @@ type Geometry = { type: 'Polygon'; coordinates: Ring[] } | { type: 'MultiPolygon
 const geo = JSON.parse(readFileSync(LAND_SOURCE, 'utf8')) as { features: { geometry: Geometry }[] };
 
 const land = new Uint8Array(W * H);
-function fillPolygon(rings: Ring[]) {
+/** Scanline-fills a polygon (outer ring + holes, even-odd) into `target` with `value`. */
+function fillPolygon(rings: Ring[], target: Uint8Array | Int32Array, value: number) {
   const rows = new Map<number, number[]>();
   for (const ring of rings) {
     const pts = ring.map(([lon, lat]) => lonLatToPixel(projection, lon, lat));
@@ -60,13 +61,13 @@ function fillPolygon(rings: Ring[]) {
     for (let i = 0; i + 1 < xs.length; i += 2) {
       const from = Math.max(0, Math.ceil(xs[i]! - 0.5));
       const to = Math.min(W - 1, Math.floor(xs[i + 1]! - 0.5));
-      for (let x = from; x <= to; x++) land[r * W + x] = 1;
+      for (let x = from; x <= to; x++) target[r * W + x] = value;
     }
   }
 }
 for (const { geometry } of geo.features) {
-  if (geometry.type === 'Polygon') fillPolygon(geometry.coordinates);
-  else for (const poly of geometry.coordinates) fillPolygon(poly);
+  if (geometry.type === 'Polygon') fillPolygon(geometry.coordinates, land, 1);
+  else for (const poly of geometry.coordinates) fillPolygon(poly, land, 1);
 }
 
 // --- 2. Seeds ---------------------------------------------------------------------------------
@@ -246,6 +247,107 @@ for (let start = 0; start < W * H; start++) {
     for (const p of comp) land[p] = 1;
   }
   for (const p of comp) owner[p] = id;
+}
+
+// --- 4b. Snap provinces to real district borders (geoBoundaries, see data/map/ATTRIBUTION.md) -----
+// A district holding one seed joins that seed's province; a district without seeds joins whichever
+// province already covers most of it. Districts with several seeds keep the grown borders inside them,
+// and mostly-desert districts are left alone so desert-edge provinces keep their radius-limited shape.
+const BOUNDARY_DIR = 'tools/vendor/geoboundaries';
+const MAX_WASTE_SHARE = 0.4;
+let snappedDistricts = 0;
+if (existsSync(BOUNDARY_DIR)) {
+  const district = new Int32Array(W * H);
+  let districtCount = 0;
+  for (const file of readdirSync(BOUNDARY_DIR).filter((f) => f.endsWith('.geojson')).sort()) {
+    const fc = JSON.parse(readFileSync(`${BOUNDARY_DIR}/${file}`, 'utf8')) as { features: { geometry: Geometry | null }[] };
+    for (const { geometry } of fc.features) {
+      if (!geometry) continue;
+      districtCount++;
+      const polys = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
+      for (const poly of polys) fillPolygon(poly, district, districtCount);
+    }
+  }
+
+  const seedsIn = new Map<number, Set<number>>();
+  for (const [id, [x, y]] of seedPixel) {
+    const d = district[y * W + x]!;
+    if (!d || medium[id] !== 1) continue;
+    let set = seedsIn.get(d);
+    if (!set) seedsIn.set(d, (set = new Set()));
+    set.add(id);
+  }
+  const counts: Map<number, number>[] = Array.from({ length: districtCount + 1 }, () => new Map());
+  for (let p = 0; p < W * H; p++) {
+    const d = district[p]!;
+    if (!d || !land[p] || owner[p]! <= 0) continue;
+    const c = counts[d]!;
+    c.set(owner[p]!, (c.get(owner[p]!) ?? 0) + 1);
+  }
+  const target = new Int32Array(districtCount + 1);
+  for (let d = 1; d <= districtCount; d++) {
+    const here = seedsIn.get(d);
+    if (here && here.size > 1) continue;
+    let total = 0;
+    let waste = 0;
+    let best = 0;
+    let bestN = 0;
+    for (const [o, n] of counts[d]!) {
+      total += n;
+      if (slow[o]) waste += n;
+      if (n > bestN) { best = o; bestN = n; }
+    }
+    const t = here ? [...here][0]! : best;
+    if (!t || slow[t] || waste > total * MAX_WASTE_SHARE) continue;
+    target[d] = t;
+    snappedDistricts++;
+  }
+  for (let p = 0; p < W * H; p++) {
+    const t = target[district[p]!]!;
+    if (t && land[p]) owner[p] = t;
+  }
+  console.log(`Snapped ${snappedDistricts} of ${districtCount} districts to provinces.`);
+}
+
+// --- 4c. Keep each province in one piece ----------------------------------------------------------
+// Snapping can strand small pieces of a province; hand each piece without the seed to the land
+// province it borders most. Seedless islands (no land neighbours) stay where they are.
+{
+  const seen = new Uint8Array(W * H);
+  const stack = new Int32Array(W * H);
+  let merged = 0;
+  for (let start = 0; start < W * H; start++) {
+    const o = owner[start]!;
+    if (seen[start] || o <= 0 || medium[o] !== 1) continue;
+    const [sx, sy] = seedPixel.get(o) ?? [-1, -1];
+    const seedP = sy * W + sx;
+    const comp: number[] = [];
+    const border = new Map<number, number>();
+    let hasSeed = false;
+    let top = 0;
+    stack[top++] = start;
+    seen[start] = 1;
+    while (top) {
+      const p = stack[--top]!;
+      comp.push(p);
+      if (p === seedP) hasSeed = true;
+      for (const q of neighbours(p)) {
+        const oq = owner[q]!;
+        if (oq === o) {
+          if (!seen[q]) { seen[q] = 1; stack[top++] = q; }
+        } else if (oq > 0 && medium[oq] === 1) {
+          border.set(oq, (border.get(oq) ?? 0) + 1);
+        }
+      }
+    }
+    if (hasSeed || border.size === 0) continue;
+    let best = 0;
+    let bestN = 0;
+    for (const [n, c] of border) if (c > bestN) { best = n; bestN = c; }
+    for (const p of comp) owner[p] = best;
+    merged++;
+  }
+  console.log(`Merged ${merged} stranded fragments into neighbouring provinces.`);
 }
 
 // --- 5. Colours and output --------------------------------------------------------------------

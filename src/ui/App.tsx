@@ -112,6 +112,14 @@ export function App() {
       <RealmPanel />
       <MapModeBar />
       <SaveMenu />
+      <a
+        class="credits"
+        href="https://github.com/hunkdepoitiers/interregnum/blob/main/data/map/ATTRIBUTION.md"
+        target="_blank"
+        rel="noopener"
+      >
+        Map data: Natural Earth, geoBoundaries, © OpenStreetMap contributors (ODbL)
+      </a>
       {hoverProvince && (
         <div class="hover-tip" style={{ left: `${hovered.value.x + 14}px`, top: `${hovered.value.y + 14}px` }}>
           {hoverProvince.name}
