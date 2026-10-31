@@ -1,8 +1,13 @@
-/** Validates data/map and writes public/generated/{province-ids.png, map.json}. Runs as part of `npm run build`. */
+/**
+ * Validates data/map and writes public/generated/{province-ids.png, map.json, rivers.json}.
+ * Runs as part of `npm run build`.
+ */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { parse } from 'yaml';
-import { definitionsSchema, projectionSchema, projectionSize, straitsSchema, type MapData } from '../src/content/map';
+import {
+  definitionsSchema, lonLatToPixel, projectionSchema, projectionSize, straitsSchema, type MapData, type RiverData,
+} from '../src/content/map';
 import { buildMap, encodeIdMap } from './map-lib';
 
 const OUT_DIR = 'public/generated';
@@ -31,4 +36,13 @@ ids.data = Buffer.from(encodeIdMap(built.idMap));
 writeFileSync(`${OUT_DIR}/province-ids.png`, PNG.sync.write(ids, { colorType: 2 }));
 const mapData: MapData = { width: png.width, height: png.height, projection, provinces: built.provinces };
 writeFileSync(`${OUT_DIR}/map.json`, JSON.stringify(mapData));
-console.log(`build-map: ${built.provinces.length} provinces, ${built.warnings.length} warnings`);
+
+// Rivers (data/map/rivers.json, from tools/build-rivers.ts) converted to map pixels for the renderer.
+const riverSource = JSON.parse(readFileSync('data/map/rivers.json', 'utf8')) as { rivers: { name: string | null; rank: number; lines: [number, number][][] }[] };
+const rivers: RiverData = riverSource.rivers.map((r) => ({
+  name: r.name,
+  rank: r.rank,
+  lines: r.lines.map((l) => l.flatMap(([lat, lon]) => lonLatToPixel(projection, lon, lat).map((v) => Math.round(v * 10) / 10))),
+}));
+writeFileSync(`${OUT_DIR}/rivers.json`, JSON.stringify(rivers));
+console.log(`build-map: ${built.provinces.length} provinces, ${rivers.length} rivers, ${built.warnings.length} warnings`);

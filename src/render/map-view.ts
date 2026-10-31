@@ -1,7 +1,7 @@
 import {
-  Application, BufferImageSource, Container, Geometry, GlProgram, ImageSource, Mesh, Shader, UniformGroup,
+  Application, BufferImageSource, Container, Geometry, GlProgram, Graphics, ImageSource, Mesh, Shader, UniformGroup,
 } from 'pixi.js';
-import { lonLatToPixel, type MapData } from '../content/map';
+import { lonLatToPixel, type MapData, type RiverData } from '../content/map';
 import { LOOKUP_SIZE } from './map-modes';
 
 /**
@@ -125,6 +125,35 @@ export class MapView {
     this.bindInput();
   }
 
+  /** Draws rivers over the map. They are redrawn as the zoom changes so major rivers keep a visible width. */
+  setRivers(rivers: RiverData) {
+    this.rivers = rivers;
+    this.riverGraphics.eventMode = 'none';
+    this.world.addChild(this.riverGraphics);
+    this.drawRivers();
+  }
+
+  private rivers: RiverData = [];
+  private readonly riverGraphics = new Graphics();
+  private riverZoom = 0;
+
+  private drawRivers() {
+    const zoom = this.world.scale.x;
+    this.riverZoom = zoom;
+    const g = this.riverGraphics.clear();
+    for (const r of this.rivers) {
+      // Width in map pixels, but never thinner on screen than the minimum for this river's size.
+      const mapWidth = Math.max(1, 3.4 - r.rank * 0.3);
+      const minScreen = r.rank <= 3 ? 1.8 : r.rank <= 6 ? 1.2 : 0.8;
+      const width = Math.max(mapWidth, minScreen / zoom);
+      for (const line of r.lines) {
+        g.moveTo(line[0]!, line[1]!);
+        for (let i = 2; i < line.length; i += 2) g.lineTo(line[i]!, line[i + 1]!);
+        g.stroke({ width, color: 0x3d6f9a, alpha: 0.85, cap: 'round', join: 'round' });
+      }
+    }
+  }
+
   setHover(id: number) {
     this.uniforms.uniforms.uHover = id;
   }
@@ -182,6 +211,7 @@ export class MapView {
     const { width, height } = this.app.screen;
     const s = this.world.scale.x;
     this.uniforms.uniforms.uZoom = s;
+    if (this.rivers.length && Math.abs(s / this.riverZoom - 1) > 0.15) this.drawRivers();
     const mw = this.map.width * s;
     const mh = this.map.height * s;
     this.world.x = mw <= width ? (width - mw) / 2 : Math.min(0, Math.max(width - mw, this.world.x));

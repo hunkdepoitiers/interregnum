@@ -8,6 +8,7 @@ sources below are ODbL or share-alike. The game code is not covered by this; onl
 ## Sources
 
 - **Coastlines:** [Natural Earth](https://www.naturalearthdata.com/) 1:50m land, public domain.
+- **Rivers:** [Natural Earth](https://www.naturalearthdata.com/) 1:10m rivers and lake centerlines, public domain.
 - **District boundaries:** [geoBoundaries](https://www.geoboundaries.org/) gbOpen (Runfola et al. 2020, *geoBoundaries: A global
   database of political administrative boundaries*, PLoS ONE 15(4): e0231866), simplified geometries. Province borders
   are snapped to these districts. Per-country source, level and licence are listed in `boundary-sources.json`;

@@ -73,6 +73,9 @@ export interface MapProvince {
   coastal: boolean;
   adjacency: { id: number; border: number; strait?: true }[];
 }
+/** public/generated/rivers.json: polylines as flat [x0, y0, x1, y1, ...] in map pixels; rank 0 = largest. */
+export type RiverData = { name: string | null; rank: number; lines: number[][] }[];
+
 export interface MapData {
   width: number;
   height: number;

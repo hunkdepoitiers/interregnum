@@ -1,7 +1,7 @@
 import { computed, effect, signal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import { command, startGame, world } from '../bridge/client';
-import type { MapData } from '../content/map';
+import type { MapData, RiverData } from '../content/map';
 import type { Scenario } from '../content/scenario';
 import { buildLookup, hexToRgb, type MapMode } from '../render/map-modes';
 import { loadIdMap, MapView } from '../render/map-view';
@@ -89,12 +89,14 @@ export function App() {
       const { bitmap, ids } = await loadIdMap(`${base}generated/province-ids.png`, map.width, map.height);
       if (cancelled || !host.current) return;
       view = new MapView(map, ids, bitmap);
+      const riversReady = fetch(`${base}generated/rivers.json`).then((r) => r.json() as Promise<RiverData>);
       view.onHover = (id, x, y) => {
         view!.setHover(id);
         hovered.value = { id, x, y };
       };
       view.onClick = (id) => selectProvince(id);
       await view.mount(host.current);
+      view.setRivers(await riversReady);
       startGame(START_SEED, scenario);
       installDebugHooks(map);
       mapData.value = map;
