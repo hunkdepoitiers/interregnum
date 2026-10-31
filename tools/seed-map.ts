@@ -76,6 +76,13 @@ for (const { polygon } of water) {
   ring.push(ring[0]!);
   fillPolygon([ring], land, 0);
 }
+// Remembers which named water body each carved pixel belongs to, so the lakes they form get proper names.
+const waterName = new Int32Array(W * H);
+water.forEach(({ polygon }, i) => {
+  const ring: Ring = polygon.map(([lat, lon]) => [lon, lat]);
+  ring.push(ring[0]!);
+  fillPolygon([ring], waterName, i + 1);
+});
 
 // --- 2. Seeds ---------------------------------------------------------------------------------
 interface Def { id: number; key: string; name: string; kind: ProvinceKind }
@@ -112,6 +119,8 @@ const AVG_COST_PER_PX = 13;
 const radiusToCost = (km: number) => Math.round((km / kmPerPx) * AVG_COST_PER_PX);
 /** Wasteland grows this many times slower, so settled provinces win any ground within their radius. */
 const WASTELAND_SLOWDOWN = 2;
+/** Settled provinces never reach further than this unless their seed says otherwise; wasteland is unlimited. */
+const DEFAULT_MAX_RADIUS_KM = 300;
 
 const seedQueue: number[] = [];
 const groups: [ProvinceKind, typeof seeds.land][] = [
@@ -129,7 +138,7 @@ for (const [kind, rows] of groups) {
     const id = defs.length + 1;
     defs.push({ id, key, name, kind });
     medium[id] = wantLand;
-    maxCost[id] = radiusKm === undefined ? Infinity : radiusToCost(radiusKm);
+    maxCost[id] = kind === 'wasteland' ? Infinity : radiusToCost(radiusKm ?? (kind === 'land' ? DEFAULT_MAX_RADIUS_KM : Infinity));
     slow[id] = kind === 'wasteland';
     seedPixel.set(id, [p % W, Math.floor(p / W)]);
     owner[p] = id;
@@ -248,7 +257,10 @@ for (let start = 0; start < W * H; start++) {
   } else if (comp.length >= MIN_LAKE_PIXELS) {
     lakeCount++;
     id = defs.length + 1;
-    defs.push({ id, key: `lake_${lakeCount}`, name: `Lake ${lakeCount}`, kind: 'lake' });
+    const named = water[comp.map((p) => waterName[p]!).find((n) => n > 0)! - 1]?.name;
+    const slug = named?.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    const key = slug ? 'lake_' + slug : `lake_${lakeCount}`;
+    defs.push({ id, key, name: named ?? `Lake ${lakeCount}`, kind: 'lake' });
   } else {
     id = touching || nearestLandProvince(start % W, Math.floor(start / W));
     for (const p of comp) land[p] = 1;
@@ -347,7 +359,9 @@ if (existsSync(BOUNDARY_DIR)) {
         const oq = owner[q]!;
         if (oq === o) {
           if (!seen[q]) { seen[q] = 1; stack[top++] = q; }
-        } else if (oq > 0 && medium[oq] === 1) {
+        } else if (oq > 0 && medium[oq] === 1 && slow[oq] === slow[o]) {
+          // Wasteland pieces only join wasteland, settled pieces only settled land: a stray desert
+          // fragment must not turn a neighbouring province into a giant.
           border.set(oq, (border.get(oq) ?? 0) + 1);
         }
       }

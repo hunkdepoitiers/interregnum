@@ -1,7 +1,7 @@
 import {
   Application, BufferImageSource, Container, Geometry, GlProgram, ImageSource, Mesh, Shader, UniformGroup,
 } from 'pixi.js';
-import type { MapData } from '../content/map';
+import { lonLatToPixel, type MapData } from '../content/map';
 import { LOOKUP_SIZE } from './map-modes';
 
 /**
@@ -165,7 +165,8 @@ export class MapView {
     this.minZoom = Math.min(width / this.map.width, height / this.map.height);
     this.world.scale.set(this.minZoom * 2.5);
     // Start over the Aegean and western Anatolia, where 1302 begins.
-    this.centerOn(this.map.width * 0.68, this.map.height * 0.52);
+    const [x, y] = lonLatToPixel(this.map.projection, 27, 39);
+    this.centerOn(x, y);
   }
 
   private zoomAt(factor: number, sx: number, sy: number) {

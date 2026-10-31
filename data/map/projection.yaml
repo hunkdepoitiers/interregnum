@@ -1,8 +1,8 @@
 # Equirectangular projection with a standard parallel; x = (lon - west) * cos(stdParallel) * scale, y = (north - lat) * scale.
 # Changing any value invalidates provinces.png, so treat this as fixed once the map is hand-painted.
-width: 4096
+width: 3690   # keeps the height under 4096 px, the safe WebGL texture limit
 west: -11
 east: 54
-north: 61
+north: 71.2
 south: 20.5
 standardParallel: 45
