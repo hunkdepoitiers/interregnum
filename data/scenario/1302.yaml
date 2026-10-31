@@ -612,8 +612,8 @@ realms:
     capital: constantinople
     provinces: [constantinople, rhaedestos, bizye, arkadiopolis, adrianople, kypsela, mosynopolis, drama,
       christoupolis, serres, thessalonica, chalkidiki, vodena, veria, kastoria, ohrid, berat, valona, plovdiv,
-      mesembria, anchialos, gallipoli, lemnos, lesbos, chios, samos, kos, rhodes, mystras, monemvasia, nicomedia,
-      sakarya, nicaea, bursa, troad, philadelphia, smyrna, ephesus, heraclea]
+      mesembria, anchialos, gallipoli, lemnos, lesbos, chios, samos, kos, rhodes, mystras, monemvasia, chalcedon,
+      nicomedia, sakarya, nicaea, bursa, troad, abydos, philadelphia, smyrna, ephesus, heraclea]
   - key: epirus
     name: Despotate of Epirus
     rank: duchy
@@ -673,7 +673,7 @@ realms:
     government: beylik
     color: "#e3d36b"
     capital: manisa
-    provinces: [manisa]  # Manisa fell to Saruhan in 1313: GUESS
+    provinces: [manisa, thyatira]  # Manisa fell to Saruhan in 1313: GUESS
   - key: aydin
     name: Aydın Beylik
     rank: county
@@ -687,28 +687,28 @@ realms:
     government: beylik
     color: "#5f7f3f"
     capital: kutahya
-    provinces: [kutahya, usak, kula, denizli]
+    provinces: [kutahya, usak, kula, denizli, kibyratis]
   - key: sahib_ata
     name: Sahib Ata Beylik
     rank: county
     government: beylik
     color: "#bf5f8f"
     capital: karahisar
-    provinces: [karahisar, sivrihisar]
+    provinces: [karahisar, sivrihisar, amorium]
   - key: menteshe
     name: Menteshe Beylik
     rank: county
     government: beylik
     color: "#3f9fa6"
     capital: milas
-    provinces: [milas, mugla, makri, lycia]
+    provinces: [milas, mugla, aphrodisias, makri, lycia]
   - key: hamid
     name: Hamid Beylik
     rank: county
     government: beylik
     color: "#6fcf9f"
     capital: egirdir
-    provinces: [egirdir, burdur, antalya]
+    provinces: [egirdir, burdur, antalya, serik]
   - key: eshref
     name: Eshref Beylik
     rank: county
@@ -722,14 +722,14 @@ realms:
     government: beylik
     color: "#3a6a8f"
     capital: karaman
-    provinces: [karaman, ermenek, eregli, alanya, anamur]  # Alanya and Anamur: GUESS
+    provinces: [karaman, isaura, ermenek, eregli, alanya, anamur]  # Alanya and Anamur: GUESS
   - key: candar
     name: Candar Beylik
     rank: county
     government: beylik
     color: "#8f7fbf"
     capital: kastamonu
-    provinces: [kastamonu, cankiri, bolu]
+    provinces: [kastamonu, cankiri, bolu, hadrianopolis, amasra, taskopru]  # Amastris: GUESS
   - key: pervane
     name: Pervane Beylik
     rank: county
@@ -745,7 +745,7 @@ realms:
     capital: konya
     overlord: ilkhanate  # Mesud II, a Mongol puppet
     provinces: [konya, aksaray, nevsehir, kayseri, kirsehir, nigde, ankara, corum, amasya, tokat, niksar, sivas,
-      samsun, divrigi, karahisar_east]
+      samsun, divrigi, karahisar_east, vezirkopru, zile, bozok, kochisar, gurun, goksun, gordion]
   - key: trebizond
     name: Empire of Trebizond
     rank: empire
@@ -792,7 +792,7 @@ realms:
     capital: tabriz
     scripted: true
     # Vassal dynasts (Artuqids, Shirvanshahs, Hazaraspids, Bavandids) merged: GUESS
-    provinces: [erzincan, erzurum, bayburt, malatya, harput, elbistan, diyarbakir, hasankeyf, mardin, jazira, siirt,
+    provinces: [erzincan, erzurum, darende, samosata, bayburt, malatya, harput, elbistan, diyarbakir, hasankeyf, mardin, jazira, siirt,
       bitlis, mus, ahlat, van, hakkari, khoy, edessa, nisibis, sinjar, mosul, erbil, kirkuk, shahrizur, tikrit, anah,
       raqqa, baquba, khanaqin, baghdad, hilla, kufa, wasit, basra, ahvaz, shushtar, behbahan, kazerun, shiraz,
       lorestan, kermanshah, hamadan, isfahan, kashan, rayy, qazvin, sultaniyya, gilan, talesh, mazandaran, tabriz,

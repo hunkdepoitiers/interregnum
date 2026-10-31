@@ -17,7 +17,7 @@ Decisions so far: **EU-style colour bitmap map**, **PixiJS v8 (WebGL)** renderer
 7. **Readable depth, data-driven.** Every number has a breakdown; all content lives in YAML.
 
 ## 2. v1 scope
-- Map: Iberia to the Caspian edge, Scotland/Baltic down to Aswan and Mecca (map edge 20.5°N). Starter map: ~1,100 provinces (1,032 land, 63 sea zones, 21 wastelands) and 114 realms including vassals and tributaries, with 1302 borders checked against the Euratlas map of 1300. The province budget was raised to ~1,000 in M2; prune seeds in `data/map/seeds.yaml` or merge realms in `data/scenario/1302.yaml` if it proves too much. Ilkhanate and Golden Horde are scripted neighbours (data-driven timelines of tribute demands and invasions, simplified armies).
+- Map: Iberia to the Caspian edge, Scotland/Baltic down to Aswan and Mecca (map edge 20.5°N). Starter map: ~1,140 provinces (1,052 land, 63 sea zones, 21 wastelands) and 114 realms including vassals and tributaries, with 1302 borders checked against the Euratlas map of 1300. The province budget was raised to ~1,000 in M2; prune seeds in `data/map/seeds.yaml` or merge realms in `data/scenario/1302.yaml` if it proves too much. Ilkhanate and Golden Horde are scripted neighbours (data-driven timelines of tribute demands and invasions, simplified armies).
 - Start 27 July 1302 on the **Julian calendar** (historically correct: leap year every 4 years, so 1304 has 29 February). Daily tick, pause, 5 speeds.
 - Singleplayer, browser (Vercel static site); later a Tauri desktop build.
 
