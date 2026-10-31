@@ -74,6 +74,7 @@ interface Def { id: number; key: string; name: string; kind: ProvinceKind }
 const defs: Def[] = [];
 const medium: number[] = [0]; // 1 = grows over land, 0 = over water; index = province id
 const maxCost: number[] = [0]; // growth budget per province (Infinity = unlimited)
+const slow: boolean[] = [false]; // wasteland: grows slower than settled land
 const seedPixel = new Map<number, [number, number]>();
 const owner = new Int32Array(W * H);
 const dist = new Int32Array(W * H).fill(0x7fffffff);
@@ -96,9 +97,13 @@ function snap(px: number, py: number, wantLand: number): number | null {
   return null;
 }
 
-// Growth cost is measured in tenths of a pixel; see STEP_COST below.
+// Growth cost per pixel averages ~13 once noise and diagonal steps are counted (see section 3),
+// so a seed radius in km converts to a cost budget with that factor.
 const kmPerPx = ((projection.north - projection.south) * 111.32) / H;
-const radiusToCost = (km: number) => Math.round((km / kmPerPx) * 10);
+const AVG_COST_PER_PX = 13;
+const radiusToCost = (km: number) => Math.round((km / kmPerPx) * AVG_COST_PER_PX);
+/** Wasteland grows this many times slower, so settled provinces win any ground within their radius. */
+const WASTELAND_SLOWDOWN = 2;
 
 const seedQueue: number[] = [];
 const groups: [ProvinceKind, typeof seeds.land][] = [
@@ -117,6 +122,7 @@ for (const [kind, rows] of groups) {
     defs.push({ id, key, name, kind });
     medium[id] = wantLand;
     maxCost[id] = radiusKm === undefined ? Infinity : radiusToCost(radiusKm);
+    slow[id] = kind === 'wasteland';
     seedPixel.set(id, [p % W, Math.floor(p / W)]);
     owner[p] = id;
     dist[p] = 0;
@@ -154,7 +160,7 @@ for (let y = 0; y < H; y++) {
   }
 }
 
-const BUCKETS = 64; // larger than the biggest single step cost (16 * 1.4 + 1)
+const BUCKETS = 64; // larger than the biggest single step cost (16 * 1.4 * WASTELAND_SLOWDOWN + 1)
 const buckets: number[][] = Array.from({ length: BUCKETS }, () => []);
 for (const p of seedQueue) buckets[0]!.push(p);
 let pending = seedQueue.length;
@@ -180,7 +186,8 @@ for (let d = 0; pending > 0; d++) {
       if (land[q] !== m) continue;
       // Don't slip diagonally between two pixels of the other medium (keeps provinces 4-connected).
       if (diagonal && land[y * W + nx] !== m && land[ny * W + x] !== m) continue;
-      const step = diagonal ? Math.round(terrainCost[q]! * 1.4) : terrainCost[q]!;
+      const base = diagonal ? Math.round(terrainCost[q]! * 1.4) : terrainCost[q]!;
+      const step = slow[id] ? base * WASTELAND_SLOWDOWN : base;
       const nd = d + step;
       if (nd >= dist[q]! || nd > maxCost[id]!) continue;
       dist[q] = nd;

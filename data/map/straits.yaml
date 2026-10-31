@@ -1,4 +1,4 @@
-# Extra land-to-land adjacencies across water. Armies may cross these; everywhere else needs ships (not in v1).
+# Extra land-to-land adjacencies: straits armies may cross, and caravan routes across the desert.
 - [constantinople, nicomedia]   # Bosporus
 - [gallipoli, adramyttion]      # Dardanelles
 - [messina, reggio]             # Strait of Messina
@@ -6,3 +6,12 @@
 - [roskilde, scania]            # Øresund
 - [caffa, zichia]               # Kerch Strait
 - [otranto, valona]             # Strait of Otranto
+# Caravan routes linking the Egyptian oases to the Nile and the coast.
+- [siwa, marsa_matruh]
+- [siwa, bahriya]
+- [bahriya, minya]
+- [bahriya, farafra]
+- [farafra, dakhla]
+- [dakhla, kharga]
+- [kharga, asyut]
+- [kharga, selima]

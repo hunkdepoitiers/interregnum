@@ -69,30 +69,37 @@ realms:
     government: iqta_sultanate
     color: "#b7724a"
     capital: fez
-    provinces: [fez, meknes, taza, debdou, marrakesh, tadla, haha, safi, azemmour, sale, larache, tangier, ceuta,
-      badis, melilla, sous, sijilmasa]  # Ceuta under the Azafids: GUESS
+    # Ceuta under the Azafids: GUESS
+    provinces: [fez, meknes, sefrou, taza, wargha, ghomara, gharb, debdou, misur, fazaz, marrakesh, hawz, tadla,
+      haha, shishawa, safi, azemmour, sale, larache, tangier, ceuta, badis, melilla, agadir, sous, massa, iligh,
+      ifni, aqqa, draa, warzazat, tudgha]
   - key: zayyanids
     name: Zayyanid Kingdom of Tlemcen
     rank: kingdom
     government: iqta_sultanate
     color: "#7d8f3a"
     capital: tlemcen
-    provinces: [tlemcen, oran, mostaganem, cherchell, algiers, titteri]  # under Marinid siege 1299-1307
+    # under Marinid siege 1299-1307
+    provinces: [tlemcen, fakkan, oran, mostaganem, tahert, lawata, tanas, cherchell, miliyana, algiers, titteri,
+      ashir]
   - key: bougie
     name: Hafsid Sultanate of Bougie
     rank: kingdom
     government: iqta_sultanate
     color: "#5fa8a0"
     capital: bejaia
-    provinces: [bejaia, dellys, jijel, setif, constantine, bona, biskra]  # separate Hafsid branch until 1309
+    # separate Hafsid branch until 1309
+    provinces: [bejaia, dellys, koukou, jijel, setif, hodna, bou_saada, tubna, bilizma, constantine, tifash, bona,
+      biskra, nemencha]
   - key: hafsids
     name: Hafsid Caliphate of Tunis
     rank: kingdom
     government: iqta_sultanate
-    color: "#d58a5b"
+    color: "#a8558a"
     capital: tunis
-    provinces: [tunis, bizerte, beja_tn, tebessa, kairouan, sousse, mahdia, sfax, gafsa, gabes, nafusa,
-      tripoli_libya, misrata, sirte]
+    provinces: [tunis, bizerte, tabarqa, beja_tn, zaghwan, nabeul, silyana, tebessa, qamuda, kairouan, sousse,
+      mahdia, sfax, gafsa, qashtiliya, souf, nefzaoua, gabes, bir_amir, jafara, nafusa, tripoli_libya, labda,
+      misrata, sirte]
 
   # ---------------------------------------------------------------- France and the Low Countries
   - key: france
@@ -763,11 +770,20 @@ realms:
     color: "#e2c26f"
     capital: cairo
     # The Hejaz and Barka (Cyrenaica) under loose Mamluk suzerainty: GUESS
-    provinces: [cairo, alexandria, damietta, sharqiya, gharbiya, buhayra, fayyum, beni_suef, minya, ashmunein,
-      asyut, akhmim, qus, esna, kom_ombo, aswan, ajdabiya, barca, derna, tobruk, marsa_matruh, gaza, ramla, hebron,
-      jerusalem, nablus, acre, safed, tyre, sidon, ajloun, hauran, kerak, ayla, tabuk, wadi_al_qura, medina, yanbu,
-      damascus, baalbek, homs, hama, palmyra, tripoli_levant, tartus, latakia, maarra, aleppo, antioch, ayntab,
+    provinces: [cairo, alexandria, damietta, sharqiya, gharbiya, buhayra, fayyum, atfih, beni_suef, minya,
+      ashmunein, asyut, akhmim, qina, qus, esna, kom_ombo, aswan, qusayr, jabal_quzlum, qulzum, siwa, bahriya,
+      farafra, dakhla, kharga, selima, farama, arish, sinai, firaun, ajdabiya, barca, cyrenaica, makhil, derna,
+      tobruk, sullum, marsa_matruh, gaza, ramla, hebron, jerusalem, nablus, acre, safed, tyre, sidon, ajloun,
+      hauran, kerak, maan, ayla, madyan, tabuk, tayma, wajh, wadi_al_qura, khaybar, medina, yanbu, damascus, baalbek, homs, hama, palmyra, tripoli_levant, tartus, latakia, maarra, aleppo, antioch, ayntab,
       bira, marash, rahba]
+  - key: mecca
+    name: Sharifate of Mecca
+    rank: duchy
+    government: theocracy
+    color: "#3f8f6f"
+    capital: mecca
+    overlord: mamluks
+    provinces: [mecca]
   - key: ilkhanate
     name: Ilkhanate
     rank: empire
