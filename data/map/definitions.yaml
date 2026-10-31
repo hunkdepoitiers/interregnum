@@ -528,7 +528,7 @@
 - { id: 526, key: benevento, name: "Benevento", kind: land, color: "#9d3463" }
 - { id: 527, key: salerno, name: "Salerno", kind: land, color: "#e0304b" }
 - { id: 528, key: capitanata, name: "Capitanata", kind: land, color: "#77738f" }
-- { id: 529, key: otranto, name: "Otranto", kind: land, color: "#c8c44f" }
+- { id: 529, key: otranto, name: "Lecce", kind: land, color: "#c8c44f" }
 - { id: 530, key: basilicata, name: "Basilicata", kind: land, color: "#df97ca" }
 - { id: 531, key: reggio, name: "Reggio", kind: land, color: "#b4e0c4" }
 - { id: 532, key: agrigento, name: "Agrigento", kind: land, color: "#c5366a" }
@@ -1567,89 +1567,269 @@
 - { id: 1565, key: trsat, name: "Trsat", kind: land, color: "#84c071" }
 - { id: 1566, key: krk, name: "Krk", kind: land, color: "#c8979a" }
 - { id: 1567, key: gacka, name: "Gacka", kind: land, color: "#b97929" }
-- { id: 1568, key: fezzan, name: "Fezzan", kind: wasteland, color: "#9e969f" }
-- { id: 1569, key: grand_erg, name: "Grand Erg", kind: wasteland, color: "#807f7f" }
-- { id: 1570, key: erg_oriental, name: "Eastern Erg", kind: wasteland, color: "#a39ea4" }
-- { id: 1571, key: hamada, name: "Hamada al-Hamra", kind: wasteland, color: "#93908c" }
-- { id: 1572, key: calanscio, name: "Calanscio Sand Sea", kind: wasteland, color: "#82827b" }
-- { id: 1573, key: eastern_desert, name: "Eastern Desert", kind: wasteland, color: "#a7abac" }
-- { id: 1574, key: nafud, name: "Nafud", kind: wasteland, color: "#8c8787" }
-- { id: 1575, key: iraqi_desert, name: "Western Iraqi Desert", kind: wasteland, color: "#8a8984" }
-- { id: 1576, key: ustyurt, name: "Ustyurt", kind: wasteland, color: "#a1a0a3" }
-- { id: 1577, key: kavir_namak, name: "Central Iranian Desert", kind: wasteland, color: "#7b797c" }
-- { id: 1578, key: sahara_west, name: "Western Sahara", kind: wasteland, color: "#a39ba1" }
-- { id: 1579, key: sahara_central, name: "Central Sahara", kind: wasteland, color: "#939096" }
-- { id: 1580, key: libyan_desert, name: "Libyan Desert", kind: wasteland, color: "#a2a9a8" }
-- { id: 1581, key: western_desert, name: "Western Desert", kind: wasteland, color: "#959697" }
-- { id: 1582, key: high_atlas, name: "High Atlas", kind: wasteland, color: "#aaaeab" }
-- { id: 1583, key: arabian_desert, name: "Arabian Desert", kind: wasteland, color: "#999b99" }
-- { id: 1584, key: syrian_desert, name: "Syrian Desert", kind: wasteland, color: "#aba9ad" }
-- { id: 1585, key: dasht_e_kavir, name: "Dasht-e Kavir", kind: wasteland, color: "#828386" }
-- { id: 1586, key: saharan_atlas, name: "Saharan Atlas", kind: wasteland, color: "#a4a4a3" }
-- { id: 1587, key: nubian_desert, name: "Nubian Desert", kind: wasteland, color: "#a5a5a9" }
-- { id: 1588, key: southern_hejaz, name: "Southern Hejaz", kind: wasteland, color: "#828282" }
-- { id: 1589, key: celtic_sea, name: "Celtic Sea", kind: sea, color: "#1c5dcf" }
-- { id: 1590, key: bay_of_biscay, name: "Bay of Biscay", kind: sea, color: "#104fba" }
-- { id: 1591, key: atlantic_portugal, name: "Coast of Portugal", kind: sea, color: "#1048c2" }
-- { id: 1592, key: atlantic_morocco, name: "Coast of Morocco", kind: sea, color: "#2d60aa" }
-- { id: 1593, key: strait_of_gibraltar, name: "Strait of Gibraltar", kind: sea, color: "#0a3ddf" }
-- { id: 1594, key: alboran_sea, name: "Alboran Sea", kind: sea, color: "#0185c2" }
-- { id: 1595, key: balearic_sea, name: "Balearic Sea", kind: sea, color: "#0b8dd7" }
-- { id: 1596, key: ligurian_sea, name: "Ligurian Sea", kind: sea, color: "#2d6da5" }
-- { id: 1597, key: tyrrhenian_sea, name: "Tyrrhenian Sea", kind: sea, color: "#0c3eff" }
-- { id: 1598, key: north_adriatic, name: "Northern Adriatic", kind: sea, color: "#3176c9" }
-- { id: 1599, key: south_adriatic, name: "Southern Adriatic", kind: sea, color: "#2c59e3" }
-- { id: 1600, key: ionian_sea, name: "Ionian Sea", kind: sea, color: "#0b74f3" }
-- { id: 1601, key: sicilian_channel, name: "Sicilian Channel", kind: sea, color: "#2e79a7" }
-- { id: 1602, key: gulf_of_sidra, name: "Gulf of Sidra", kind: sea, color: "#2993ef" }
-- { id: 1603, key: libyan_sea, name: "Libyan Sea", kind: sea, color: "#1f7fc2" }
-- { id: 1604, key: north_aegean, name: "Northern Aegean", kind: sea, color: "#2b47e5" }
-- { id: 1605, key: south_aegean, name: "Southern Aegean", kind: sea, color: "#0380b4" }
-- { id: 1606, key: levantine_sea, name: "Levantine Sea", kind: sea, color: "#228cc7" }
-- { id: 1607, key: cilician_sea, name: "Cilician Sea", kind: sea, color: "#2771c1" }
-- { id: 1608, key: sea_of_marmara, name: "Sea of Marmara", kind: sea, color: "#0487ac" }
-- { id: 1609, key: west_black_sea, name: "Western Black Sea", kind: sea, color: "#028bd0" }
-- { id: 1610, key: east_black_sea, name: "Eastern Black Sea", kind: sea, color: "#2b74c4" }
-- { id: 1611, key: north_black_sea, name: "Northern Black Sea", kind: sea, color: "#0152a6" }
-- { id: 1612, key: sea_of_azov, name: "Sea of Azov", kind: sea, color: "#254da3" }
-- { id: 1613, key: north_caspian, name: "Northern Caspian", kind: sea, color: "#2848a1" }
-- { id: 1614, key: south_caspian, name: "Southern Caspian", kind: sea, color: "#175eff" }
-- { id: 1615, key: red_sea, name: "Red Sea", kind: sea, color: "#267ad6" }
-- { id: 1616, key: persian_gulf, name: "Persian Gulf", kind: sea, color: "#2c51b0" }
-- { id: 1617, key: english_channel, name: "English Channel", kind: sea, color: "#3160e1" }
-- { id: 1618, key: south_north_sea, name: "Southern North Sea", kind: sea, color: "#0483e8" }
-- { id: 1619, key: north_north_sea, name: "Northern North Sea", kind: sea, color: "#137de6" }
-- { id: 1620, key: skagerrak, name: "Skagerrak", kind: sea, color: "#0970c3" }
-- { id: 1621, key: kattegat, name: "Kattegat", kind: sea, color: "#1075bf" }
-- { id: 1622, key: west_baltic, name: "Western Baltic", kind: sea, color: "#0184d9" }
-- { id: 1623, key: central_baltic, name: "Central Baltic", kind: sea, color: "#1045c3" }
-- { id: 1624, key: gulf_of_riga, name: "Gulf of Riga", kind: sea, color: "#2e44c5" }
-- { id: 1625, key: gulf_of_finland, name: "Gulf of Finland", kind: sea, color: "#1979d6" }
-- { id: 1626, key: gulf_of_bothnia, name: "Gulf of Bothnia", kind: sea, color: "#1e5cae" }
-- { id: 1627, key: irish_sea, name: "Irish Sea", kind: sea, color: "#288baa" }
-- { id: 1628, key: norwegian_sea, name: "Norwegian Sea", kind: sea, color: "#2a68b0" }
-- { id: 1629, key: hebrides_sea, name: "Sea of the Hebrides", kind: sea, color: "#2065de" }
-- { id: 1630, key: atlantic_open, name: "Open Atlantic", kind: sea, color: "#2281dd" }
-- { id: 1631, key: gulf_of_lion, name: "Gulf of Lion", kind: sea, color: "#1d45bb" }
-- { id: 1632, key: sea_of_sardinia, name: "Sea of Sardinia", kind: sea, color: "#0d89f8" }
-- { id: 1633, key: north_tyrrhenian, name: "Northern Tyrrhenian", kind: sea, color: "#1e78e7" }
-- { id: 1634, key: gulf_of_taranto, name: "Gulf of Taranto", kind: sea, color: "#1e63b6" }
-- { id: 1635, key: central_adriatic, name: "Central Adriatic", kind: sea, color: "#2a4bc2" }
-- { id: 1636, key: gulf_of_gabes, name: "Gulf of Gabès", kind: sea, color: "#1f45f7" }
-- { id: 1637, key: myrtoan_sea, name: "Myrtoan Sea", kind: sea, color: "#1e3cf7" }
-- { id: 1638, key: carpathian_sea, name: "Carpathian Sea", kind: sea, color: "#2882e9" }
-- { id: 1639, key: gulf_of_antalya, name: "Gulf of Antalya", kind: sea, color: "#298bef" }
-- { id: 1640, key: nile_delta_sea, name: "Waters of the Nile Delta", kind: sea, color: "#0d5ef6" }
-- { id: 1641, key: sea_of_barca, name: "Sea of Barca", kind: sea, color: "#0871e6" }
-- { id: 1642, key: palestine_coast, name: "Coast of Palestine", kind: sea, color: "#146bc1" }
-- { id: 1643, key: galician_coast, name: "Coast of Galicia", kind: sea, color: "#0086a1" }
-- { id: 1644, key: western_approaches, name: "Western Approaches", kind: sea, color: "#1973eb" }
-- { id: 1645, key: dogger_bank, name: "Dogger Bank", kind: sea, color: "#2b7ea5" }
-- { id: 1646, key: german_bight, name: "German Bight", kind: sea, color: "#286be0" }
-- { id: 1647, key: gulf_of_danzig, name: "Gulf of Danzig", kind: sea, color: "#0187ac" }
-- { id: 1648, key: gotland_sea, name: "Gotland Sea", kind: sea, color: "#0392ac" }
-- { id: 1649, key: bosporus_approaches, name: "Western Black Sea Coast", kind: sea, color: "#005fa1" }
-- { id: 1650, key: sinop_sea, name: "Sea of Sinope", kind: sea, color: "#1b52b4" }
-- { id: 1651, key: middle_caspian, name: "Middle Caspian", kind: sea, color: "#1375c1" }
-- { id: 1652, key: zuiderzee, name: "Zuiderzee", kind: sea, color: "#0e90d2" }
-- { id: 1653, key: wadden_sea, name: "Wadden Sea", kind: sea, color: "#004ffb" }
+- { id: 1568, key: coruna, name: "Coruña", kind: land, color: "#bdbc80" }
+- { id: 1569, key: mondonedo, name: "Mondoñedo", kind: land, color: "#9de99c" }
+- { id: 1570, key: trastamara, name: "Trastámara", kind: land, color: "#8f8234" }
+- { id: 1571, key: amamira, name: "Amamira", kind: land, color: "#ccb3ce" }
+- { id: 1572, key: deza, name: "Deza", kind: land, color: "#e285d7" }
+- { id: 1573, key: melide, name: "Melide", kind: land, color: "#89746a" }
+- { id: 1574, key: lemos, name: "Lemos", kind: land, color: "#59dbc8" }
+- { id: 1575, key: monterrei, name: "Monterrei", kind: land, color: "#91bd34" }
+- { id: 1576, key: tui, name: "Tui", kind: land, color: "#44e080" }
+- { id: 1577, key: pravia, name: "Pravia", kind: land, color: "#87d6d8" }
+- { id: 1578, key: asturias_de_santillana, name: "Asturias de Santillana", kind: land, color: "#e74297" }
+- { id: 1579, key: bierzo, name: "Bierzo", kind: land, color: "#d9d250" }
+- { id: 1580, key: cea, name: "Cea", kind: land, color: "#b1643d" }
+- { id: 1581, key: saldana, name: "Saldaña", kind: land, color: "#9f5b66" }
+- { id: 1582, key: amaya, name: "Amaya", kind: land, color: "#89d274" }
+- { id: 1583, key: castilla_vieja, name: "Castilla Vieja", kind: land, color: "#b8729b" }
+- { id: 1584, key: bardulia, name: "Bardulia", kind: land, color: "#968d8a" }
+- { id: 1585, key: lizarra, name: "Lizarra", kind: land, color: "#479875" }
+- { id: 1586, key: najera, name: "Nájera", kind: land, color: "#83419c" }
+- { id: 1587, key: calahorra, name: "Calahorra", kind: land, color: "#429d2f" }
+- { id: 1588, key: tutera, name: "Tutera", kind: land, color: "#dfae8d" }
+- { id: 1589, key: tarazona, name: "Tarazona", kind: land, color: "#e78331" }
+- { id: 1590, key: erriberri, name: "Erriberri", kind: land, color: "#cdb877" }
+- { id: 1591, key: zangoza, name: "Zangoza", kind: land, color: "#5c4e36" }
+- { id: 1592, key: egea, name: "Egea", kind: land, color: "#89713a" }
+- { id: 1593, key: monzon, name: "Monzón", kind: land, color: "#b35f71" }
+- { id: 1594, key: toro, name: "Toro", kind: land, color: "#8c77ab" }
+- { id: 1595, key: benavente, name: "Benavente", kind: land, color: "#525b36" }
+- { id: 1596, key: braganza, name: "Braganza", kind: land, color: "#2c965e" }
+- { id: 1597, key: chaves, name: "Chaves", kind: land, color: "#8d765e" }
+- { id: 1598, key: lima, name: "Lima", kind: land, color: "#e2dbdb" }
+- { id: 1599, key: mirandela, name: "Mirandela", kind: land, color: "#91d9b2" }
+- { id: 1600, key: douro, name: "Douro", kind: land, color: "#9d6533" }
+- { id: 1601, key: lamego, name: "Lamego", kind: land, color: "#cbcb61" }
+- { id: 1602, key: aveiro, name: "Aveiro", kind: land, color: "#a4508f" }
+- { id: 1603, key: leiria, name: "Leiria", kind: land, color: "#9784ad" }
+- { id: 1604, key: castelo_branco, name: "Castelo Branco", kind: land, color: "#295e7b" }
+- { id: 1605, key: atienza, name: "Atienza", kind: land, color: "#5ae9c7" }
+- { id: 1606, key: medinaceli, name: "Medinaceli", kind: land, color: "#5fc793" }
+- { id: 1607, key: cuellar, name: "Cuéllar", kind: land, color: "#2bc396" }
+- { id: 1608, key: olmedo, name: "Olmedo", kind: land, color: "#c93949" }
+- { id: 1609, key: arevalo, name: "Arévalo", kind: land, color: "#518cb4" }
+- { id: 1610, key: ledesma, name: "Ledesma", kind: land, color: "#762a6b" }
+- { id: 1611, key: ciudad_rodrigo, name: "Ciudad Rodrigo", kind: land, color: "#ccd15c" }
+- { id: 1612, key: alba_de_tormes, name: "Alba de Tormes", kind: land, color: "#80973c" }
+- { id: 1613, key: bejar, name: "Béjar", kind: land, color: "#31e44c" }
+- { id: 1614, key: guadalajara, name: "Guadalajara", kind: land, color: "#d94e3a" }
+- { id: 1615, key: talavera, name: "Talavera", kind: land, color: "#64cc55" }
+- { id: 1616, key: sobrarbe, name: "Sobrarbe", kind: land, color: "#677e9f" }
+- { id: 1617, key: ribagorza, name: "Ribagorza", kind: land, color: "#76cee6" }
+- { id: 1618, key: zuera, name: "Zuera", kind: land, color: "#ccb780" }
+- { id: 1619, key: sastago, name: "Sástago", kind: land, color: "#bbde6d" }
+- { id: 1620, key: fraga, name: "Fraga", kind: land, color: "#dacdd0" }
+- { id: 1621, key: balaguer, name: "Balaguer", kind: land, color: "#ddc762" }
+- { id: 1622, key: pallars, name: "Pallars", kind: land, color: "#49cc77" }
+- { id: 1623, key: cerdanya, name: "Cerdanya", kind: land, color: "#7bbc7d" }
+- { id: 1624, key: besalu, name: "Besalú", kind: land, color: "#98bdaf" }
+- { id: 1625, key: bergueda, name: "Berguedà", kind: land, color: "#dec2dd" }
+- { id: 1626, key: manresa, name: "Manresa", kind: land, color: "#e238de" }
+- { id: 1627, key: penedes, name: "Penedès", kind: land, color: "#34d76e" }
+- { id: 1628, key: alcaniz, name: "Alcañiz", kind: land, color: "#3ac1b2" }
+- { id: 1629, key: belchite, name: "Belchite", kind: land, color: "#e8cd9d" }
+- { id: 1630, key: molina, name: "Molina", kind: land, color: "#ab4f47" }
+- { id: 1631, key: albarracin, name: "Albarracín", kind: land, color: "#c47f8a" }
+- { id: 1632, key: maestrazgo, name: "Maestrazgo", kind: land, color: "#58c536" }
+- { id: 1633, key: al_bunt, name: "Al-Bunt", kind: land, color: "#878b5b" }
+- { id: 1634, key: almenara, name: "Almenara", kind: land, color: "#aa9a77" }
+- { id: 1635, key: rukana, name: "Rukana", kind: land, color: "#e43229" }
+- { id: 1636, key: bilyana, name: "Bilyana", kind: land, color: "#b7354f" }
+- { id: 1637, key: daniyyah, name: "Daniyyah", kind: land, color: "#89405a" }
+- { id: 1638, key: shaqurah, name: "Shaqurah", kind: land, color: "#843396" }
+- { id: 1639, key: al_karas, name: "Al-Karas", kind: land, color: "#48c165" }
+- { id: 1640, key: al_urqub, name: "Al-Urqub", kind: land, color: "#a03e49" }
+- { id: 1641, key: yanasta, name: "Yanasta", kind: land, color: "#bbe66d" }
+- { id: 1642, key: huete, name: "Huete", kind: land, color: "#a64d68" }
+- { id: 1643, key: ucles, name: "Uclés", kind: land, color: "#53c764" }
+- { id: 1644, key: ocana, name: "Ocaña", kind: land, color: "#c9d8d0" }
+- { id: 1645, key: orgaz, name: "Orgaz", kind: land, color: "#6fe45c" }
+- { id: 1646, key: la_jara, name: "La Jara", kind: land, color: "#2daf61" }
+- { id: 1647, key: malagon, name: "Malagón", kind: land, color: "#308276" }
+- { id: 1648, key: consuegra, name: "Consuegra", kind: land, color: "#54e33f" }
+- { id: 1649, key: trujillo, name: "Trujillo", kind: land, color: "#a6a196" }
+- { id: 1650, key: avis, name: "Avis", kind: land, color: "#e44b28" }
+- { id: 1651, key: setubal, name: "Setúbal", kind: land, color: "#5edc95" }
+- { id: 1652, key: alcacer_do_sal, name: "Alcácer do Sal", kind: land, color: "#cd6894" }
+- { id: 1653, key: mertola, name: "Mértola", kind: land, color: "#a44854" }
+- { id: 1654, key: odemira, name: "Odemira", kind: land, color: "#7c3c9c" }
+- { id: 1655, key: silb, name: "Silb", kind: land, color: "#6d7f51" }
+- { id: 1656, key: tavira, name: "Tavira", kind: land, color: "#97e6b7" }
+- { id: 1657, key: madallin, name: "Madallin", kind: land, color: "#71c345" }
+- { id: 1658, key: al_manijah, name: "Al-Manijah", kind: land, color: "#e9a166" }
+- { id: 1659, key: thalyata, name: "Thalyata", kind: land, color: "#b493af" }
+- { id: 1660, key: awnaba, name: "Awnaba", kind: land, color: "#e7d76f" }
+- { id: 1661, key: qustantinah, name: "Qustantinah", kind: land, color: "#38c3b8" }
+- { id: 1662, key: anduyar, name: "Anduyar", kind: land, color: "#6ca25a" }
+- { id: 1663, key: burj_al_hansh, name: "Burj al-Hansh", kind: land, color: "#d22c8d" }
+- { id: 1664, key: qabra, name: "Qabra", kind: land, color: "#b1747e" }
+- { id: 1665, key: istiyya, name: "Istiyya", kind: land, color: "#867751" }
+- { id: 1666, key: qarmunah, name: "Qarmunah", kind: land, color: "#668392" }
+- { id: 1667, key: mawrur, name: "Mawrur", kind: land, color: "#2ae9b6" }
+- { id: 1668, key: arkosh, name: "Arkosh", kind: land, color: "#427a74" }
+- { id: 1669, key: qadis, name: "Qadis", kind: land, color: "#477497" }
+- { id: 1670, key: saduna, name: "Saduna", kind: land, color: "#685478" }
+- { id: 1671, key: al_jazira_al_khadra, name: "Al-Jazira al-Khadra", kind: land, color: "#92d6cd" }
+- { id: 1672, key: antaquira, name: "Antaquira", kind: land, color: "#e48c51" }
+- { id: 1673, key: al_bussara, name: "Al-Bussara", kind: land, color: "#bada2f" }
+- { id: 1674, key: basthah, name: "Basthah", kind: land, color: "#60caa6" }
+- { id: 1675, key: barshanah, name: "Barshanah", kind: land, color: "#e28f75" }
+- { id: 1676, key: qarabakah, name: "Qarabakah", kind: land, color: "#9de0c9" }
+- { id: 1677, key: logudoro, name: "Logudoro", kind: land, color: "#937f99" }
+- { id: 1678, key: goceano, name: "Goceano", kind: land, color: "#82bc3e" }
+- { id: 1679, key: posada, name: "Posada", kind: land, color: "#2e4629" }
+- { id: 1680, key: planargia, name: "Planargia", kind: land, color: "#36a2a1" }
+- { id: 1681, key: barbagia, name: "Barbagia", kind: land, color: "#a087c0" }
+- { id: 1682, key: ogliastra, name: "Ogliastra", kind: land, color: "#935b66" }
+- { id: 1683, key: nora, name: "Nora", kind: land, color: "#dbe3af" }
+- { id: 1684, key: sarrabus, name: "Sarrabus", kind: land, color: "#d3ded1" }
+- { id: 1685, key: cixerri, name: "Cixerri", kind: land, color: "#ca51e7" }
+- { id: 1686, key: siurgus, name: "Siurgus", kind: land, color: "#71316a" }
+- { id: 1687, key: corte, name: "Corte", kind: land, color: "#2ddde2" }
+- { id: 1688, key: vecchio, name: "Vecchio", kind: land, color: "#b0a990" }
+- { id: 1689, key: balagna, name: "Balagna", kind: land, color: "#75e949" }
+- { id: 1690, key: geraci, name: "Geraci", kind: land, color: "#a487ad" }
+- { id: 1691, key: demona, name: "Demona", kind: land, color: "#34da62" }
+- { id: 1692, key: aderno, name: "Aderno", kind: land, color: "#2f614f" }
+- { id: 1693, key: taormina, name: "Taormina", kind: land, color: "#dd58be" }
+- { id: 1694, key: mazara, name: "Mazara", kind: land, color: "#d3a5ce" }
+- { id: 1695, key: castrogiovanni, name: "Castrogiovanni", kind: land, color: "#3d883a" }
+- { id: 1696, key: butera, name: "Butera", kind: land, color: "#8fd57c" }
+- { id: 1697, key: ragusa_sicily, name: "Ragusa", kind: land, color: "#c89956" }
+- { id: 1698, key: noto, name: "Noto", kind: land, color: "#4d7ba3" }
+- { id: 1699, key: mileto, name: "Mileto", kind: land, color: "#d63660" }
+- { id: 1700, key: bisignano, name: "Bisignano", kind: land, color: "#854a4c" }
+- { id: 1701, key: rossano, name: "Rossano", kind: land, color: "#7497a4" }
+- { id: 1702, key: cassano, name: "Cassano", kind: land, color: "#e06f58" }
+- { id: 1703, key: policastro, name: "Policastro", kind: land, color: "#e58131" }
+- { id: 1704, key: marsico, name: "Marsico", kind: land, color: "#5f5151" }
+- { id: 1705, key: acerenza, name: "Acerenza", kind: land, color: "#97c09c" }
+- { id: 1706, key: gravina, name: "Gravina", kind: land, color: "#3b7a3c" }
+- { id: 1707, key: otranto_town, name: "Otranto", kind: land, color: "#bf3528" }
+- { id: 1708, key: andria, name: "Andria", kind: land, color: "#9e93a8" }
+- { id: 1709, key: bovino, name: "Bovino", kind: land, color: "#29c64f" }
+- { id: 1710, key: lucera, name: "Lucera", kind: land, color: "#e6cc58" }
+- { id: 1711, key: gargano, name: "Gargano", kind: land, color: "#d0e67d" }
+- { id: 1712, key: larino, name: "Larino", kind: land, color: "#38d73f" }
+- { id: 1713, key: alife, name: "Alife", kind: land, color: "#8cdd91" }
+- { id: 1714, key: nola, name: "Nola", kind: land, color: "#71babd" }
+- { id: 1715, key: irpinia, name: "Irpinia", kind: land, color: "#be48bd" }
+- { id: 1716, key: teano, name: "Teano", kind: land, color: "#ca3c48" }
+- { id: 1717, key: fondi, name: "Fondi", kind: land, color: "#cedfc7" }
+- { id: 1718, key: aquino, name: "Aquino", kind: land, color: "#42dd9d" }
+- { id: 1719, key: ceccano, name: "Ceccano", kind: land, color: "#826040" }
+- { id: 1720, key: tusculum, name: "Tusculum", kind: land, color: "#cdb956" }
+- { id: 1721, key: tivoli, name: "Tivoli", kind: land, color: "#29446b" }
+- { id: 1722, key: sabina, name: "Sabina", kind: land, color: "#91e96d" }
+- { id: 1723, key: rieti, name: "Rieti", kind: land, color: "#593875" }
+- { id: 1724, key: marsi, name: "Marsi", kind: land, color: "#9fcd69" }
+- { id: 1725, key: penne, name: "Penne", kind: land, color: "#ebc546" }
+- { id: 1726, key: lanciano, name: "Lanciano", kind: land, color: "#3b552d" }
+- { id: 1727, key: nursia, name: "Nursia", kind: land, color: "#623267" }
+- { id: 1728, key: todi, name: "Todi", kind: land, color: "#4d8c57" }
+- { id: 1729, key: falisca, name: "Falisca", kind: land, color: "#28e887" }
+- { id: 1730, key: pset, name: "Pset", kind: land, color: "#b3c357" }
+- { id: 1731, key: krbava, name: "Krbava", kind: land, color: "#a7d8a0" }
+- { id: 1732, key: vrbas, name: "Vrbas", kind: land, color: "#bde1e9" }
+- { id: 1733, key: sana, name: "Sana", kind: land, color: "#83525d" }
+- { id: 1734, key: glaz, name: "Glaz", kind: land, color: "#6f9160" }
+- { id: 1735, key: soli, name: "Soli", kind: land, color: "#92bce4" }
+- { id: 1736, key: lasva, name: "Lašva", kind: land, color: "#96a42d" }
+- { id: 1737, key: olovac, name: "Olovac", kind: land, color: "#2fce37" }
+- { id: 1738, key: vrhbosna, name: "Vrhbosna", kind: land, color: "#e74ca3" }
+- { id: 1739, key: imota, name: "Imota", kind: land, color: "#b9588a" }
+- { id: 1740, key: cetina, name: "Cetina", kind: land, color: "#d5679a" }
+- { id: 1741, key: zavrsje, name: "Završje", kind: land, color: "#3a4058" }
+- { id: 1742, key: bribir, name: "Bribir", kind: land, color: "#33ac83" }
+- { id: 1743, key: omis, name: "Omiš", kind: land, color: "#c8a87d" }
+- { id: 1744, key: pharos, name: "Pharos", kind: land, color: "#66a249" }
+- { id: 1745, key: korcula, name: "Korčula", kind: land, color: "#4f4d52" }
+- { id: 1746, key: ston, name: "Ston", kind: land, color: "#28bea9" }
+- { id: 1747, key: pagania, name: "Pagania", kind: land, color: "#958f40" }
+- { id: 1748, key: fezzan, name: "Fezzan", kind: wasteland, color: "#a9aca7" }
+- { id: 1749, key: grand_erg, name: "Grand Erg", kind: wasteland, color: "#888589" }
+- { id: 1750, key: erg_oriental, name: "Eastern Erg", kind: wasteland, color: "#a39c9d" }
+- { id: 1751, key: hamada, name: "Hamada al-Hamra", kind: wasteland, color: "#9d9f9d" }
+- { id: 1752, key: calanscio, name: "Calanscio Sand Sea", kind: wasteland, color: "#818380" }
+- { id: 1753, key: eastern_desert, name: "Eastern Desert", kind: wasteland, color: "#9b9b9d" }
+- { id: 1754, key: nafud, name: "Nafud", kind: wasteland, color: "#ababa8" }
+- { id: 1755, key: iraqi_desert, name: "Western Iraqi Desert", kind: wasteland, color: "#a19d9d" }
+- { id: 1756, key: ustyurt, name: "Ustyurt", kind: wasteland, color: "#828281" }
+- { id: 1757, key: kavir_namak, name: "Central Iranian Desert", kind: wasteland, color: "#a2a1a6" }
+- { id: 1758, key: sahara_west, name: "Western Sahara", kind: wasteland, color: "#adada9" }
+- { id: 1759, key: sahara_central, name: "Central Sahara", kind: wasteland, color: "#afafab" }
+- { id: 1760, key: libyan_desert, name: "Libyan Desert", kind: wasteland, color: "#9a9696" }
+- { id: 1761, key: western_desert, name: "Western Desert", kind: wasteland, color: "#a7a9a7" }
+- { id: 1762, key: high_atlas, name: "High Atlas", kind: wasteland, color: "#9a9194" }
+- { id: 1763, key: arabian_desert, name: "Arabian Desert", kind: wasteland, color: "#7d827f" }
+- { id: 1764, key: syrian_desert, name: "Syrian Desert", kind: wasteland, color: "#a0a6a0" }
+- { id: 1765, key: dasht_e_kavir, name: "Dasht-e Kavir", kind: wasteland, color: "#87848a" }
+- { id: 1766, key: saharan_atlas, name: "Saharan Atlas", kind: wasteland, color: "#989a9c" }
+- { id: 1767, key: nubian_desert, name: "Nubian Desert", kind: wasteland, color: "#8d8d91" }
+- { id: 1768, key: southern_hejaz, name: "Southern Hejaz", kind: wasteland, color: "#939794" }
+- { id: 1769, key: celtic_sea, name: "Celtic Sea", kind: sea, color: "#147aa2" }
+- { id: 1770, key: bay_of_biscay, name: "Bay of Biscay", kind: sea, color: "#255da8" }
+- { id: 1771, key: atlantic_portugal, name: "Coast of Portugal", kind: sea, color: "#0e77af" }
+- { id: 1772, key: atlantic_morocco, name: "Coast of Morocco", kind: sea, color: "#2d93c6" }
+- { id: 1773, key: strait_of_gibraltar, name: "Strait of Gibraltar", kind: sea, color: "#2488b8" }
+- { id: 1774, key: alboran_sea, name: "Alboran Sea", kind: sea, color: "#2481fc" }
+- { id: 1775, key: balearic_sea, name: "Balearic Sea", kind: sea, color: "#2091f0" }
+- { id: 1776, key: ligurian_sea, name: "Ligurian Sea", kind: sea, color: "#1061ab" }
+- { id: 1777, key: tyrrhenian_sea, name: "Tyrrhenian Sea", kind: sea, color: "#028dd5" }
+- { id: 1778, key: north_adriatic, name: "Northern Adriatic", kind: sea, color: "#0f51f2" }
+- { id: 1779, key: south_adriatic, name: "Southern Adriatic", kind: sea, color: "#2e7ea8" }
+- { id: 1780, key: ionian_sea, name: "Ionian Sea", kind: sea, color: "#2785e4" }
+- { id: 1781, key: sicilian_channel, name: "Sicilian Channel", kind: sea, color: "#2f7cfe" }
+- { id: 1782, key: gulf_of_sidra, name: "Gulf of Sidra", kind: sea, color: "#2f82b4" }
+- { id: 1783, key: libyan_sea, name: "Libyan Sea", kind: sea, color: "#1c6ed4" }
+- { id: 1784, key: north_aegean, name: "Northern Aegean", kind: sea, color: "#2542c1" }
+- { id: 1785, key: south_aegean, name: "Southern Aegean", kind: sea, color: "#2b87fc" }
+- { id: 1786, key: levantine_sea, name: "Levantine Sea", kind: sea, color: "#283cb9" }
+- { id: 1787, key: cilician_sea, name: "Cilician Sea", kind: sea, color: "#0286a0" }
+- { id: 1788, key: sea_of_marmara, name: "Sea of Marmara", kind: sea, color: "#2041fb" }
+- { id: 1789, key: west_black_sea, name: "Western Black Sea", kind: sea, color: "#185cce" }
+- { id: 1790, key: east_black_sea, name: "Eastern Black Sea", kind: sea, color: "#1d8eda" }
+- { id: 1791, key: north_black_sea, name: "Northern Black Sea", kind: sea, color: "#185ae6" }
+- { id: 1792, key: sea_of_azov, name: "Sea of Azov", kind: sea, color: "#114db2" }
+- { id: 1793, key: north_caspian, name: "Northern Caspian", kind: sea, color: "#2463f3" }
+- { id: 1794, key: south_caspian, name: "Southern Caspian", kind: sea, color: "#0693ed" }
+- { id: 1795, key: red_sea, name: "Red Sea", kind: sea, color: "#2b6ade" }
+- { id: 1796, key: persian_gulf, name: "Persian Gulf", kind: sea, color: "#0995df" }
+- { id: 1797, key: english_channel, name: "English Channel", kind: sea, color: "#2d4db0" }
+- { id: 1798, key: south_north_sea, name: "Southern North Sea", kind: sea, color: "#0645d5" }
+- { id: 1799, key: north_north_sea, name: "Northern North Sea", kind: sea, color: "#1066f4" }
+- { id: 1800, key: skagerrak, name: "Skagerrak", kind: sea, color: "#0872d1" }
+- { id: 1801, key: kattegat, name: "Kattegat", kind: sea, color: "#0f41b1" }
+- { id: 1802, key: west_baltic, name: "Western Baltic", kind: sea, color: "#0979d1" }
+- { id: 1803, key: central_baltic, name: "Central Baltic", kind: sea, color: "#075fcb" }
+- { id: 1804, key: gulf_of_riga, name: "Gulf of Riga", kind: sea, color: "#1f58e8" }
+- { id: 1805, key: gulf_of_finland, name: "Gulf of Finland", kind: sea, color: "#127eef" }
+- { id: 1806, key: gulf_of_bothnia, name: "Gulf of Bothnia", kind: sea, color: "#1a93e3" }
+- { id: 1807, key: irish_sea, name: "Irish Sea", kind: sea, color: "#0355b3" }
+- { id: 1808, key: norwegian_sea, name: "Norwegian Sea", kind: sea, color: "#2674d0" }
+- { id: 1809, key: hebrides_sea, name: "Sea of the Hebrides", kind: sea, color: "#173ce7" }
+- { id: 1810, key: atlantic_open, name: "Open Atlantic", kind: sea, color: "#1248aa" }
+- { id: 1811, key: gulf_of_lion, name: "Gulf of Lion", kind: sea, color: "#2854ea" }
+- { id: 1812, key: sea_of_sardinia, name: "Sea of Sardinia", kind: sea, color: "#1073f0" }
+- { id: 1813, key: north_tyrrhenian, name: "Northern Tyrrhenian", kind: sea, color: "#0283b6" }
+- { id: 1814, key: gulf_of_taranto, name: "Gulf of Taranto", kind: sea, color: "#033ce4" }
+- { id: 1815, key: central_adriatic, name: "Central Adriatic", kind: sea, color: "#0a4de6" }
+- { id: 1816, key: gulf_of_gabes, name: "Gulf of Gabès", kind: sea, color: "#036cdc" }
+- { id: 1817, key: myrtoan_sea, name: "Myrtoan Sea", kind: sea, color: "#1d73dd" }
+- { id: 1818, key: carpathian_sea, name: "Carpathian Sea", kind: sea, color: "#0d7bf5" }
+- { id: 1819, key: gulf_of_antalya, name: "Gulf of Antalya", kind: sea, color: "#086bbe" }
+- { id: 1820, key: nile_delta_sea, name: "Waters of the Nile Delta", kind: sea, color: "#1889d4" }
+- { id: 1821, key: sea_of_barca, name: "Sea of Barca", kind: sea, color: "#0d91bd" }
+- { id: 1822, key: palestine_coast, name: "Coast of Palestine", kind: sea, color: "#1f6eae" }
+- { id: 1823, key: galician_coast, name: "Coast of Galicia", kind: sea, color: "#313cf3" }
+- { id: 1824, key: western_approaches, name: "Western Approaches", kind: sea, color: "#1170cd" }
+- { id: 1825, key: dogger_bank, name: "Dogger Bank", kind: sea, color: "#0b5ee7" }
+- { id: 1826, key: german_bight, name: "German Bight", kind: sea, color: "#0b48aa" }
+- { id: 1827, key: gulf_of_danzig, name: "Gulf of Danzig", kind: sea, color: "#0176f4" }
+- { id: 1828, key: gotland_sea, name: "Gotland Sea", kind: sea, color: "#0692c8" }
+- { id: 1829, key: bosporus_approaches, name: "Western Black Sea Coast", kind: sea, color: "#2d69af" }
+- { id: 1830, key: sinop_sea, name: "Sea of Sinope", kind: sea, color: "#0770a3" }
+- { id: 1831, key: middle_caspian, name: "Middle Caspian", kind: sea, color: "#0e50a8" }
+- { id: 1832, key: zuiderzee, name: "Zuiderzee", kind: sea, color: "#044ea9" }
+- { id: 1833, key: wadden_sea, name: "Wadden Sea", kind: sea, color: "#1b45e9" }

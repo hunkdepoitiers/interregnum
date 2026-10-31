@@ -5,7 +5,7 @@
 - [jerez, ceuta]                # Strait of Gibraltar
 - [roskilde, scania]            # Øresund
 - [caffa, zichia]               # Kerch Strait
-- [otranto, valona]             # Strait of Otranto
+- [otranto_town, valona]        # Strait of Otranto
 # Caravan routes linking the Egyptian oases to the Nile and the coast.
 - [siwa, marsa_matruh]
 - [siwa, bahriya]
