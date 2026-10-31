@@ -1,7 +1,8 @@
 /**
  * One-off generator for a STARTER provinces.png. It rasterises the Natural Earth 1:50m land polygons
- * and grows one province per seed point (data/map/seeds.yaml) by multi-source BFS, so provinces are
- * contiguous and never cross water. After this, the bitmap is meant to be repainted by hand.
+ * and grows one province per seed point (data/map/seeds.yaml) with noise-weighted multi-source growth,
+ * so provinces are contiguous, never cross water and get irregular borders. Seeds may carry a radius
+ * (km) to keep desert-edge provinces small. After this, the bitmap is meant to be repainted by hand.
  *
  * Usage: npm run seed-map [-- --force]   (refuses to overwrite an existing provinces.png without --force)
  */
@@ -72,10 +73,10 @@ for (const { geometry } of geo.features) {
 interface Def { id: number; key: string; name: string; kind: ProvinceKind }
 const defs: Def[] = [];
 const medium: number[] = [0]; // 1 = grows over land, 0 = over water; index = province id
+const maxCost: number[] = [0]; // growth budget per province (Infinity = unlimited)
+const seedPixel = new Map<number, [number, number]>();
 const owner = new Int32Array(W * H);
-const queue = new Int32Array(W * H);
-let qHead = 0;
-let qTail = 0;
+const dist = new Int32Array(W * H).fill(0x7fffffff);
 
 function snap(px: number, py: number, wantLand: number): number | null {
   const cx = Math.floor(px);
@@ -95,11 +96,16 @@ function snap(px: number, py: number, wantLand: number): number | null {
   return null;
 }
 
-const groups: [ProvinceKind, [string, string, number, number][]][] = [
+// Growth cost is measured in tenths of a pixel; see STEP_COST below.
+const kmPerPx = ((projection.north - projection.south) * 111.32) / H;
+const radiusToCost = (km: number) => Math.round((km / kmPerPx) * 10);
+
+const seedQueue: number[] = [];
+const groups: [ProvinceKind, typeof seeds.land][] = [
   ['land', seeds.land], ['wasteland', seeds.wasteland], ['sea', seeds.sea],
 ];
 for (const [kind, rows] of groups) {
-  for (const [key, name, lat, lon] of rows) {
+  for (const [key, name, lat, lon, radiusKm] of rows) {
     const [px, py] = lonLatToPixel(projection, lon, lat);
     const wantLand = kind === 'sea' ? 0 : 1;
     const p = snap(px, py, wantLand);
@@ -110,12 +116,81 @@ for (const [kind, rows] of groups) {
     const id = defs.length + 1;
     defs.push({ id, key, name, kind });
     medium[id] = wantLand;
+    maxCost[id] = radiusKm === undefined ? Infinity : radiusToCost(radiusKm);
+    seedPixel.set(id, [p % W, Math.floor(p / W)]);
     owner[p] = id;
-    queue[qTail++] = p;
+    dist[p] = 0;
+    seedQueue.push(p);
   }
 }
 
-// --- 3. Multi-source BFS ----------------------------------------------------------------------
+// --- 3. Noise-weighted multi-source growth (Dial's algorithm) ---------------------------------
+// Each step costs 10 (straight) or 14 (diagonal) times a smooth noise factor, so borders wander
+// like real ones instead of forming straight Voronoi lines. A seed with a radius stops growing at
+// that distance; what it leaves (deserts) is taken by wasteland seeds, which grow without limit.
+function hash(x: number, y: number): number {
+  let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ 0x5bd1e995;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+function valueNoise(x: number, y: number, cell: number): number {
+  const gx = x / cell;
+  const gy = y / cell;
+  const x0 = Math.floor(gx);
+  const y0 = Math.floor(gy);
+  const fx = gx - x0;
+  const fy = gy - y0;
+  const sx = fx * fx * (3 - 2 * fx);
+  const sy = fy * fy * (3 - 2 * fy);
+  const top = hash(x0, y0) + (hash(x0 + 1, y0) - hash(x0, y0)) * sx;
+  const bottom = hash(x0, y0 + 1) + (hash(x0 + 1, y0 + 1) - hash(x0, y0 + 1)) * sx;
+  return top + (bottom - top) * sy;
+}
+const terrainCost = new Uint8Array(W * H);
+for (let y = 0; y < H; y++) {
+  for (let x = 0; x < W; x++) {
+    const n = 0.65 * valueNoise(x, y, 48) + 0.35 * valueNoise(x, y, 13);
+    terrainCost[y * W + x] = Math.round(6 + n * 10); // 6..16, averaging ~10
+  }
+}
+
+const BUCKETS = 64; // larger than the biggest single step cost (16 * 1.4 + 1)
+const buckets: number[][] = Array.from({ length: BUCKETS }, () => []);
+for (const p of seedQueue) buckets[0]!.push(p);
+let pending = seedQueue.length;
+const DIRS: [number, number, boolean][] = [
+  [1, 0, false], [-1, 0, false], [0, 1, false], [0, -1, false],
+  [1, 1, true], [1, -1, true], [-1, 1, true], [-1, -1, true],
+];
+for (let d = 0; pending > 0; d++) {
+  const bucket = buckets[d % BUCKETS]!;
+  while (bucket.length) {
+    const p = bucket.pop()!;
+    pending--;
+    if (dist[p] !== d) continue; // stale entry
+    const id = owner[p]!;
+    const m = medium[id]!;
+    const x = p % W;
+    const y = (p - x) / W;
+    for (const [dx, dy, diagonal] of DIRS) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+      const q = ny * W + nx;
+      if (land[q] !== m) continue;
+      // Don't slip diagonally between two pixels of the other medium (keeps provinces 4-connected).
+      if (diagonal && land[y * W + nx] !== m && land[ny * W + x] !== m) continue;
+      const step = diagonal ? Math.round(terrainCost[q]! * 1.4) : terrainCost[q]!;
+      const nd = d + step;
+      if (nd >= dist[q]! || nd > maxCost[id]!) continue;
+      dist[q] = nd;
+      owner[q] = id;
+      buckets[nd % BUCKETS]!.push(q);
+      pending++;
+    }
+  }
+}
+
 function neighbours(p: number): number[] {
   const x = p % W;
   const out: number[] = [];
@@ -125,23 +200,8 @@ function neighbours(p: number): number[] {
   if (p < W * (H - 1)) out.push(p + W);
   return out;
 }
-while (qHead < qTail) {
-  const p = queue[qHead++]!;
-  const id = owner[p]!;
-  for (const q of neighbours(p)) {
-    if (owner[q] === 0 && land[q] === medium[id]) {
-      owner[q] = id;
-      queue[qTail++] = q;
-    }
-  }
-}
 
 // --- 4. Unreached components (seedless islands, inland water) ---------------------------------
-const seedPixel = new Map<number, [number, number]>();
-for (let p = 0; p < W * H; p++) {
-  const id = owner[p]!;
-  if (id && !seedPixel.has(id)) seedPixel.set(id, [p % W, Math.floor(p / W)]);
-}
 function nearestLandProvince(x: number, y: number): number {
   let best = 0;
   let bestD = Infinity;
@@ -149,8 +209,8 @@ function nearestLandProvince(x: number, y: number): number {
     if (d.kind !== 'land') continue;
     const s = seedPixel.get(d.id);
     if (!s) continue;
-    const dist = (s[0] - x) ** 2 + (s[1] - y) ** 2;
-    if (dist < bestD) { bestD = dist; best = d.id; }
+    const d2 = (s[0] - x) ** 2 + (s[1] - y) ** 2;
+    if (d2 < bestD) { bestD = d2; best = d.id; }
   }
   return best;
 }

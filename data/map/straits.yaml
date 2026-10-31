@@ -1,6 +1,6 @@
 # Extra land-to-land adjacencies across water. Armies may cross these; everywhere else needs ships (not in v1).
 - [constantinople, nicomedia]   # Bosporus
-- [gallipoli, troad]            # Dardanelles
+- [gallipoli, adramyttion]      # Dardanelles
 - [messina, reggio]             # Strait of Messina
 - [jerez, ceuta]                # Strait of Gibraltar
 - [roskilde, scania]            # Øresund

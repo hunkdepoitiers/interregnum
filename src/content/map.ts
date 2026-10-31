@@ -47,7 +47,12 @@ export type ProvinceDefinition = z.infer<typeof definitionSchema>;
 
 export const straitsSchema = z.array(z.tuple([z.string(), z.string()]));
 
-const seedRow = z.tuple([z.string().regex(/^[a-z0-9_]+$/), z.string(), z.number(), z.number()]);
+const seedKey = z.string().regex(/^[a-z0-9_]+$/);
+/** [key, name, lat, lon] or [key, name, lat, lon, max radius in km]. */
+const seedRow = z.union([
+  z.tuple([seedKey, z.string(), z.number(), z.number()]),
+  z.tuple([seedKey, z.string(), z.number(), z.number(), z.number().positive()]),
+]);
 export const seedsSchema = z.object({
   land: z.array(seedRow),
   sea: z.array(seedRow),

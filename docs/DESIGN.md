@@ -17,7 +17,7 @@ Decisions so far: **EU-style colour bitmap map**, **PixiJS v8 (WebGL)** renderer
 7. **Readable depth, data-driven.** Every number has a breakdown; all content lives in YAML.
 
 ## 2. v1 scope
-- Map: Iberia to the Caspian edge, Scotland/Baltic to Upper Egypt. Starter map (M2): 638 land provinces, 42 sea zones, 9 wastelands; 86 realms including vassals and tributaries. This is above the original ~300–500 provinces / ~50–70 realms target: prune seeds in `data/map/seeds.yaml` or merge realms in `data/scenario/1302.yaml` if it proves too much. Ilkhanate and Golden Horde are scripted neighbours (data-driven timelines of tribute demands and invasions, simplified armies).
+- Map: Iberia to the Caspian edge, Scotland/Baltic to Upper Egypt. Starter map: ~1,050 provinces (969 land, 63 sea zones, 19 wastelands) and 113 realms including vassals and tributaries, with 1302 borders checked against the Euratlas map of 1300. The province budget was raised to ~1,000 in M2; prune seeds in `data/map/seeds.yaml` or merge realms in `data/scenario/1302.yaml` if it proves too much. Ilkhanate and Golden Horde are scripted neighbours (data-driven timelines of tribute demands and invasions, simplified armies).
 - Start 27 July 1302 on the **Julian calendar** (historically correct: leap year every 4 years, so 1304 has 29 February). Daily tick, pause, 5 speeds.
 - Singleplayer, browser (Vercel static site); later a Tauri desktop build.
 
@@ -74,7 +74,7 @@ With a colour bitmap of 4096×3342 px (~13.7M pixels), Canvas 2D would recolour 
 - `data/scenario/1302.yaml`: realms (rank, government, colour, capital, overlord, scripted flag) with the provinces each owns, start-date occupations and explicitly unclaimed land. `tools/build-data` validates it against the built map (every land province owned exactly once or listed as unclaimed, capitals inside the realm, no loops of overlords, no water owned, warnings for look-alike neighbour colours) and writes `public/generated/scenario.json`.
 - `data/map/projection.yaml`: equirectangular, standard parallel 45°N, bounds; converts city lat/lon to pixels.
 - `tools/build-map` (runs in `npm run build`, also on Vercel): checks every pixel colour is defined, warns on non-contiguous and tiny provinces; computes pixel count, bbox, centroid, coastal flag, adjacency with shared border length; writes `public/generated/province-ids.png` (ID in R+G, 16-bit) and `public/generated/map.json`.
-- `tools/seed-map` (one-off starter): rasterises a public-domain coastline (Natural Earth 1:50m land) and floods land and sea from seed points in `data/map/seeds.yaml` (historical towns, lat/lon) with a multi-source BFS, so provinces stay contiguous and never jump water. The output is a **starter** bitmap to repaint by hand (GIMP/Aseprite pencil tool, anti-aliasing off, no colour profile).
+- `tools/seed-map` (one-off starter): rasterises a public-domain coastline (Natural Earth 1:50m land) and grows land and sea provinces from seed points in `data/map/seeds.yaml` (historical towns, lat/lon) with a noise-weighted multi-source growth (Dial's algorithm), so provinces stay contiguous, never jump water and get irregular borders. A seed may carry a radius in km: desert-edge provinces (Maghreb, Nile valley, Syrian and Arabian fringe) stop there and the open desert is filled by wasteland seeds, keeping those provinces coastal or riverine. The output is a **starter** bitmap to repaint by hand (GIMP/Aseprite pencil tool, anti-aliasing off, no colour profile).
 - Picking: the decoded ID map is kept as a `Uint16Array` on the main thread; hover/click is one array read.
 
 ## 5. Core systems
@@ -198,7 +198,7 @@ Saves: `GameState` serialised to JSON, gzipped (CompressionStream), stored in In
 **Guessing / simplifying**: borders and rulers of the smaller Anatolian beyliks (Karesi, Saruhan, Aydın, Menteshe, Germiyan, Hamid, Eshref, Candar, Karaman — some were founded or expanded a few years after 1302); the Cilician Armenian ruler arrangement (Leo III / Hethum II); Greek successor states (Epirus, Thessaly); Scotland's guardianship; every population figure; every income figure (balanced for play, not historically sourced); fort levels; the HRE prince list (minor princes merged into larger realms to stay within ~70 realms). Guessed data is marked `# GUESS` in YAML.
 
 ## 8. Bigger than they look
-- **Map content**: the starter map is generated from seed towns; hand-repainting ~640 provinces into historical shapes is weeks of work, separate from code.
+- **Map content**: the starter map is generated from seed towns; hand-repainting ~970 provinces into historical shapes is weeks of work, separate from code.
 - **AI** for war, sieges and budgeting: the largest single risk; v1 AI will be simple and exploitable.
 - **UI**: "every number explainable" means nested tooltips everywhere — many components.
 - **Balance**: a money-centric economy with loans and mercenaries can spiral; needs a headless "run 100 years, dump stats" tool.
