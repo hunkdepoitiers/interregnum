@@ -12,6 +12,14 @@ if (!parsed.success) {
   process.exit(1);
 }
 
+if (!parsed.data.enabled) {
+  // Provinces-only mode: no realms, every province unowned. The realm data stays in the YAML untouched.
+  const empty = new Array<number>(Math.max(...map.provinces.map((p) => p.id)) + 1).fill(0);
+  writeFileSync('public/generated/scenario.json', JSON.stringify({ realms: [], owner: empty, controller: empty }));
+  console.log('build-data: realms disabled (enabled: false), provinces-only map');
+  process.exit(0);
+}
+
 const { scenario, errors, warnings } = compileScenario(parsed.data, map.provinces);
 for (const w of warnings) console.warn(`warning: ${w}`);
 if (errors.length) {

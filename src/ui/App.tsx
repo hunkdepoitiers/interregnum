@@ -1,4 +1,4 @@
-import { effect, signal } from '@preact/signals';
+import { computed, effect, signal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import { command, startGame, world } from '../bridge/client';
 import type { MapData } from '../content/map';
@@ -13,6 +13,8 @@ import { TopBar } from './TopBar';
 
 export const mapData = signal<MapData | null>(null);
 export const mapMode = signal<MapMode>('political');
+/** False while the scenario's realms are switched off (provinces-only map). */
+export const hasRealms = computed(() => (world.value?.realms.length ?? 0) > 1);
 export const hovered = signal<{ id: number; x: number; y: number }>({ id: 0, x: 0, y: 0 });
 /** At most one of these is non-zero: the panel shows either a province or a realm. */
 export const selected = signal(0);
@@ -53,7 +55,7 @@ export function showToast(text: string) {
 effect(() => {
   const map = mapData.value;
   const w = world.value;
-  const mode = mapMode.value;
+  const mode = hasRealms.value ? mapMode.value : 'terrain';
   if (map && view) view.setLookup(buildLookup(map, mode, w));
 });
 

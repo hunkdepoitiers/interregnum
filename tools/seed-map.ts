@@ -69,6 +69,13 @@ for (const { geometry } of geo.features) {
   if (geometry.type === 'Polygon') fillPolygon(geometry.coordinates, land, 1);
   else for (const poly of geometry.coordinates) fillPolygon(poly, land, 1);
 }
+// Historical water (data/map/water.yaml), e.g. the Zuiderzee before its modern land reclamation.
+const water = (parse(readFileSync('data/map/water.yaml', 'utf8')) ?? []) as { name: string; polygon: [number, number][] }[];
+for (const { polygon } of water) {
+  const ring: Ring = polygon.map(([lat, lon]) => [lon, lat]);
+  ring.push(ring[0]!);
+  fillPolygon([ring], land, 0);
+}
 
 // --- 2. Seeds ---------------------------------------------------------------------------------
 interface Def { id: number; key: string; name: string; kind: ProvinceKind }
@@ -252,9 +259,12 @@ for (let start = 0; start < W * H; start++) {
 // --- 4b. Snap provinces to real district borders (geoBoundaries, see data/map/ATTRIBUTION.md) -----
 // A district holding one seed joins that seed's province; a district without seeds joins whichever
 // province already covers most of it. Districts with several seeds keep the grown borders inside them,
-// and mostly-desert districts are left alone so desert-edge provinces keep their radius-limited shape.
+// mostly-desert districts are left alone so desert-edge provinces keep their radius-limited shape, and so are
+// districts much larger than the province they would join (coarse units such as German Regierungsbezirke).
 const BOUNDARY_DIR = 'tools/vendor/geoboundaries';
 const MAX_WASTE_SHARE = 0.4;
+/** A district may be at most this many times the grown size of the province it would join. */
+const MAX_DISTRICT_RATIO = 1.5;
 let snappedDistricts = 0;
 if (existsSync(BOUNDARY_DIR)) {
   const district = new Int32Array(W * H);
@@ -284,6 +294,8 @@ if (existsSync(BOUNDARY_DIR)) {
     const c = counts[d]!;
     c.set(owner[p]!, (c.get(owner[p]!) ?? 0) + 1);
   }
+  const grown = new Uint32Array(defs.length + 1);
+  for (let p = 0; p < W * H; p++) if (owner[p]! > 0) grown[owner[p]!]!++;
   const target = new Int32Array(districtCount + 1);
   for (let d = 1; d <= districtCount; d++) {
     const here = seedsIn.get(d);
@@ -298,7 +310,7 @@ if (existsSync(BOUNDARY_DIR)) {
       if (n > bestN) { best = o; bestN = n; }
     }
     const t = here ? [...here][0]! : best;
-    if (!t || slow[t] || waste > total * MAX_WASTE_SHARE) continue;
+    if (!t || slow[t] || waste > total * MAX_WASTE_SHARE || total > grown[t]! * MAX_DISTRICT_RATIO) continue;
     target[d] = t;
     snappedDistricts++;
   }

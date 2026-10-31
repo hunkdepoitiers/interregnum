@@ -1,5 +1,5 @@
 import type { MapMode } from '../render/map-modes';
-import { mapMode } from './App';
+import { hasRealms, mapMode } from './App';
 
 const MODES: { mode: MapMode; label: string; key: string }[] = [
   { mode: 'political', label: 'Political', key: 'q' },
@@ -7,6 +7,7 @@ const MODES: { mode: MapMode; label: string; key: string }[] = [
 ];
 
 export function MapModeBar() {
+  if (!hasRealms.value) return null; // provinces-only map: there is nothing political to show
   return (
     <nav class="mapmodes panel" aria-label="Map mode">
       {MODES.map((m) => (

@@ -1,5 +1,5 @@
 import { world } from '../bridge/client';
-import { mapData, selected, selectProvince } from './App';
+import { hasRealms, mapData, selected, selectProvince } from './App';
 import { RealmLink } from './RealmPanel';
 
 const KIND_LABEL = { land: 'Land province', sea: 'Sea zone', wasteland: 'Wasteland (impassable)', lake: 'Lake' };
@@ -28,7 +28,7 @@ export function ProvincePanel() {
         {p.coastal ? ' · coastal' : ''} · #{p.id}
       </p>
       <dl>
-        {p.kind === 'land' && (
+        {p.kind === 'land' && hasRealms.value && (
           <>
             <dt>Owner</dt>
             <dd>{owner ? <RealmLink id={owner} /> : <span class="muted">Unclaimed</span>}</dd>

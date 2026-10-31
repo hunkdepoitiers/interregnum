@@ -1698,3 +1698,5 @@ sea:
   - [bosporus_approaches, Western Black Sea Coast, 41.8, 29.8]
   - [sinop_sea, Sea of Sinope, 42.3, 34.5]
   - [middle_caspian, Middle Caspian, 42.0, 50.5]
+  - [zuiderzee, Zuiderzee, 52.65, 5.50]
+  - [wadden_sea, Wadden Sea, 53.40, 6.30]

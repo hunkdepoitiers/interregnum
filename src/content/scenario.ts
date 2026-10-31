@@ -23,6 +23,8 @@ const realmSourceSchema = z.object({
 
 /** Shape of data/scenario/*.yaml. */
 export const scenarioSourceSchema = z.object({
+  /** false = provinces-only map while the map is under construction; realms are kept but not loaded. */
+  enabled: z.boolean().default(true),
   unclaimed: z.array(key).default([]),
   occupations: z.record(key, key).default({}),
   realms: z.array(realmSourceSchema).min(1),

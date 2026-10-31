@@ -6,6 +6,10 @@
 # Ranks: empire | kingdom | duchy | county. Governments: feudal_monarchy | merchant_republic | theocracy |
 # holy_order | steppe_horde | iqta_sultanate | beylik.
 
+# Realms are switched off while the province map is being built: the game then shows provinces only and
+# new provinces need no owner. Set to true (and give every land province an owner) to bring the realms back.
+enabled: false
+
 unclaimed: []
 
 # Controller differs from owner at game start (sieges and occupations in progress).

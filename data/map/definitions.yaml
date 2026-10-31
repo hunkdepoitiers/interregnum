@@ -1651,3 +1651,5 @@
 - { id: 1649, key: bosporus_approaches, name: "Western Black Sea Coast", kind: sea, color: "#005fa1" }
 - { id: 1650, key: sinop_sea, name: "Sea of Sinope", kind: sea, color: "#1b52b4" }
 - { id: 1651, key: middle_caspian, name: "Middle Caspian", kind: sea, color: "#1375c1" }
+- { id: 1652, key: zuiderzee, name: "Zuiderzee", kind: sea, color: "#0e90d2" }
+- { id: 1653, key: wadden_sea, name: "Wadden Sea", kind: sea, color: "#004ffb" }

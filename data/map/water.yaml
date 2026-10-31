@@ -1,0 +1,22 @@
+# Historical water carved out of the modern coastline before provinces are grown.
+# Polygons are [lat, lon] points (closed automatically).
+- name: Zuiderzee   # open sea since the floods of the 13th century; modern IJsselmeer and Flevoland polders
+  polygon:
+    - [52.95, 5.05]
+    - [53.07, 5.33]
+    - [52.95, 5.43]
+    - [52.86, 5.37]
+    - [52.82, 5.62]
+    - [52.72, 5.75]
+    - [52.73, 5.93]
+    - [52.62, 5.96]
+    - [52.53, 5.90]
+    - [52.43, 5.82]
+    - [52.33, 5.60]
+    - [52.27, 5.38]
+    - [52.33, 5.10]
+    - [52.38, 5.00]
+    - [52.50, 5.06]
+    - [52.63, 5.08]
+    - [52.70, 5.28]
+    - [52.78, 5.11]
