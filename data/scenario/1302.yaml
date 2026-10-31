@@ -114,7 +114,8 @@ realms:
       artois, lille, tournai, poitiers, niort, la_rochelle, saintes, angouleme, limoges, perigueux, cahors, rodez,
       aurillac, gevaudan, le_puy, clermont, bourbon, lyon, macon, toulouse, albi, carcassonne, narbonne, beziers,
       nimes, foix, comminges, bigorre, armagnac, bearn, bar, besancon,
-      guines, ornois, uzege, alais, rases, florac, peyre, randon, millau, castras, caucada, biron, bainac, turenne, ventadour, comborn, murat, tallende, thiers, beaujolais, portois, avalois, bassigny, barrois, brenois, perthois, vertus, arcis, provins, omois, valois, senonais, joigny, donzy, sancerre, sully, vierzon, gatinais, dunois, perche, beaumont, mayenne, laval, sable, craon, saumur, mauges, thouars, loudun, amboise, loches, issoudun, berry, orval, jaligny, la_marche, bellac, charroux, lusignan, parthenay, sola, astarac, fezensac, iscla, saves, cotentin, carentan, bessin, lieuvin, auge, hiemois, mortain, ouche, roumois, caux, talou, eu, vexin, meulan, porcien, dormois, tiffauges, fontenay, talmont, lodeve, forez, roannais, viviers, escuens, amous]
+      guines, ornois, uzege, alais, rases, florac, peyre, randon, millau, castras, caucada, biron, bainac, turenne, ventadour, comborn, murat, tallende, thiers, beaujolais, portois, avalois, bassigny, barrois, brenois, perthois, vertus, arcis, provins, omois, valois, senonais, joigny, donzy, sancerre, sully, vierzon, gatinais, dunois, perche, beaumont, mayenne, laval, sable, craon, saumur, mauges, thouars, loudun, amboise, loches, issoudun, berry, orval, jaligny, la_marche, bellac, charroux, lusignan, parthenay, sola, astarac, fezensac, iscla, saves, cotentin, carentan, bessin, lieuvin, auge, hiemois, mortain, ouche, roumois, caux, talou, eu, vexin, meulan, porcien, dormois, tiffauges, fontenay, talmont, lodeve, forez, roannais, viviers, escuens, amous,
+      montbeliard]
   - key: brittany
     name: Duchy of Brittany
     rank: duchy
@@ -149,7 +150,8 @@ realms:
     capital: hainaut
     # Bishoprics of Utrecht and Cambrai merged: GUESS
     provinces: [hainaut, cambrai, holland, west_friesland, zeeland, utrecht, overijssel,
-      orthen, hamaland, avesnois]
+      orthen, hamaland, avesnois,
+      twente, rijnland, kennemerland]
   - key: frisia
     name: Frisian Lands
     rank: county
@@ -157,7 +159,8 @@ realms:
     color: "#6ab0d0"
     capital: friesland
     provinces: [friesland, groningen,
-      westergo, emsgau]  # the "Frisian freedom": no lord, ruled by local communities
+      westergo, emsgau,
+      zuidergo, bornego, ostfriesland, agradingau, rustringen, saterland]  # the "Frisian freedom": no lord, ruled by local communities
   - key: brabant
     name: Duchy of Brabant
     rank: duchy
@@ -166,7 +169,8 @@ realms:
     capital: brussels
     # Lower Rhine lordships (Liège, Loon, Luxembourg, Guelders, Cleves, Jülich, Berg, Aachen) merged: GUESS
     provinces: [brussels, antwerp, liege, loon, luxembourg, guelders, kleve, julich, aachen, berg,
-      breda, betuwe, kempen, maasgau, limbourg, salm, la_roche, chiny, arlon, moers]
+      breda, betuwe, kempen, maasgau, limbourg, salm, la_roche, chiny, arlon, moers,
+      kessel, gelre, zulpichgau, clervaux, bouillon]
 
   # ---------------------------------------------------------------- British Isles
   - key: england
@@ -229,7 +233,8 @@ realms:
     # Albert I, King of the Romans. Swabian imperial cities and bishoprics merged into Habsburg lands: GUESS
     provinces: [vienna, st_polten, wiener_neustadt, linz, styria, lucerne, freiburg, basel, zurich, bern,
       constance, strasbourg, wurttemberg, ulm, baden, schaffhausen, st_gallen, vorarlberg,
-      colmar, sundgau, ortenau, klettgau, aargau, elsgau]
+      colmar, sundgau, ortenau, klettgau, aargau, elsgau,
+      wertheim, hohenlohe, kochergau, laufen, pfinzgau, weissenburg, murrgau, neckargau, wurmgau, nagoldgau, urach, zollern, tubingen, ravensburg, furstenberg, berge, gruningen, thurgau, kyburg, toggenburg, sisgau, dagsburg, raabs, hohenau, krems, riedmark, melk, amstetten, steyr, murztal, leoben, stubenberg, leibnitz, cilli, kammersberg, pettau, rapperswil]
   - key: swiss
     name: Swiss Confederacy
     rank: county
@@ -244,7 +249,7 @@ realms:
     color: "#7a5c9e"
     capital: tyrol
     provinces: [tyrol, brixen, trento, chur, carinthia, carniola, gorizia,
-      disentis, engadin]  # bishoprics and Gorizia merged: GUESS
+      disentis, engadin, gurk, lurngau, villach, lienz, pustertal, meran, innstal, vinschgau, arco, eppan, pisino]  # bishoprics and Gorizia merged: GUESS
   - key: bavaria
     name: Duchy of Bavaria
     rank: duchy
@@ -253,21 +258,24 @@ realms:
     capital: munich
     # Upper and Lower Bavaria, the Palatinate, Salzburg, Passau and Augsburg merged: GUESS
     provinces: [munich, ingolstadt, landshut, straubing, regensburg, amberg, passau, salzburg, augsburg, speyer,
-      worms, heidelberg]
+      worms, heidelberg,
+      cham, parsberg, deggendorf, leuchtenburg, eichstatt, abensberg, leonsberg, wormsfeldgau, elsenzgau, dillingen, nordlingen, lechsgemund, lechrain, andechs, kirchberg, illergau, keltenstein, traungau, attergau, mattiggau, isengau, scheyern, freising, chiemgau, falkenstein, sundergau, pinzgau, pongau, admont, lungau, eschenlohe]
   - key: bohemia
     name: Kingdom of Bohemia
     rank: kingdom
     government: feudal_monarchy
     color: "#a9442e"
     capital: prague
-    provinces: [prague, plzen, cheb, litomerice, hradec, budweis, moravia, olomouc, troppau]
+    provinces: [prague, plzen, cheb, litomerice, hradec, budweis, moravia, olomouc, troppau,
+      loket, zatec, decin, slany, rakovnik, kourim, podbrdy, vltava, tachov, tuhost, pisek, prachen, bechyne, boleslav, libice, chrudim, caslav, chynov, jihlava, krumlov, znojmo, prerov, kladsko, hradiste]
   - key: silesia
     name: Silesian Duchies
     rank: duchy
     government: feudal_monarchy
     color: "#d9a441"
     capital: silesia
-    provinces: [silesia, legnica, swidnica, glogow, nysa, opole, raciborz]  # Piast duchies merged: GUESS
+    provinces: [silesia, legnica, swidnica, glogow, nysa, opole, raciborz,
+      zielona_gora, swiebodzin]  # Piast duchies merged: GUESS
   - key: poland
     name: Kingdom of Poland
     rank: kingdom
@@ -275,7 +283,8 @@ realms:
     color: "#c9485b"
     capital: krakow
     overlord: bohemia  # personal union under Wenceslaus II, modelled as vassalage: GUESS
-    provinces: [krakow, sandomierz, lublin, poznan, gniezno, kalisz, sieradz, leczyca, kuyavia, pomerelia, slupsk]
+    provinces: [krakow, sandomierz, lublin, poznan, gniezno, kalisz, sieradz, leczyca, kuyavia, pomerelia, slupsk,
+      slawno, walcz, czarnkow]
   - key: masovia
     name: Duchy of Masovia
     rank: duchy
@@ -290,7 +299,8 @@ realms:
     color: "#9fb4c8"
     capital: cologne
     provinces: [cologne, dortmund, munster, osnabruck, paderborn, minden,
-      ruhrgau, werl, lippe, auelgau]  # Westphalian bishoprics merged: GUESS
+      ruhrgau, werl, lippe, auelgau,
+      bentheim, almegau, arnsberg, ravensberg, neuenahr, hasegau, dersagau]  # Westphalian bishoprics merged: GUESS
   - key: mainz
     name: Archbishopric of Mainz
     rank: duchy
@@ -298,7 +308,8 @@ realms:
     color: "#6f8fae"
     capital: mainz
     provinces: [mainz, frankfurt, hesse, marburg, fulda,
-      waldeck, ziegenhain, lahngau]  # Hesse and Fulda merged: GUESS
+      waldeck, ziegenhain, lahngau,
+      wettergau, kinziggau, erbach, sponheim]  # Hesse and Fulda merged: GUESS
   - key: trier
     name: Archbishopric of Trier
     rank: duchy
@@ -306,7 +317,8 @@ realms:
     color: "#c08a5a"
     capital: trier
     provinces: [trier, koblenz, nassau,
-      prum, bidgau, diez]  # Nassau merged: GUESS
+      prum, bidgau, diez,
+      wildgrafs, vianden]  # Nassau merged: GUESS
   - key: lorraine
     name: Duchy of Lorraine
     rank: duchy
@@ -314,7 +326,8 @@ realms:
     color: "#c4b07a"
     capital: nancy
     provinces: [nancy, metz, toul, verdun, saarbrucken,
-      bitsch, saulnois, briey, chaumontois, saintois]  # Three Bishoprics and Saarbrücken merged: GUESS
+      bitsch, saulnois, briey, chaumontois, saintois,
+      saargau, zweibrucken, blamont]  # Three Bishoprics and Saarbrücken merged: GUESS
   - key: wurzburg
     name: Bishopric of Würzburg
     rank: county
@@ -322,7 +335,8 @@ realms:
     color: "#b3a3c9"
     capital: wurzburg
     provinces: [wurzburg, bamberg, nuremberg,
-      rieneck, saalgau, wiltberg, coburg]  # Franconian bishoprics and Nuremberg merged: GUESS
+      rieneck, saalgau, wiltberg, coburg,
+      mainwenden, bayreuth, hirschberg, iphgau, rangau, volkfeldgau, truhendingen, durn, henneberg]  # Franconian bishoprics and Nuremberg merged: GUESS
   - key: savoy
     name: County of Savoy
     rank: county
@@ -331,7 +345,8 @@ realms:
     capital: chambery
     # Geneva, Sion, Neuchâtel, Fribourg, Piedmont, Saluzzo and Asti merged: GUESS
     provinces: [chambery, vaud, geneva, valais, neuchatel, fribourg, aosta, turin, saluzzo, asti,
-      piedmonte, susa, tarentaise, maurienne, chablais, belley, bresse]
+      piedmonte, susa, tarentaise, maurienne, chablais, belley, bresse,
+      mondovi]
   - key: dauphine
     name: Dauphiné of Viennois
     rank: county
@@ -339,7 +354,8 @@ realms:
     color: "#4f8fbf"
     capital: grenoble
     provinces: [grenoble, vienne, valence, gap,
-      gresivaudan, albon, diois, embrunnais]
+      gresivaudan, albon, diois, embrunnais,
+      brianconnais]
   - key: brunswick
     name: Duchy of Brunswick-Lüneburg
     rank: duchy
@@ -347,7 +363,8 @@ realms:
     color: "#d6c25e"
     capital: brunswick
     provinces: [brunswick, hildesheim, gottingen, luneburg,
-      hanstein, hoya, wolpe, lohingau, luchow, osterwalde]  # Hildesheim bishopric merged: GUESS
+      hanstein, hoya, wolpe, lohingau, luchow, osterwalde,
+      hannover, homburg, gandersheim, corvey, balsamgau, supplingenburg]  # Hildesheim bishopric merged: GUESS
   - key: magdeburg
     name: Archbishopric of Magdeburg
     rank: duchy
@@ -355,7 +372,8 @@ realms:
     color: "#a8b9a0"
     capital: magdeburg
     provinces: [magdeburg, halberstadt, anhalt,
-      zerbst]  # Anhalt merged: GUESS
+      zerbst,
+      mansfeld]  # Anhalt merged: GUESS
   - key: wettin
     name: Margraviate of Meissen
     rank: duchy
@@ -363,7 +381,8 @@ realms:
     color: "#4f9e86"
     capital: meissen
     provinces: [meissen, osterland, erfurt, eisenach,
-      gleichenstein, brene]  # Thuringia merged: GUESS
+      gleichenstein, brene,
+      merseburg, naumburg, pleissnerland, wolkenstein, vogtland, lobdaburg, schwarzburg, dresden]  # Thuringia merged: GUESS
   - key: brandenburg
     name: Margraviate of Brandenburg
     rank: duchy
@@ -372,7 +391,8 @@ realms:
     capital: brandenburg
     # Saxe-Wittenberg merged with fellow Ascanians: GUESS
     provinces: [brandenburg, altmark, prignitz, uckermark, neumark, lusatia, lower_lusatia, wittenberg,
-      redaria, ruppin]
+      redaria, ruppin,
+      havelberg, havelland, berlin, mittelmark, barnim, juterbog, spreewald, santok, sommerfeld, gorlitz]
   - key: pomerania
     name: Duchy of Pomerania
     rank: duchy
@@ -380,7 +400,8 @@ realms:
     color: "#5e7fae"
     capital: stettin
     provinces: [stettin, kolobrzeg, rugen,
-      tribuzin, dolencia]  # Principality of Rügen merged: GUESS
+      tribuzin, dolencia,
+      bardo, voligost, grozwin, wolin, cedynia, prissania, bialogard, szczecinek]  # Principality of Rügen merged: GUESS
   - key: mecklenburg
     name: Lordship of Mecklenburg
     rank: county
@@ -396,7 +417,8 @@ realms:
     color: "#a35a7d"
     capital: holstein
     provinces: [holstein, ditmarsh, hamburg, lubeck,
-      stormarn, wagria]  # Lübeck and Dithmarschen were free: GUESS
+      stormarn, wagria,
+      heilangau, racisburg]  # Lübeck and Dithmarschen were free: GUESS
   - key: bremen
     name: Archbishopric of Bremen
     rank: county
@@ -404,7 +426,7 @@ realms:
     color: "#d6a0c0"
     capital: bremen
     provinces: [bremen, oldenburg,
-      lerigau, wigmodia]  # County of Oldenburg merged: GUESS
+      lerigau, wigmodia, diepholz, hadeln, kehdingen]  # County of Oldenburg merged: GUESS
 
   # ---------------------------------------------------------------- Baltic and Scandinavia
   - key: teutonic_order
@@ -463,7 +485,8 @@ realms:
     color: "#f0e6a8"
     capital: rome
     provinces: [rome, viterbo, orvieto, spoleto, perugia, ancona, fermo, ascoli, urbino, forli, rimini, campagna,
-      bologna, ravenna]
+      bologna, ravenna,
+      comacchio, imola, pesaro, gubbio, assisi, chiusi, tiferno]
   - key: naples
     name: Kingdom of Naples
     rank: kingdom
@@ -489,28 +512,29 @@ realms:
     color: "#2f8f8f"
     capital: venice
     # The Patriarchate of Aquileia (Friuli, Istria) merged: GUESS
-    provinces: [venice, friuli, istria, zadar, ragusa, candia, chania, rethymno, sitia, negroponte]
+    provinces: [venice, friuli, istria, zadar, ragusa, candia, chania, rethymno, sitia, negroponte, caorle, trieste, aquileia]
   - key: genoa
     name: Republic of Genoa
     rank: duchy
     government: merchant_republic
     color: "#c9d2dc"
     capital: genoa
-    provinces: [genoa, savona, lunigiana, corsica, ajaccio, sassari, caffa, phocaea]  # Phocaea: the Zaccaria
+    provinces: [genoa, savona, lunigiana, corsica, ajaccio, sassari, caffa, phocaea,
+      lavagna, albenga, ventimiglia]  # Phocaea: the Zaccaria
   - key: pisa
     name: Republic of Pisa
     rank: county
     government: merchant_republic
     color: "#8c3a3a"
     capital: pisa
-    provinces: [pisa, cagliari, iglesias, gallura, arborea, nuoro]  # Judicate of Arborea merged: GUESS
+    provinces: [pisa, cagliari, iglesias, gallura, arborea, nuoro, piombino]  # Judicate of Arborea merged: GUESS
   - key: florence
     name: Republic of Florence
     rank: county
     government: merchant_republic
     color: "#a0347a"
     capital: florence
-    provinces: [florence, pistoia, arezzo, siena, maremma, lucca]  # Tuscan communes merged: GUESS
+    provinces: [florence, pistoia, arezzo, siena, maremma, lucca, cortona, montalcino, volterra, empoli, casentino, soana]  # Tuscan communes merged: GUESS
   - key: milan
     name: Lordship of Milan
     rank: county
@@ -519,14 +543,16 @@ realms:
     capital: milan
     # della Torre restored in 1302; Lombard communes merged: GUESS
     provinces: [milan, como, bellinzona, pavia, novara, alessandria, piacenza, cremona, bergamo, brescia,
-      valtellina, seprio, arona, vercelli, lodi, tortona, bosco]
+      valtellina, seprio, arona, vercelli, lodi, tortona, bosco,
+      lomello, bobbio, canavese]
   - key: verona
     name: Lordship of Verona
     rank: county
     government: feudal_monarchy
     color: "#9a6fbf"
     capital: verona
-    provinces: [verona, mantua, padua, treviso]  # Mantua, Padua and Treviso were separate: GUESS
+    provinces: [verona, mantua, padua, treviso,
+      ceneta, feltre, belluno, vicenza, bassano, oderzo, gonzaga]  # Mantua, Padua and Treviso were separate: GUESS
   - key: ferrara
     name: Marquisate of Ferrara
     rank: county
@@ -534,7 +560,8 @@ realms:
     color: "#5fbfb0"
     capital: ferrara
     provinces: [ferrara, modena, reggio_emilia, parma,
-      fidenza]  # Parma merged: GUESS
+      fidenza,
+      polesine, adria, canossa, frignano, este]  # Parma merged: GUESS
 
   # ---------------------------------------------------------------- Hungary and the Balkans
   - key: hungary
@@ -545,7 +572,7 @@ realms:
     capital: buda
     # Interregnum: Wenceslaus (László V) and Charles Robert both claim the crown; oligarchs rule the provinces.
     provinces: [buda, pressburg, gyor, fehervar, szeged, pecs, kalocsa, temesvar, arad, bekes, varad, szabolcs,
-      eger, slavonia, syrmia, zagreb, varasd, somogy, maramures, severin]
+      eger, slavonia, syrmia, zagreb, varasd, somogy, maramures, severin, zagorje]
   - key: csak
     name: Domain of Matthew Csák
     rank: duchy
@@ -585,7 +612,8 @@ realms:
     color: "#bf6f4a"
     capital: knin
     overlord: hungary  # Paul Šubić, Charles Robert's chief backer
-    provinces: [knin, lika, modrus, sibenik, split, bosnia, hum]  # Frankopan Modruš merged: GUESS
+    provinces: [knin, lika, modrus, sibenik, split, bosnia, hum,
+      trsat, krk, gacka]  # Frankopan Modruš merged: GUESS
   - key: syrmia
     name: Kingdom of Syrmia
     rank: kingdom
