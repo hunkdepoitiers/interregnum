@@ -2602,34 +2602,38 @@
 - { id: 2600, key: mtn_kjolen, name: "Kjolen", kind: mountain, color: "#554d47" }
 - { id: 2601, key: mtn_greater_caucasus, name: "Greater Caucasus", kind: mountain, color: "#5e554d" }
 - { id: 2602, key: mtn_pontic_alps, name: "Pontic Alps", kind: mountain, color: "#5a534b" }
-- { id: 2603, key: mtn_taurus_mountains, name: "Taurus Mountains", kind: mountain, color: "#625953" }
-- { id: 2604, key: mtn_amanus_mountains, name: "Amanus Mountains", kind: mountain, color: "#79756c" }
-- { id: 2605, key: mtn_ararat, name: "Ararat", kind: mountain, color: "#756f6c" }
-- { id: 2606, key: mtn_zagros_mountains, name: "Zagros Mountains", kind: mountain, color: "#5d4d4b" }
-- { id: 2607, key: mtn_alborz_mountains, name: "Alborz Mountains", kind: mountain, color: "#5e5c58" }
-- { id: 2608, key: mtn_mount_lebanon, name: "Mount Lebanon", kind: mountain, color: "#73706c" }
-- { id: 2609, key: mtn_sinai_mountains, name: "Sinai Mountains", kind: mountain, color: "#504744" }
-- { id: 2610, key: mtn_high_atlas, name: "High Atlas", kind: mountain, color: "#514b4a" }
-- { id: 2611, key: mtn_anti_atlas, name: "Anti-Atlas", kind: mountain, color: "#605851" }
-- { id: 2612, key: mtn_middle_atlas, name: "Middle Atlas", kind: mountain, color: "#5b514d" }
-- { id: 2613, key: mtn_rif, name: "Rif", kind: mountain, color: "#69645e" }
-- { id: 2614, key: mtn_djurdjura, name: "Djurdjura", kind: mountain, color: "#625753" }
-- { id: 2615, key: mtn_aures, name: "Aures", kind: mountain, color: "#615957" }
-- { id: 2616, key: lake_1, name: "Lake 1", kind: lake, color: "#2b58ae" }
-- { id: 2617, key: lake_onega, name: "Onega", kind: lake, color: "#2b81d0" }
-- { id: 2618, key: lake_ladoga, name: "Ladoga", kind: lake, color: "#244bc5" }
-- { id: 2619, key: lake_vanern, name: "Vänern", kind: lake, color: "#2f62f5" }
-- { id: 2620, key: lake_peipus, name: "Peipus", kind: lake, color: "#1c42ab" }
-- { id: 2621, key: lake_vattern, name: "Vättern", kind: lake, color: "#255cbc" }
-- { id: 2622, key: lake_constance, name: "Constance", kind: lake, color: "#0783a6" }
-- { id: 2623, key: lake_balaton, name: "Balaton", kind: lake, color: "#073fad" }
-- { id: 2624, key: lake_geneva, name: "Geneva", kind: lake, color: "#2f60c5" }
-- { id: 2625, key: lake_garda, name: "Garda", kind: lake, color: "#117ace" }
-- { id: 2626, key: lake_scutari, name: "Scutari", kind: lake, color: "#038da2" }
-- { id: 2627, key: lake_ohrid, name: "Ohrid", kind: lake, color: "#2694d6" }
-- { id: 2628, key: lake_prespa, name: "Prespa", kind: lake, color: "#043fe0" }
-- { id: 2629, key: lake_sevan, name: "Sevan", kind: lake, color: "#3043f6" }
-- { id: 2630, key: lake_tuz, name: "Tuz", kind: lake, color: "#2361b2" }
-- { id: 2631, key: lake_van, name: "Van", kind: lake, color: "#2382bb" }
-- { id: 2632, key: lake_urmia, name: "Urmia", kind: lake, color: "#207bfa" }
-- { id: 2633, key: lake_dead_sea, name: "Dead Sea", kind: lake, color: "#0a8bd9" }
+- { id: 2603, key: mtn_geyik_mountains, name: "Geyik Mountains", kind: mountain, color: "#625953" }
+- { id: 2604, key: mtn_bolkar_mountains, name: "Bolkar Mountains", kind: mountain, color: "#79756c" }
+- { id: 2605, key: mtn_aladaglar, name: "Aladaglar", kind: mountain, color: "#756f6c" }
+- { id: 2606, key: mtn_erciyes, name: "Erciyes", kind: mountain, color: "#5d4d4b" }
+- { id: 2607, key: mtn_binboga_mountains, name: "Binboga Mountains", kind: mountain, color: "#5e5c58" }
+- { id: 2608, key: mtn_amanus_mountains, name: "Amanus Mountains", kind: mountain, color: "#73706c" }
+- { id: 2609, key: mtn_ararat, name: "Ararat", kind: mountain, color: "#504744" }
+- { id: 2610, key: mtn_zagros_mountains, name: "Zagros Mountains", kind: mountain, color: "#514b4a" }
+- { id: 2611, key: mtn_alborz_mountains, name: "Alborz Mountains", kind: mountain, color: "#605851" }
+- { id: 2612, key: mtn_mount_lebanon, name: "Mount Lebanon", kind: mountain, color: "#5b514d" }
+- { id: 2613, key: mtn_sinai_mountains, name: "Sinai Mountains", kind: mountain, color: "#69645e" }
+- { id: 2614, key: mtn_high_atlas, name: "High Atlas", kind: mountain, color: "#625753" }
+- { id: 2615, key: mtn_anti_atlas, name: "Anti-Atlas", kind: mountain, color: "#615957" }
+- { id: 2616, key: mtn_middle_atlas, name: "Middle Atlas", kind: mountain, color: "#655351" }
+- { id: 2617, key: mtn_rif, name: "Rif", kind: mountain, color: "#59554f" }
+- { id: 2618, key: mtn_djurdjura, name: "Djurdjura", kind: mountain, color: "#6c6357" }
+- { id: 2619, key: mtn_aures, name: "Aures", kind: mountain, color: "#7c6f6e" }
+- { id: 2620, key: lake_1, name: "Lake 1", kind: lake, color: "#2a4cf9" }
+- { id: 2621, key: lake_onega, name: "Onega", kind: lake, color: "#156cfb" }
+- { id: 2622, key: lake_ladoga, name: "Ladoga", kind: lake, color: "#177fe1" }
+- { id: 2623, key: lake_vanern, name: "Vänern", kind: lake, color: "#247fdd" }
+- { id: 2624, key: lake_peipus, name: "Peipus", kind: lake, color: "#0252bb" }
+- { id: 2625, key: lake_vattern, name: "Vättern", kind: lake, color: "#1f4ad0" }
+- { id: 2626, key: lake_constance, name: "Constance", kind: lake, color: "#0854fa" }
+- { id: 2627, key: lake_balaton, name: "Balaton", kind: lake, color: "#214ce6" }
+- { id: 2628, key: lake_geneva, name: "Geneva", kind: lake, color: "#077ab7" }
+- { id: 2629, key: lake_garda, name: "Garda", kind: lake, color: "#1160d5" }
+- { id: 2630, key: lake_scutari, name: "Scutari", kind: lake, color: "#0a93a8" }
+- { id: 2631, key: lake_ohrid, name: "Ohrid", kind: lake, color: "#2148a0" }
+- { id: 2632, key: lake_prespa, name: "Prespa", kind: lake, color: "#1387be" }
+- { id: 2633, key: lake_sevan, name: "Sevan", kind: lake, color: "#1390b2" }
+- { id: 2634, key: lake_tuz, name: "Tuz", kind: lake, color: "#0a53bc" }
+- { id: 2635, key: lake_van, name: "Van", kind: lake, color: "#0a49ba" }
+- { id: 2636, key: lake_urmia, name: "Urmia", kind: lake, color: "#036eb6" }
+- { id: 2637, key: lake_dead_sea, name: "Dead Sea", kind: lake, color: "#1158b1" }

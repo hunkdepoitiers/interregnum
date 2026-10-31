@@ -126,15 +126,31 @@
   width_km: 18
   lines:
     - [[40.85, 40.80], [41.05, 41.45]]
-- name: Taurus Mountains      # the Cilician Gates (34.78 E) between the two lines
+# The Taurus is a chain of separate impassable blocks (CK3 terrain); the valleys between them stay open.
+- name: Geyik Mountains
   width_km: 22
   lines:
-    - [[36.75, 31.90], [37.00, 32.60], [37.20, 33.40], [37.35, 34.30]]
-    - [[37.45, 35.10], [37.75, 35.80], [38.05, 36.50]]
-- name: Amanus Mountains
+    - [[37.25, 31.70], [36.95, 32.10], [36.70, 32.50]]
+- name: Bolkar Mountains      # north of Silifke; the Cilician Gates (37.28 N, 34.78 E) stay open to the east
+  width_km: 22
+  lines:
+    - [[36.95, 33.45], [37.15, 33.95], [37.35, 34.40], [37.45, 34.60]]
+- name: Aladaglar
+  width_km: 18
+  lines:
+    - [[37.65, 35.00], [37.85, 35.15], [38.05, 35.20]]
+- name: Erciyes
   width_km: 14
   lines:
-    - [[36.60, 36.15], [37.05, 36.45]]
+    - [[38.58, 35.40], [38.48, 35.52]]
+- name: Binboga Mountains
+  width_km: 18
+  lines:
+    - [[38.40, 36.25], [38.25, 36.60], [38.15, 36.90]]
+- name: Amanus Mountains
+  width_km: 12
+  lines:
+    - [[36.30, 36.15], [36.70, 36.30], [37.10, 36.55]]
 - name: Ararat
   width_km: 16
   lines:
