@@ -17,7 +17,7 @@ Decisions so far: **EU-style colour bitmap map**, **PixiJS v8 (WebGL)** renderer
 7. **Readable depth, data-driven.** Every number has a breakdown; all content lives in YAML.
 
 ## 2. v1 scope
-- Map: Iberia to the Caspian edge, Scotland/Baltic to Upper Egypt. Target ~350–450 land provinces, ~60 sea zones, plus wasteland. ~50–70 playable realms. Ilkhanate and Golden Horde are scripted neighbours (data-driven timelines of tribute demands and invasions, simplified armies).
+- Map: Iberia to the Caspian edge, Scotland/Baltic to Upper Egypt. Starter map (M2): 638 land provinces, 42 sea zones, 9 wastelands; 86 realms including vassals and tributaries. This is above the original ~300–500 provinces / ~50–70 realms target: prune seeds in `data/map/seeds.yaml` or merge realms in `data/scenario/1302.yaml` if it proves too much. Ilkhanate and Golden Horde are scripted neighbours (data-driven timelines of tribute demands and invasions, simplified armies).
 - Start 27 July 1302 on the **Julian calendar** (historically correct: leap year every 4 years, so 1304 has 29 February). Daily tick, pause, 5 speeds.
 - Singleplayer, browser (Vercel static site); later a Tauri desktop build.
 
@@ -71,6 +71,7 @@ With a colour bitmap of 4096×3342 px (~13.7M pixels), Canvas 2D would recolour 
 - `data/map/provinces.png`: RGB, one colour per province, no anti-aliasing.
 - `data/map/definitions.yaml`: `color → id, key, name, kind (land | sea | wasteland | lake)`.
 - `data/map/straits.yaml`: extra adjacencies.
+- `data/scenario/1302.yaml`: realms (rank, government, colour, capital, overlord, scripted flag) with the provinces each owns, start-date occupations and explicitly unclaimed land. `tools/build-data` validates it against the built map (every land province owned exactly once or listed as unclaimed, capitals inside the realm, no loops of overlords, no water owned, warnings for look-alike neighbour colours) and writes `public/generated/scenario.json`.
 - `data/map/projection.yaml`: equirectangular, standard parallel 45°N, bounds; converts city lat/lon to pixels.
 - `tools/build-map` (runs in `npm run build`, also on Vercel): checks every pixel colour is defined, warns on non-contiguous and tiny provinces; computes pixel count, bbox, centroid, coastal flag, adjacency with shared border length; writes `public/generated/province-ids.png` (ID in R+G, 16-bit) and `public/generated/map.json`.
 - `tools/seed-map` (one-off starter): rasterises a public-domain coastline (Natural Earth 1:50m land) and floods land and sea from seed points in `data/map/seeds.yaml` (historical towns, lat/lon) with a multi-source BFS, so provinces stay contiguous and never jump water. The output is a **starter** bitmap to repaint by hand (GIMP/Aseprite pencil tool, anti-aliasing off, no colour profile).
@@ -189,7 +190,7 @@ GameState { saveVersion, seed, rng, day, playerRealmId, realms, provinces, chara
             armies, sieges, wars, loans, banks, modifiers, eventQueue, log }
 ```
 
-Saves: `GameState` serialised to JSON, gzipped (CompressionStream), stored in IndexedDB and exportable as a file. `saveVersion` from day one; loading runs a `migrate(fromVersion)` chain.
+Saves: `GameState` serialised to JSON, gzipped (CompressionStream), stored in IndexedDB and exportable as a file. `saveVersion` from day one; loading runs a `migrate(fromVersion)` chain. Migrations receive the compiled scenario, so a save that predates a field can be filled from start-date data (v1 → v2 adds realms and province ownership).
 
 ## 7. Starting situation 1302 — and where I am guessing
 **Confident**: Andronikos II Palaiologos (Byzantium, broke, after Bapheus), Osman I (Ottoman beylik), Ghazan (Ilkhanate), Tokhta (Golden Horde), al-Nasir Muhammad (Mamluks; real power with Baybars al-Jashnakir and Salar), Philip IV (France, after Courtrai on 11 July 1302), Edward I (England), Albert I (King of the Romans), Wenceslaus II (Bohemia and Poland), Hungary in a succession crisis after Andrew III's death (1301), Boniface VIII (Papacy), James II (Aragon), Frederick III (Sicily), Charles II (Naples), Ferdinand IV under regent María de Molina (Castile), Denis (Portugal), Pietro Gradenigo (Venice), Stefan Milutin (Serbia), Theodore Svetoslav (Bulgaria), Henry II (Cyprus), Vytenis (Lithuania).
@@ -197,7 +198,7 @@ Saves: `GameState` serialised to JSON, gzipped (CompressionStream), stored in In
 **Guessing / simplifying**: borders and rulers of the smaller Anatolian beyliks (Karesi, Saruhan, Aydın, Menteshe, Germiyan, Hamid, Eshref, Candar, Karaman — some were founded or expanded a few years after 1302); the Cilician Armenian ruler arrangement (Leo III / Hethum II); Greek successor states (Epirus, Thessaly); Scotland's guardianship; every population figure; every income figure (balanced for play, not historically sourced); fort levels; the HRE prince list (minor princes merged into larger realms to stay within ~70 realms). Guessed data is marked `# GUESS` in YAML.
 
 ## 8. Bigger than they look
-- **Map content**: painting and naming ~450 provinces and assigning 1302 owners is weeks of work, separate from code.
+- **Map content**: the starter map is generated from seed towns; hand-repainting ~640 provinces into historical shapes is weeks of work, separate from code.
 - **AI** for war, sieges and budgeting: the largest single risk; v1 AI will be simple and exploitable.
 - **UI**: "every number explainable" means nested tooltips everywhere — many components.
 - **Balance**: a money-centric economy with loans and mercenaries can spiral; needs a headless "run 100 years, dump stats" tool.

@@ -4,9 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run build:map && vite",
+    "dev": "npm run build:map && npm run build:data && vite",
     "build:map": "tsx tools/build-map.ts",
-    "build": "npm run build:map && tsc --noEmit && vite build",
+    "build:data": "tsx tools/build-data.ts",
+    "build": "npm run build:map && npm run build:data && tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint .",

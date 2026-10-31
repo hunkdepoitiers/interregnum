@@ -56,7 +56,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .speeds button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .paused-label { color: var(--accent); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; font-size: 12px; }
 
-.province-panel {
+.side-panel {
   top: 70px;
   left: 12px;
   width: 300px;
@@ -64,13 +64,13 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   overflow-y: auto;
   padding: 12px 16px;
 }
-.province-panel h2 { margin: 0; font-size: 22px; padding-right: 24px; }
-.province-panel h3 { margin: 12px 0 4px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); }
-.province-panel .sub { margin: 2px 0 8px; color: var(--ink-soft); font-size: 13px; }
-.province-panel .close { position: absolute; top: 8px; right: 8px; padding: 0 8px; }
-.province-panel dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; }
-.province-panel dt { color: var(--ink-soft); }
-.province-panel dd { margin: 0; }
+.side-panel h2 { margin: 0; font-size: 22px; padding-right: 24px; }
+.side-panel h3 { margin: 12px 0 4px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); }
+.side-panel .sub { margin: 2px 0 8px; color: var(--ink-soft); font-size: 13px; }
+.side-panel .close { position: absolute; top: 8px; right: 8px; padding: 0 8px; }
+.side-panel dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; }
+.side-panel dt { color: var(--ink-soft); }
+.side-panel dd { margin: 0; }
 .neighbours { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 12px; }
 .neighbours li { break-inside: avoid; }
 button.link { background: none; border: 0; padding: 1px 0; text-align: left; text-decoration: underline; text-decoration-color: rgba(0, 0, 0, 0.25); }
@@ -103,7 +103,25 @@ button.link.kind-sea, button.link.kind-lake { color: var(--water-link); font-sty
 @media (max-width: 640px) {
   .topbar { top: 8px; gap: 6px; padding: 4px 8px; }
   .topbar .date { font-size: 15px; }
-  .province-panel { top: auto; bottom: 64px; left: 8px; right: 8px; width: auto; max-height: 40%; }
+  .side-panel { top: auto; bottom: 64px; left: 8px; right: 8px; width: auto; max-height: 40%; }
   .save-menu { left: 8px; right: 8px; justify-content: center; }
   .paused-label { display: none; }
+}
+
+.side-panel h2 { display: flex; align-items: center; gap: 8px; }
+.swatch { display: inline-block; width: 12px; height: 12px; border: 1px solid rgba(0, 0, 0, 0.45); border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.swatch.big { width: 18px; height: 18px; margin: 0; flex: none; }
+button.realm-link { text-decoration: none; }
+button.realm-link:hover { text-decoration: underline; }
+.muted { color: var(--ink-soft); font-style: italic; }
+.warn { color: var(--accent); }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+.tip-realm { opacity: 0.75; }
+
+.mapmodes { bottom: 12px; left: 12px; display: flex; gap: 4px; padding: 6px; }
+.mapmodes button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+@media (max-width: 640px) {
+  .mapmodes { bottom: 60px; left: 8px; }
+  .side-panel { bottom: 108px; }
 }

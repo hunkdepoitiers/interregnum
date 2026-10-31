@@ -1,7 +1,8 @@
 import { signal } from '@preact/signals';
 import type { Command } from '../sim/commands';
+import type { Scenario } from '../sim/scenario';
 import type { Speed } from '../sim/state';
-import type { FromWorker, ToWorker } from '../worker/protocol';
+import type { FromWorker, ToWorker, WorldView } from '../worker/protocol';
 
 /**
  * Main-thread handle on the simulation worker. The UI reads this signal and never touches sim state.
@@ -9,6 +10,8 @@ import type { FromWorker, ToWorker } from '../worker/protocol';
  * only re-rendered when the day changed, so pause/speed changes showed one update late.
  */
 export const status = signal<{ day: number; speed: Speed; paused: boolean }>({ day: 0, speed: 2, paused: true });
+/** Realms and who owns/holds each province; null until the worker has started a game. */
+export const world = signal<WorldView | null>(null);
 
 const worker = new Worker(new URL('../worker/sim.worker.ts', import.meta.url), { type: 'module' });
 const pending = new Map<number, (msg: FromWorker) => void>();
@@ -18,6 +21,10 @@ worker.onmessage = (e: MessageEvent<FromWorker>) => {
   const msg = e.data;
   if (msg.type === 'status') {
     status.value = { day: msg.day, speed: msg.speed, paused: msg.paused };
+    return;
+  }
+  if (msg.type === 'world') {
+    world.value = { realms: msg.realms, owner: msg.owner, controller: msg.controller };
     return;
   }
   pending.get(msg.requestId)?.(msg);
@@ -38,8 +45,8 @@ export function command(cmd: Command) {
   send({ type: 'command', cmd });
 }
 
-export function newGame(seed: number) {
-  send({ type: 'newGame', seed });
+export function startGame(seed: number, scenario: Scenario) {
+  send({ type: 'init', seed, scenario });
 }
 
 export async function getSaveText(): Promise<string> {

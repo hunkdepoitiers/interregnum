@@ -1,0 +1,692 @@
+# Political situation on 27 July 1302.
+# Every land province belongs to exactly one realm, or is listed under `unclaimed`.
+# `overlord` makes a realm a vassal/tributary; `scripted` realms are run by data timelines, not AI.
+# `# GUESS` marks simplifications: merged minor lordships, uncertain 1302 holders, or approximate borders.
+# Ranks: empire | kingdom | duchy | county. Governments: feudal_monarchy | merchant_republic | theocracy |
+# holy_order | steppe_horde | iqta_sultanate | beylik.
+
+unclaimed: [fezzan]   # Saharan oases outside any realm's control
+
+# Controller differs from owner at game start (sieges and occupations in progress).
+occupations:
+  edinburgh: england  # English garrisons hold Lothian during the Wars of Independence
+
+realms:
+  # ---------------------------------------------------------------- Iberia
+  - key: castile
+    name: Kingdom of Castile
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d8a93b"
+    capital: toledo
+    provinces: [santiago, lugo, oviedo, leon, burgos, valladolid, toledo, cuenca, badajoz, seville, cordoba,
+      jaen, jerez, calatrava, caceres, salamanca, zamora, segovia, siguenza, soria, logrono, santander, biscay]
+  - key: portugal
+    name: Kingdom of Portugal
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#2f7d4f"
+    capital: lisbon
+    provinces: [lisbon, porto, coimbra, algarve, evora]
+  - key: aragon
+    name: Crown of Aragon
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#e0c85a"
+    capital: barcelona
+    # Murcia and Alicante were held by Aragon from 1296 until the Treaty of Torrellas (1304).
+    provinces: [zaragoza, barcelona, valencia, huesca, lleida, tarragona, teruel, girona, murcia, alicante]
+  - key: majorca
+    name: Kingdom of Majorca
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c86b3c"
+    capital: mallorca
+    overlord: aragon
+    provinces: [mallorca, roussillon, montpellier]
+  - key: navarre
+    name: Kingdom of Navarre
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#9c3f6e"
+    capital: pamplona
+    provinces: [pamplona]  # in personal union with France through Queen Joan I; not modelled yet
+  - key: granada
+    name: Emirate of Granada
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#3e9a6a"
+    capital: granada
+    provinces: [granada, malaga, almeria]
+
+  # ---------------------------------------------------------------- Maghreb
+  - key: marinids
+    name: Marinid Sultanate
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#b7724a"
+    capital: fez
+    provinces: [fez, marrakesh, tangier, ceuta, sale, meknes, safi, sous, taza, sijilmasa]  # Ceuta under the Azafids: GUESS
+  - key: zayyanids
+    name: Zayyanid Kingdom of Tlemcen
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#7d8f3a"
+    capital: tlemcen
+    provinces: [tlemcen, oran, algiers, titteri]  # Tlemcen itself under Marinid siege 1299-1307
+  - key: hafsids
+    name: Hafsid Sultanate
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#d58a5b"
+    capital: tunis
+    # The Béjaïa branch (separate until 1309) is merged in: GUESS
+    provinces: [tunis, kairouan, mahdia, gabes, gafsa, bejaia, constantine, bona, biskra, tripoli_libya]
+
+  # ---------------------------------------------------------------- France and the Low Countries
+  - key: france
+    name: Kingdom of France
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#2d4f9e"
+    capital: paris
+    # Great fiefs (Brittany, Burgundy, Foix, Armagnac, Bar, Franche-Comté) merged into the crown: GUESS
+    provinces: [paris, rouen, caen, rennes, nantes, cornouaille, tours, orleans, bourges, poitiers, toulouse,
+      carcassonne, lyon, clermont, limoges, dijon, troyes, reims, amiens, boulogne, lille, le_mans, angers,
+      la_rochelle, angouleme, perigueux, cahors, rodez, le_puy, macon, nevers, auxerre, chartres, beauvais,
+      laon, bar, foix, bearn, armagnac, artois, bourbon, besancon]
+  - key: flanders
+    name: County of Flanders
+    rank: county
+    government: feudal_monarchy
+    color: "#d9d04c"
+    capital: ghent
+    overlord: france  # in open revolt after Courtrai (11 July 1302)
+    provinces: [bruges, ghent]
+  - key: hainaut
+    name: Counties of Hainaut and Holland
+    rank: county
+    government: feudal_monarchy
+    color: "#e08a2e"
+    capital: hainaut
+    provinces: [hainaut, holland, zeeland, friesland, utrecht]  # Bishopric of Utrecht merged: GUESS
+  - key: brabant
+    name: Duchy of Brabant
+    rank: duchy
+    government: feudal_monarchy
+    color: "#b9483f"
+    capital: brussels
+    # Lower Rhine lordships (Liège, Luxembourg, Guelders, Cleves, Jülich, Aachen) merged: GUESS
+    provinces: [brussels, liege, luxembourg, guelders, kleve, julich, aachen]
+
+  # ---------------------------------------------------------------- British Isles
+  - key: england
+    name: Kingdom of England
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#b8312f"
+    capital: london
+    # Includes the Lordship of Ireland (Gaelic kingdoms merged: GUESS) and Gascony.
+    provinces: [london, canterbury, winchester, exeter, bristol, oxford, norwich, lincoln, york, chester, durham,
+      carlisle, lancaster, leicester, shrewsbury, northampton, salisbury, cambridge, glamorgan, gwynedd, pembroke,
+      dublin, cork, waterford, meath, limerick, galway, ulster, sligo, bordeaux, bayonne, agen]
+  - key: scotland
+    name: Kingdom of Scotland
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#3b5bb5"
+    capital: perth
+    provinces: [edinburgh, glasgow, perth, aberdeen, inverness, galloway, argyll, ross, moray]  # ruled by Guardians
+
+  # ---------------------------------------------------------------- Holy Roman Empire
+  - key: habsburg
+    name: Duchy of Austria
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e9e3d0"
+    capital: vienna
+    # Albert I, King of the Romans. Swabian imperial cities and bishoprics merged into Habsburg lands: GUESS
+    provinces: [vienna, linz, styria, lucerne, freiburg, basel, zurich, bern, constance, strasbourg, wurttemberg, ulm]
+  - key: tyrol
+    name: Duchy of Carinthia and Tyrol
+    rank: duchy
+    government: feudal_monarchy
+    color: "#7a5c9e"
+    capital: tyrol
+    provinces: [tyrol, carinthia, carniola, trento, chur]  # Trento and Chur bishoprics merged: GUESS
+  - key: bavaria
+    name: Duchy of Bavaria
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5aa0d8"
+    capital: munich
+    # Upper and Lower Bavaria, the Palatinate, Salzburg, Passau and Augsburg merged: GUESS
+    provinces: [munich, landshut, regensburg, passau, salzburg, augsburg, speyer]
+  - key: bohemia
+    name: Kingdom of Bohemia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#a9442e"
+    capital: prague
+    provinces: [prague, plzen, hradec, moravia, silesia, opole, glogow]  # Silesian duchies merged: GUESS
+  - key: poland
+    name: Kingdom of Poland
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c9485b"
+    capital: krakow
+    overlord: bohemia  # personal union under Wenceslaus II, modelled as vassalage: GUESS
+    provinces: [krakow, sandomierz, lublin, poznan, kalisz, leczyca, kuyavia, masovia, pomerelia, slupsk]
+  - key: cologne
+    name: Archbishopric of Cologne
+    rank: duchy
+    government: theocracy
+    color: "#9fb4c8"
+    capital: cologne
+    provinces: [cologne, dortmund, munster, osnabruck, paderborn]  # Westphalian bishoprics merged: GUESS
+  - key: mainz
+    name: Archbishopric of Mainz
+    rank: duchy
+    government: theocracy
+    color: "#6f8fae"
+    capital: mainz
+    provinces: [mainz, frankfurt, hesse]  # Landgraviate of Hesse merged: GUESS
+  - key: trier
+    name: Archbishopric of Trier
+    rank: duchy
+    government: theocracy
+    color: "#c08a5a"
+    capital: trier
+    provinces: [trier, koblenz]
+  - key: lorraine
+    name: Duchy of Lorraine
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c4b07a"
+    capital: nancy
+    provinces: [nancy, metz]
+  - key: wurzburg
+    name: Bishopric of Würzburg
+    rank: county
+    government: theocracy
+    color: "#b3a3c9"
+    capital: wurzburg
+    provinces: [wurzburg, bamberg, nuremberg]  # Franconian bishoprics and Nuremberg merged: GUESS
+  - key: savoy
+    name: County of Savoy
+    rank: county
+    government: feudal_monarchy
+    color: "#c23b3b"
+    capital: chambery
+    provinces: [chambery, vaud, geneva, valais, turin, asti]  # Geneva, Sion, Piedmont, Asti merged: GUESS
+  - key: dauphine
+    name: Dauphiné of Viennois
+    rank: county
+    government: feudal_monarchy
+    color: "#4f8fbf"
+    capital: grenoble
+    provinces: [grenoble, valence]
+  - key: brunswick
+    name: Duchy of Brunswick-Lüneburg
+    rank: duchy
+    government: feudal_monarchy
+    color: "#d6c25e"
+    capital: brunswick
+    provinces: [brunswick, gottingen, luneburg]
+  - key: magdeburg
+    name: Archbishopric of Magdeburg
+    rank: duchy
+    government: theocracy
+    color: "#a8b9a0"
+    capital: magdeburg
+    provinces: [magdeburg, halberstadt]
+  - key: wettin
+    name: Margraviate of Meissen
+    rank: duchy
+    government: feudal_monarchy
+    color: "#4f9e86"
+    capital: meissen
+    provinces: [meissen, erfurt]  # Thuringia merged: GUESS
+  - key: brandenburg
+    name: Margraviate of Brandenburg
+    rank: duchy
+    government: feudal_monarchy
+    color: "#7f6a4a"
+    capital: brandenburg
+    provinces: [brandenburg, neumark, lusatia, wittenberg]  # Saxe-Wittenberg merged with fellow Ascanians: GUESS
+  - key: pomerania
+    name: Duchy of Pomerania
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5e7fae"
+    capital: stettin
+    provinces: [stettin, kolobrzeg, rugen]  # Principality of Rügen merged: GUESS
+  - key: mecklenburg
+    name: Lordship of Mecklenburg
+    rank: county
+    government: feudal_monarchy
+    color: "#c9a07a"
+    capital: mecklenburg
+    provinces: [mecklenburg]
+  - key: holstein
+    name: County of Holstein
+    rank: county
+    government: feudal_monarchy
+    color: "#a35a7d"
+    capital: holstein
+    provinces: [holstein, hamburg, lubeck]  # Lübeck was a free city: GUESS
+  - key: bremen
+    name: Archbishopric of Bremen
+    rank: county
+    government: theocracy
+    color: "#d6a0c0"
+    capital: bremen
+    provinces: [bremen, oldenburg]  # County of Oldenburg merged: GUESS
+
+  # ---------------------------------------------------------------- Baltic and Scandinavia
+  - key: teutonic_order
+    name: Teutonic Order
+    rank: duchy
+    government: holy_order
+    color: "#2b2b2b"
+    capital: elbing  # Marienburg became the seat in 1309
+    # The Livonian branch, Riga and Dorpat merged: GUESS
+    provinces: [chelmno, konigsberg, elbing, galindia, memel, courland, semigallia, latgale, riga, dorpat]
+  - key: denmark
+    name: Kingdom of Denmark
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c8443c"
+    capital: roskilde
+    provinces: [roskilde, odense, aarhus, ribe, viborg_dk, aalborg, scania, halland, blekinge, bornholm, reval,
+      schleswig]
+  - key: sweden
+    name: Kingdom of Sweden
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#3d6fb6"
+    capital: stockholm
+    provinces: [stockholm, uppsala, vasteras, narke, varmland, skara, linkoping, jonkoping, vaxjo, kalmar,
+      gotland, turku, tavastia, vyborg]
+  - key: norway
+    name: Kingdom of Norway
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#a8563f"
+    capital: bergen
+    provinces: [bergen, oslo, stavanger, agder, tonsberg, hamar]
+  - key: lithuania
+    name: Grand Duchy of Lithuania
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#9fd04a"
+    capital: vilnius
+    provinces: [vilnius, novogrudok, grodno, samogitia, minsk, polotsk, vitebsk]  # Polotsk and Vitebsk: GUESS
+
+  # ---------------------------------------------------------------- Italy
+  - key: papal_states
+    name: Papal States
+    rank: kingdom
+    government: theocracy
+    color: "#f0e6a8"
+    capital: rome
+    provinces: [rome, viterbo, orvieto, spoleto, perugia, ancona, urbino, campagna, bologna, ravenna]
+  - key: naples
+    name: Kingdom of Naples
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#6a8f3a"
+    capital: naples
+    # Includes Charles II's County of Provence and Angevin Corfu.
+    provinces: [naples, capua, benevento, salerno, capitanata, otranto, bari, taranto, basilicata, calabria,
+      reggio, molise, abruzzo, marseille, nice, avignon, corfu]
+  - key: sicily
+    name: Kingdom of Trinacria
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d0763b"
+    capital: palermo
+    provinces: [palermo, messina, syracuse, agrigento, trapani, malta]
+  - key: venice
+    name: Republic of Venice
+    rank: duchy
+    government: merchant_republic
+    color: "#2f8f8f"
+    capital: venice
+    # The Patriarchate of Aquileia (Friuli, Istria) merged: GUESS
+    provinces: [venice, friuli, istria, zadar, ragusa, candia, chania, negroponte]
+  - key: genoa
+    name: Republic of Genoa
+    rank: duchy
+    government: merchant_republic
+    color: "#c9d2dc"
+    capital: genoa
+    provinces: [genoa, corsica, sassari, caffa]
+  - key: pisa
+    name: Republic of Pisa
+    rank: county
+    government: merchant_republic
+    color: "#8c3a3a"
+    capital: pisa
+    provinces: [pisa, cagliari, gallura, arborea]  # Judicate of Arborea merged: GUESS
+  - key: florence
+    name: Republic of Florence
+    rank: county
+    government: merchant_republic
+    color: "#a0347a"
+    capital: florence
+    provinces: [florence, arezzo, siena, lucca]  # Tuscan communes merged: GUESS
+  - key: milan
+    name: Lordship of Milan
+    rank: county
+    government: feudal_monarchy
+    color: "#3b8f5a"
+    capital: milan
+    provinces: [milan, como, pavia, bergamo, brescia]  # della Torre restored in 1302; Lombard communes merged: GUESS
+  - key: verona
+    name: Lordship of Verona
+    rank: county
+    government: feudal_monarchy
+    color: "#9a6fbf"
+    capital: verona
+    provinces: [verona, mantua, padua, treviso]  # Mantua, Padua and Treviso were separate: GUESS
+  - key: ferrara
+    name: Marquisate of Ferrara
+    rank: county
+    government: feudal_monarchy
+    color: "#5fbfb0"
+    capital: ferrara
+    provinces: [ferrara, modena, parma]  # Parma merged: GUESS
+
+  # ---------------------------------------------------------------- Hungary and the Balkans
+  - key: hungary
+    name: Kingdom of Hungary
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#4c7a3a"
+    capital: buda
+    # Interregnum: Wenceslaus (László V) and Charles Robert both claim the crown; oligarchs rule the provinces.
+    provinces: [buda, pressburg, kassa, szeged, pecs, temesvar, varad, szepes, eger, gyor, fehervar, szabolcs,
+      kalocsa, slavonia, syrmia, zagreb, maramures, severin]
+  - key: csak
+    name: Domain of Matthew Csák
+    rank: duchy
+    government: feudal_monarchy
+    color: "#8fbf5a"
+    capital: nyitra
+    overlord: hungary
+    provinces: [nyitra, zolyom]
+  - key: transylvania
+    name: Voivodeship of Transylvania
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c06a9a"
+    capital: gyulafehervar
+    overlord: hungary  # Ladislaus Kán, de facto independent
+    provinces: [gyulafehervar, kolozsvar, szeben, szekelyfold, brasso]
+  - key: subic
+    name: Banate of Croatia and Bosnia
+    rank: duchy
+    government: feudal_monarchy
+    color: "#bf6f4a"
+    capital: knin
+    overlord: hungary  # Paul Šubić, Charles Robert's chief backer
+    provinces: [knin, split, bosnia, hum]
+  - key: syrmia
+    name: Kingdom of Syrmia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#6a5aa6"
+    capital: belgrade
+    overlord: hungary  # Stefan Dragutin
+    provinces: [belgrade, usora]
+  - key: wallachia
+    name: Wallachia
+    rank: duchy
+    government: feudal_monarchy
+    color: "#d9b25e"
+    capital: wallachia
+    overlord: hungary  # GUESS: pre-Basarab voivodes
+    provinces: [wallachia, oltenia]
+  - key: serbia
+    name: Kingdom of Serbia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#a63a3a"
+    capital: ras
+    provinces: [ras, nis, skopje, prizren, zeta, shkoder, prilep, velbazhd, durres]  # Durrës and Velbazhd: GUESS
+  - key: bulgaria
+    name: Tsardom of Bulgaria
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#2f9f6f"
+    capital: tarnovo
+    provinces: [tarnovo, sofia, vidin, lovech, varna, silistra, dobruja]  # Vidin despotate merged: GUESS
+  - key: byzantium
+    name: Byzantine Empire
+    rank: empire
+    government: feudal_monarchy
+    color: "#7b2d74"
+    capital: constantinople
+    provinces: [constantinople, rhaedestos, bizye, adrianople, mosynopolis, christoupolis, thessalonica,
+      chalkidiki, serres, veria, kastoria, ohrid, plovdiv, mesembria, gallipoli, lemnos, lesbos, chios, samos,
+      kos, rhodes, mystras, monemvasia, valona, nicomedia, nicaea, bursa, troad, philadelphia, smyrna, ephesus,
+      heraclea]
+  - key: epirus
+    name: Despotate of Epirus
+    rank: duchy
+    government: feudal_monarchy
+    color: "#b0648f"
+    capital: arta
+    provinces: [arta, ioannina]
+  - key: thessaly
+    name: Duchy of Neopatras
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c48aa8"
+    capital: thessaly
+    provinces: [thessaly, neopatras]
+  - key: athens
+    name: Duchy of Athens
+    rank: duchy
+    government: feudal_monarchy
+    color: "#4a6fa6"
+    capital: athens
+    overlord: achaea
+    provinces: [athens, argos]
+  - key: achaea
+    name: Principality of Achaea
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5d8b4a"
+    capital: achaea
+    overlord: naples
+    provinces: [achaea, patras, corinth, messenia, cephalonia, naxos]  # Cephalonia and the Archipelago: GUESS
+  - key: cyprus
+    name: Kingdom of Cyprus
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d4c06a"
+    capital: nicosia
+    provinces: [nicosia, famagusta]
+
+  # ---------------------------------------------------------------- Anatolia
+  - key: ottomans
+    name: Ottoman Beylik
+    rank: county
+    government: beylik
+    color: "#9e3b2e"
+    capital: sogut
+    provinces: [sogut, eskisehir, bilecik, goynuk]
+  - key: karesi
+    name: Karesi Beylik
+    rank: county
+    government: beylik
+    color: "#c97f5f"
+    capital: balikesir
+    provinces: [balikesir, pergamon, adramyttion]  # GUESS
+  - key: saruhan
+    name: Saruhan Beylik
+    rank: county
+    government: beylik
+    color: "#e3d36b"
+    capital: manisa
+    provinces: [manisa]  # Manisa fell to Saruhan in 1313: GUESS
+  - key: germiyan
+    name: Germiyan Beylik
+    rank: duchy
+    government: beylik
+    color: "#5f7f3f"
+    capital: kutahya
+    # Aydın (Birgi, Tralles) began as a Germiyan march: merged: GUESS
+    provinces: [kutahya, usak, karahisar, denizli, birgi, tralles]
+  - key: menteshe
+    name: Menteshe Beylik
+    rank: county
+    government: beylik
+    color: "#3f9fa6"
+    capital: milas
+    provinces: [milas, mugla, makri]
+  - key: hamid
+    name: Hamid Beylik
+    rank: county
+    government: beylik
+    color: "#6fcf9f"
+    capital: egirdir
+    provinces: [egirdir, antalya, beysehir]  # Eshrefids merged: GUESS
+  - key: karaman
+    name: Karaman Beylik
+    rank: duchy
+    government: beylik
+    color: "#3a6a8f"
+    capital: karaman
+    provinces: [karaman, alanya, silifke]  # GUESS
+  - key: candar
+    name: Candar Beylik
+    rank: county
+    government: beylik
+    color: "#8f7fbf"
+    capital: kastamonu
+    provinces: [kastamonu, sinop, cankiri, bolu]
+  - key: rum
+    name: Sultanate of Rum
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#c2a97e"
+    capital: konya
+    overlord: ilkhanate  # Mesud II, a Mongol puppet
+    provinces: [konya, aksaray, kayseri, kirsehir, nigde, ankara, amasya, tokat, sivas, samsun]
+  - key: trebizond
+    name: Empire of Trebizond
+    rank: empire
+    government: feudal_monarchy
+    color: "#d07ab0"
+    capital: trebizond
+    provinces: [trebizond, rize, kerasous]
+  - key: cilicia
+    name: Armenian Kingdom of Cilicia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d9774a"
+    capital: sis
+    overlord: ilkhanate
+    provinces: [sis, adana, ayas, tarsus]
+
+  # ---------------------------------------------------------------- The great powers of the east
+  - key: mamluks
+    name: Mamluk Sultanate
+    rank: empire
+    government: iqta_sultanate
+    color: "#e2c26f"
+    capital: cairo
+    provinces: [cairo, alexandria, damietta, sharqiya, gharbiya, buhayra, fayyum, minya, asyut, akhmim, qus,
+      aswan, gaza, jerusalem, nablus, acre, safed, kerak, damascus, baalbek, homs, hama, tripoli_levant,
+      latakia, aleppo, antioch, marash, rahba, ayla, tabuk, medina, barca]  # Medina and Barca: GUESS
+  - key: ilkhanate
+    name: Ilkhanate
+    rank: empire
+    government: steppe_horde
+    color: "#4f6f8f"
+    capital: tabriz
+    scripted: true
+    # Vassal dynasts (Artuqids, Shirvanshahs, Hazaraspids, Bavandids) merged: GUESS
+    provinces: [erzincan, erzurum, bayburt, malatya, harput, elbistan, diyarbakir, mardin, siirt, bitlis, van,
+      hakkari, edessa, nisibis, mosul, erbil, kirkuk, tikrit, anah, raqqa, baghdad, hilla, kufa, wasit, basra,
+      ahvaz, lorestan, kermanshah, hamadan, isfahan, kashan, shiraz, rayy, qazvin, sultaniyya, gilan,
+      mazandaran, tabriz, maragha, urmia, ardabil, nakhichevan, siunik, dvin, ani, arran, shirvan, derbent]
+  - key: georgia
+    name: Kingdom of Georgia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#b34d4d"
+    capital: tiflis
+    overlord: ilkhanate
+    provinces: [tiflis, kutaisi]  # Imereti was separate: GUESS
+  - key: golden_horde
+    name: Golden Horde
+    rank: empire
+    government: steppe_horde
+    color: "#c9a23e"
+    capital: sarai
+    scripted: true
+    provinces: [sarai, astrakhan, tana, dnieper_steppe, zaporizhia, don_steppe, ukek, bolghar, samara,
+      bashkiria, mordovia, kuban, zichia, alania, kabarda, budjak, moldavia, podolia, kyiv, pereiaslav,
+      chernihiv, kursk]
+
+  # ---------------------------------------------------------------- Rus' (tributaries of the Golden Horde)
+  - key: novgorod
+    name: Novgorod Republic
+    rank: kingdom
+    government: merchant_republic
+    color: "#6f9f5f"
+    capital: novgorod
+    overlord: golden_horde
+    provinces: [novgorod, staraya_russa, ladoga, karelia, pskov, vologda, ustyug, vyatka]  # Pskov merged: GUESS
+  - key: vladimir
+    name: Grand Principality of Vladimir
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#9a7a3a"
+    capital: vladimir
+    overlord: golden_horde
+    provinces: [vladimir, kostroma, nizhny, rostov, yaroslavl, beloozero]  # Rostov line merged: GUESS
+  - key: moscow
+    name: Principality of Moscow
+    rank: duchy
+    government: feudal_monarchy
+    color: "#7f3f5f"
+    capital: moscow
+    overlord: golden_horde
+    provinces: [moscow, pereslavl]  # Pereslavl bequeathed to Daniel in 1302
+  - key: tver
+    name: Principality of Tver
+    rank: duchy
+    government: feudal_monarchy
+    color: "#3fbfa0"
+    capital: tver
+    overlord: golden_horde
+    provinces: [tver]
+  - key: ryazan
+    name: Principality of Ryazan
+    rank: duchy
+    government: feudal_monarchy
+    color: "#af8f5f"
+    capital: ryazan
+    overlord: golden_horde
+    provinces: [ryazan, murom]  # Murom merged: GUESS
+  - key: smolensk
+    name: Principality of Smolensk
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5f6f9f"
+    capital: smolensk
+    overlord: golden_horde
+    provinces: [smolensk, mozhaysk, bryansk, seversk]  # Bryansk and Seversk: GUESS
+  - key: galicia
+    name: Kingdom of Galicia-Volhynia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#5aa65a"
+    capital: lviv
+    overlord: golden_horde
+    provinces: [lviv, halych, przemysl, volodymyr, lutsk, brest_litovsk, pinsk]  # Pinsk: GUESS

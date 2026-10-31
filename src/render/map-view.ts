@@ -2,12 +2,13 @@ import {
   Application, BufferImageSource, Container, Geometry, GlProgram, ImageSource, Mesh, Shader, UniformGroup,
 } from 'pixi.js';
 import type { MapData } from '../content/map';
-import { buildLookup, LOOKUP_SIZE } from './map-modes';
+import { LOOKUP_SIZE } from './map-modes';
 
 /**
  * The whole map is one quad. The fragment shader reads the province id at each pixel from the id texture,
- * looks up that province's colour in a 1-row lookup texture, and draws borders where neighbouring ids differ.
- * Recolouring the map (map modes, conquests) only rewrites the small lookup texture.
+ * looks up that province's colours in a small lookup texture (see map-modes.ts), stripes occupied provinces
+ * in the occupier's colour, and draws borders: faint between provinces, strong between realms.
+ * Recolouring the map (map modes, conquests) only rewrites the lookup texture.
  */
 const vertex = /* glsl */ `
 in vec2 aPosition;
@@ -31,27 +32,45 @@ uniform vec2 uMapSize;
 uniform float uHover;
 uniform float uSelected;
 uniform float uZoom;
+uniform vec4 uRealmHighlight; // rgb: owner colour to highlight; a: 1 when active
+
+const vec3 INK = vec3(0.08, 0.06, 0.05);
 
 float idAt(vec2 uv) {
   vec4 c = texture(uIdMap, uv);
   return floor(c.r * 255.0 + 0.5) + floor(c.g * 255.0 + 0.5) * 256.0;
 }
+vec4 baseOf(float id) { return texture(uLookup, vec2((id + 0.5) / ${LOOKUP_SIZE}.0, 0.25)); }
+vec4 heldOf(float id) { return texture(uLookup, vec2((id + 0.5) / ${LOOKUP_SIZE}.0, 0.75)); }
+bool sameColor(vec3 a, vec3 b) { return distance(a, b) < 0.004; }
+
+// 0 = same province, 1 = province border, 2 = realm border (base colour changes).
+float edgeTo(vec2 uv, float id, vec3 own) {
+  float n = idAt(uv);
+  if (n == id) return 0.0;
+  return sameColor(baseOf(n).rgb, own) ? 1.0 : 2.0;
+}
 
 void main() {
   float id = idAt(vUV);
-  vec4 col = texture(uLookup, vec2((id + 0.5) / ${LOOKUP_SIZE}.0, 0.5));
+  vec4 base = baseOf(id);
+  vec3 rgb = base.rgb;
 
-  // Border: compare with neighbours one screen pixel (at least one map pixel) away.
-  vec2 step = max(1.0, 1.0 / uZoom) / uMapSize;
-  bool border =
-    idAt(vUV + vec2(step.x, 0.0)) != id || idAt(vUV - vec2(step.x, 0.0)) != id ||
-    idAt(vUV + vec2(0.0, step.y)) != id || idAt(vUV - vec2(0.0, step.y)) != id;
+  // Occupied: diagonal stripes in the controller's colour, ~12 screen pixels apart.
+  vec3 held = heldOf(id).rgb;
+  vec2 screenPx = vUV * uMapSize * uZoom;
+  if (!sameColor(held, base.rgb) && mod(screenPx.x + screenPx.y, 12.0) < 5.0) rgb = held;
 
-  vec3 rgb = col.rgb;
+  if (uRealmHighlight.a > 0.5 && id > 0.0 && sameColor(base.rgb, uRealmHighlight.rgb)) rgb = mix(rgb, vec3(1.0), 0.3);
   if (id > 0.0 && id == uSelected) rgb = mix(rgb, vec3(1.0, 0.85, 0.35), 0.45);
   else if (id > 0.0 && id == uHover) rgb = mix(rgb, vec3(1.0), 0.25);
-  // Lookup alpha marks water (0.5) so sea zone borders are drawn fainter than land borders.
-  if (border) rgb = mix(rgb, vec3(0.08, 0.06, 0.05), col.a < 0.75 ? 0.25 : 0.65);
+
+  // Neighbours one screen pixel (at least one map pixel) away.
+  vec2 step = max(1.0, 1.0 / uZoom) / uMapSize;
+  float edge = max(max(edgeTo(vUV + vec2(step.x, 0.0), id, base.rgb), edgeTo(vUV - vec2(step.x, 0.0), id, base.rgb)),
+                   max(edgeTo(vUV + vec2(0.0, step.y), id, base.rgb), edgeTo(vUV - vec2(0.0, step.y), id, base.rgb)));
+  // Lookup alpha < 0.75 marks water: its borders stay faint.
+  if (edge > 0.0) rgb = mix(rgb, INK, base.a < 0.75 ? 0.25 : (edge > 1.5 ? 0.7 : 0.22));
   finalColor = vec4(rgb, 1.0);
 }`;
 
@@ -80,7 +99,7 @@ export class MapView {
     const { width: W, height: H } = this.map;
     const idSource = new ImageSource({ resource: this.idBitmap, scaleMode: 'nearest', autoGenerateMipmaps: false });
     this.lookupSource = new BufferImageSource({
-      resource: buildLookup(this.map), width: LOOKUP_SIZE, height: 1, format: 'rgba8unorm', scaleMode: 'nearest',
+      resource: new Uint8Array(LOOKUP_SIZE * 2 * 4), width: LOOKUP_SIZE, height: 2, format: 'rgba8unorm', scaleMode: 'nearest',
       alphaMode: 'no-premultiply-alpha', // alpha is a water flag, not transparency
     });
     this.uniforms = new UniformGroup({
@@ -88,6 +107,7 @@ export class MapView {
       uHover: { value: 0, type: 'f32' },
       uSelected: { value: 0, type: 'f32' },
       uZoom: { value: 1, type: 'f32' },
+      uRealmHighlight: { value: new Float32Array(4), type: 'vec4<f32>' },
     });
     const geometry = new Geometry({
       attributes: { aPosition: [0, 0, W, 0, W, H, 0, H], aUV: [0, 0, 1, 0, 1, 1, 0, 1] },
@@ -111,6 +131,17 @@ export class MapView {
 
   setSelected(id: number) {
     this.uniforms.uniforms.uSelected = id;
+  }
+
+  /** Replaces the colour lookup (see buildLookup). */
+  setLookup(lut: Uint8Array) {
+    this.lookupSource.resource = lut;
+    this.lookupSource.update();
+  }
+
+  /** Brightens every province whose base colour is this one (a realm's provinces); null clears it. */
+  setRealmHighlight(rgb: [number, number, number] | null) {
+    this.uniforms.uniforms.uRealmHighlight = rgb ? new Float32Array([rgb[0] / 255, rgb[1] / 255, rgb[2] / 255, 1]) : new Float32Array(4);
   }
 
   /** Centres the camera on a map pixel. */
