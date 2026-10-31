@@ -1,0 +1,39 @@
+{
+  "name": "interregnum",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm run build:map && vite",
+    "build:map": "tsx tools/build-map.ts",
+    "build": "npm run build:map && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "seed-map": "tsx tools/seed-map.ts"
+  },
+  "dependencies": {
+    "@preact/signals": "2.11.4",
+    "idb-keyval": "6.3.0",
+    "pixi.js": "8.22.0",
+    "preact": "11.1.1",
+    "yaml": "2.9.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@preact/preset-vite": "2.10.6",
+    "@types/node": "26.6.6",
+    "@types/pngjs": "6.0.5",
+    "eslint": "10.14.0",
+    "pngjs": "7.0.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

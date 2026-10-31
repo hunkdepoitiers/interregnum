@@ -1,0 +1,7 @@
+node_modules/
+dist/
+public/generated/
+tools/vendor/
+*.log
+.vercel
+.claude/

@@ -1,0 +1,8 @@
+# Extra land-to-land adjacencies across water. Armies may cross these; everywhere else needs ships (not in v1).
+- [constantinople, nicomedia]   # Bosporus
+- [gallipoli, adramyttion]      # Dardanelles (Troad side is a GUESS of which starter province holds it)
+- [messina, calabria]           # Strait of Messina
+- [malaga, tangier]             # Strait of Gibraltar
+- [roskilde, scania]            # Øresund
+- [caffa, zichia]               # Kerch Strait
+- [taranto, durres]             # Strait of Otranto
