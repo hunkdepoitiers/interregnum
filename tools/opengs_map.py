@@ -36,12 +36,21 @@ DENSITY_BLUR = 4      # coarse cells (~45 km)
 LLOYD_ITERATIONS = 4  # as OpenGS
 JAGGED = 0.3          # noise amplitude as a fraction of local seed spacing (OpenGS: 0.12 of a single-octave field)
 NOISE_OCTAVES = [(128, 0.55), (32, 0.3), (8, 0.15)]  # (period px, weight)
-WASTE_AREA = 60_000   # px per wasteland province (old map averaged ~68k)
 MOUNT_AREA = 20_000   # px per mountain province
 SEA_COUNT = 1600
 SEA_COAST_BOOST = 2.0  # seas near land get up to 3x the province density
 ISLAND_SHARE = 0.25   # a seedless island gets its own province above this share of a local province's area
 MIN_ISLAND = 150      # px
+
+# Deserts and "wilds" are plain land: no wasteland, oasis strips or corridors. The old wasteland provinces were big, so
+# the density keeps desert provinces large.
+DESERTS_AS_LAND = True
+
+
+def kind_of_name(name):
+    kind = KINDS[name]
+    return LAND if DESERTS_AS_LAND and kind == WASTE else kind
+
 
 rng = np.random.default_rng(1302)
 t0 = time.time()
@@ -59,7 +68,7 @@ for line in (MAP / 'definitions.yaml').read_text(encoding='utf8').splitlines():
         m = DEF_RE.search(line)
         if not m:
             sys.exit(f'Cannot parse definitions line: {line}')
-        defs.append({'key': m[2], 'name': m[3].replace('\\"', '"'), 'kind': KINDS[m[4]], 'color': int(m[5], 16)})
+        defs.append({'key': m[2], 'name': m[3].replace('\\"', '"'), 'kind': kind_of_name(m[4]), 'color': int(m[5], 16)})
 n_old = len(defs)
 log(f'{n_old} old provinces')
 
@@ -88,7 +97,7 @@ for f in ('seeds.yaml', 'seeds-world.yaml'):
         m = SEED_RE.match(line)
         if m and section in ('land', 'sea', 'wasteland'):
             x, y = to_pixel(float(m[4]), float(m[5]))
-            town_seeds.append((m[1], (m[2] if m[2] is not None else m[3]).strip(), KINDS[section], x, y))
+            town_seeds.append((m[1], (m[2] if m[2] is not None else m[3]).strip(), kind_of_name(section), x, y))
 
 # ---------- old map -> old id and kind rasters ----------
 img = np.asarray(Image.open(MAP / 'provinces.png').convert('RGB'))
@@ -279,7 +288,6 @@ def generate(kind, dens):
 
 
 generate(LAND, land_dens * (n_land / max((land_dens * land_count).sum(), 1e-9)))
-generate(WASTE, np.full((HC, WC), 1.0 / WASTE_AREA))
 generate(MOUNT, np.full((HC, WC), 1.0 / MOUNT_AREA))
 generate(SEA, sea_dens)
 
