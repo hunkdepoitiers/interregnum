@@ -206,7 +206,7 @@ realms:
     name: Kingdom of Navarre
     rank: kingdom
     government: feudal_monarchy
-    color: "#c9c45a"
+    color: "#6a4a9a"
     capital: [42.82, -1.64]  # Pamplona; Louis I of Navarre is also Louis X, heir of France
     area:
       - [[43.32, -1.8], [43.3, -1.2], [42.95, -0.75], [42.6, -1.0], [42.35, -1.15], [42.0, -1.4], [41.95, -1.85],
@@ -215,7 +215,7 @@ realms:
     name: Emirate of Granada
     rank: kingdom
     government: iqta_sultanate
-    color: "#c96a4a"
+    color: "#2e8a6e"
     capital: [37.18, -3.6]  # Granada; Ismail I took the throne in 1314
     area:
       - [[37.25, -5.35], [37.4, -4.6], [37.55, -4.05], [37.7, -3.3], [37.75, -2.6], [37.55, -2.0], [37.35, -1.65],
@@ -381,7 +381,7 @@ realms:
     name: County of Jülich
     rank: county
     government: feudal_monarchy
-    color: "#8fb35a"
+    color: "#70d0d0"
     capital: [50.92, 6.36]  # Jülich
     area:
       - [[51.15, 6.0], [51.1, 6.6], [50.6, 6.65], [50.5, 6.2], [50.85, 6.0]]
@@ -497,7 +497,7 @@ realms:
     name: Landgraviate of Hesse
     rank: county
     government: feudal_monarchy
-    color: "#7ab07a"
+    color: "#3a8a8a"
     capital: [51.32, 9.5]  # Kassel; Otto I
     area:
       - [[51.6, 8.65], [51.5, 9.95], [50.9, 10.05], [50.6, 9.5], [50.55, 8.6], [51.05, 8.45]]
@@ -505,7 +505,7 @@ realms:
     name: County of Württemberg
     rank: county
     government: feudal_monarchy
-    color: "#d0b060"
+    color: "#e0d0a0"
     capital: [48.78, 9.18]  # Stuttgart; Eberhard I
     area:
       - [[49.1, 8.8], [49.15, 9.9], [48.7, 10.0], [48.25, 9.5], [48.3, 8.7], [48.75, 8.6]]
@@ -529,7 +529,7 @@ realms:
     name: Prince-Bishopric of Bamberg
     rank: county
     government: theocracy
-    color: "#c8a0c0"
+    color: "#d0b0e0"
     capital: [49.89, 10.89]  # Bamberg
     area:
       - [[50.15, 10.7], [50.2, 11.4], [49.7, 11.35], [49.7, 10.7]]
@@ -537,7 +537,7 @@ realms:
     name: Burgraviate of Nuremberg
     rank: county
     government: feudal_monarchy
-    color: "#e0e0a0"
+    color: "#a0d8b0"
     capital: [49.45, 11.08]  # Nuremberg; Frederick IV of Hohenzollern
     area:
       - [[49.65, 10.5], [49.6, 11.3], [49.15, 11.3], [49.15, 10.5]]
@@ -654,7 +654,7 @@ realms:
     name: Margraviate of Brandenburg
     rank: duchy
     government: feudal_monarchy
-    color: "#8a9ab0"
+    color: "#b0c890"
     capital: [52.41, 12.55]  # Brandenburg; Waldemar, elector
     area:
       - [[53.5, 11.2], [53.6, 12.5], [53.45, 13.8], [53.4, 14.4], [53.3, 15.6], [53.0, 16.2], [52.4, 15.6], [51.9, 15.4],
@@ -681,7 +681,7 @@ realms:
     name: Duchy of Saxe-Lauenburg
     rank: duchy
     government: feudal_monarchy
-    color: "#d0d070"
+    color: "#a0a0e0"
     capital: [53.37, 10.56]  # Lauenburg
     area:
       - [[53.75, 10.3], [53.75, 11.0], [53.35, 10.95], [53.35, 10.4]]
@@ -738,7 +738,7 @@ realms:
     name: Duchy of Pomerania-Wolgast
     rank: duchy
     government: feudal_monarchy
-    color: "#70b0b0"
+    color: "#40a0c8"
     capital: [54.05, 13.77]  # Wolgast; Rügen merged in: GUESS
     area:
       - [[54.75, 12.9], [54.7, 14.2], [53.85, 14.1], [53.9, 12.9]]
@@ -746,7 +746,7 @@ realms:
     name: Duchy of Pomerania-Stettin
     rank: duchy
     government: feudal_monarchy
-    color: "#90c0a0"
+    color: "#e0c0e0"
     capital: [53.43, 14.55]  # Stettin; Otto I
     area:
       - [[53.95, 14.1], [54.3, 15.0], [54.6, 16.25], [54.1, 16.25], [53.6, 15.6], [53.35, 14.5], [53.5, 14.1]]
@@ -791,7 +791,7 @@ realms:
     name: Upper Silesian Duchies
     rank: duchy
     government: feudal_monarchy
-    color: "#e0a0a0"
+    color: "#f0c070"
     capital: [50.67, 17.93]  # Opole; Opole, Racibórz, Bytom and Cieszyn merged: GUESS
     area:
       - [[51.0, 17.4], [50.9, 19.0], [50.3, 19.4], [49.6, 18.9], [49.9, 18.05], [50.3, 17.5]]
@@ -809,7 +809,7 @@ realms:
     name: Duchy of Płock
     rank: duchy
     government: feudal_monarchy
-    color: "#e8a0c8"
+    color: "#c070a0"
     capital: [52.55, 19.7]  # Płock; Wenceslaus
     area:
       - [[53.25, 19.3], [53.1, 20.2], [52.5, 20.3], [52.45, 19.4], [52.8, 19.1]]
@@ -820,7 +820,7 @@ realms:
     color: "#f0c0d8"
     capital: [51.96, 21.23]  # Czersk; Trojden I and Siemowit II (Warsaw merged in)
     area:
-      - [[53.4, 20.2], [53.2, 22.0], [52.3, 22.6], [51.8, 21.6], [51.9, 20.6], [52.4, 20.3]]
+      - [[53.4, 20.2], [53.3, 22.2], [52.6, 22.9], [52.1, 22.7], [51.75, 21.9], [51.8, 20.6], [52.4, 20.3]]
 
   # ======================================================== Baltic
   - key: teutonic_order
@@ -1048,7 +1048,7 @@ realms:
     name: Kingdom of Hungary
     rank: kingdom
     government: feudal_monarchy
-    color: "#e8b080"
+    color: "#f0c0a0"
     capital: [47.19, 18.41]  # Székesfehérvár; Charles I, still fighting the oligarchs
     area:
       - [[49.55, 18.9], [49.4, 21.5], [48.75, 22.9], [48.3, 24.0], [47.8, 25.0], [47.2, 25.6], [46.6, 26.2], [45.6, 26.0],
@@ -1089,7 +1089,7 @@ realms:
     capital: [45.0, 22.5]  # Severin country
     overlord: hungary
     area:
-      - [[45.2, 22.3], [45.1, 23.3], [44.5, 23.4], [44.4, 22.5], [44.8, 22.1]]
+      - [[45.2, 22.3], [45.35, 24.3], [43.75, 24.4], [43.9, 23.4], [44.4, 22.5], [44.8, 22.1]]  # Oltenia
   - key: wallachia
     name: Wallachia
     rank: duchy
@@ -1098,12 +1098,12 @@ realms:
     capital: [45.14, 24.67]  # Curtea de Argeș; Basarab I
     overlord: hungary
     area:
-      - [[45.6, 23.5], [45.75, 26.5], [45.3, 27.3], [44.2, 27.3], [43.7, 25.3], [43.7, 23.5], [44.3, 22.8], [45.2, 23.4]]
+      - [[45.5, 24.3], [45.75, 26.5], [45.3, 27.3], [44.2, 27.3], [43.7, 25.3], [43.7, 24.4]]
   - key: serbia
     name: Kingdom of Serbia
     rank: kingdom
     government: feudal_monarchy
-    color: "#7a8ab0"
+    color: "#6a6aa0"
     capital: [42.66, 21.17]  # Priština country; Stefan Milutin
     area:
       - [[44.3, 21.2], [43.9, 22.5], [42.8, 22.8], [42.2, 22.9], [41.6, 22.9], [41.3, 22.7], [41.0, 22.0], [40.85, 20.9],
@@ -1234,7 +1234,7 @@ realms:
     name: Principality of Kiev
     rank: duchy
     government: feudal_monarchy
-    color: "#b8c070"
+    color: "#8aa0d0"
     capital: [50.45, 30.52]  # Kiev; Stanislav, under the Horde: GUESS
     overlord: golden_horde
     area:
@@ -1302,7 +1302,7 @@ realms:
     name: Principality of Beloozero
     rank: duchy
     government: feudal_monarchy
-    color: "#90a870"
+    color: "#2f6a5a"
     capital: [60.03, 37.79]  # Beloozero
     overlord: golden_horde
     area:
@@ -1311,7 +1311,7 @@ realms:
     name: Principality of Galich
     rank: duchy
     government: feudal_monarchy
-    color: "#a8b878"
+    color: "#c8c070"
     capital: [58.38, 42.35]  # Galich Mersky
     overlord: golden_horde
     area:
@@ -1320,7 +1320,7 @@ realms:
     name: Principality of Nizhny Novgorod-Suzdal
     rank: duchy
     government: feudal_monarchy
-    color: "#70a080"
+    color: "#3a8a8a"
     capital: [56.33, 44.0]  # Nizhny Novgorod
     overlord: golden_horde
     area:
@@ -1338,7 +1338,7 @@ realms:
     name: Principality of Ryazan
     rank: duchy
     government: feudal_monarchy
-    color: "#60a868"
+    color: "#c0a050"
     capital: [54.6, 39.7]  # Pereyaslavl-Ryazansky
     overlord: golden_horde
     area:
@@ -1347,7 +1347,7 @@ realms:
     name: Principality of Smolensk
     rank: duchy
     government: feudal_monarchy
-    color: "#88b0a0"
+    color: "#5a7aa0"
     capital: [54.78, 32.05]  # Smolensk
     overlord: golden_horde
     area:
@@ -1385,7 +1385,7 @@ realms:
     name: Western Kingdom of Georgia
     rank: kingdom
     government: feudal_monarchy
-    color: "#c8c050"
+    color: "#6aa0a0"
     capital: [42.27, 42.7]  # Kutaisi; Constantine I
     area:
       - [[43.45, 40.0], [43.0, 41.6], [42.75, 43.5], [42.0, 43.3], [41.6, 42.6], [41.5, 41.6], [42.0, 41.55], [43.0, 40.1]]
@@ -1421,11 +1421,11 @@ realms:
     name: Sultanate of Rum
     rank: kingdom
     government: iqta_sultanate
-    color: "#7a9a6a"
+    color: "#8fbf5a"
     capital: [37.87, 32.49]  # Konya; Seljuk remnant under Ilkhanid governors: GUESS
     overlord: ilkhanate
     area:
-      - [[40.0, 31.2], [39.8, 33.5], [39.3, 34.5], [38.3, 34.5], [37.5, 33.8], [37.6, 32.2], [38.4, 31.6], [39.3, 31.2]]
+      - [[40.9, 31.4], [40.8, 32.6], [40.3, 33.6], [39.6, 35.0], [38.6, 35.6], [37.9, 34.9], [37.5, 33.8], [37.6, 32.2], [38.4, 31.6], [39.6, 31.0]]
   - key: ottomans
     name: Beylik of the Ottomans
     rank: duchy
@@ -1438,7 +1438,7 @@ realms:
     name: Beylik of Karasi
     rank: duchy
     government: beylik
-    color: "#c0a060"
+    color: "#4a6ab0"
     capital: [39.65, 27.88]  # Balıkesir
     area:
       - [[40.35, 26.5], [40.35, 28.3], [39.6, 28.3], [39.2, 27.0], [39.5, 26.5], [40.1, 26.2]]
@@ -1502,7 +1502,7 @@ realms:
     name: Beylik of Eşrefoğulları
     rank: county
     government: beylik
-    color: "#90c080"
+    color: "#e0e0a0"
     capital: [37.68, 31.72]  # Beyşehir
     area:
       - [[38.3, 31.3], [38.2, 32.1], [37.4, 32.0], [37.45, 31.4]]
@@ -1566,7 +1566,7 @@ realms:
     name: Armenian Kingdom of Cilicia
     rank: kingdom
     government: feudal_monarchy
-    color: "#e09050"
+    color: "#e07a40"
     capital: [37.45, 35.82]  # Sis; Oshin
     area:
       - [[38.0, 34.6], [38.0, 36.3], [37.2, 37.0], [36.6, 36.7], [36.3, 36.1], [36.2, 34.8], [36.8, 34.3], [37.5, 34.3]]
@@ -1586,7 +1586,7 @@ realms:
     name: Mihrabanids
     rank: county
     government: iqta_sultanate
-    color: "#8a8ab0"
+    color: "#6a5aa0"
     capital: [31.03, 61.5]  # Zaranj, Sistan
     overlord: ilkhanate
     area:
@@ -1916,7 +1916,7 @@ realms:
     name: Kingdom of Kutch
     rank: county
     government: feudal_monarchy
-    color: "#e0b0c0"
+    color: "#60a0d0"
     capital: [23.25, 69.67]  # Bhuj country
     area:
       - [[24.2, 68.6], [24.2, 71.0], [22.9, 70.6], [22.8, 69.0], [23.5, 68.3]]
@@ -1972,7 +1972,7 @@ realms:
     name: Kingdom of Kashmir
     rank: duchy
     government: feudal_monarchy
-    color: "#a09858"
+    color: "#c09060"
     capital: [34.08, 74.8]  # Srinagar; Suhadeva of the Lohara line
     area:
       - [[35.0, 73.5], [35.2, 75.8], [33.8, 76.0], [32.7, 75.2], [33.7, 73.5]]
@@ -2023,7 +2023,7 @@ realms:
     name: Tibet
     rank: kingdom
     government: theocracy
-    color: "#9a8060"
+    color: "#c8b8a0"
     capital: [28.9, 88.0]  # Sakya; under the Yuan
     overlord: yuan
     area:
@@ -2095,7 +2095,7 @@ realms:
     name: Kingdom of Martaban
     rank: kingdom
     government: feudal_monarchy
-    color: "#d0c060"
+    color: "#7a9ad0"
     capital: [16.53, 97.62]  # Martaban
     area:
       - [[17.8, 96.0], [17.8, 98.0], [14.5, 98.6], [14.5, 97.6], [16.5, 95.5]]
