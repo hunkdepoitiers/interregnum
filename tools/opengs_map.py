@@ -38,6 +38,8 @@ JAGGED = 0.3          # noise amplitude as a fraction of local seed spacing (Ope
 NOISE_OCTAVES = [(128, 0.55), (32, 0.3), (8, 0.15)]  # (period px, weight)
 MOUNT_AREA = 20_000   # px per mountain province
 SEA_COUNT = 1600
+LAND_COUNT = 10_000
+MAX_LAND_AREA = 12_000  # px (~24,000 km2): no land province is planned bigger, so deserts and steppes stay playable
 SEA_COAST_BOOST = 2.0  # seas near land get up to 3x the province density
 ISLAND_SHARE = 0.25   # a seedless island gets its own province above this share of a local province's area
 MIN_ISLAND = 150      # px
@@ -153,7 +155,6 @@ inv_area = np.zeros(n_old + 1, np.float64)
 inv_area[1:] = 1.0 / np.maximum(old_area[1:], 1)
 land_count = block_sum(lambda a, b: cls[a:b] == LAND)
 land_dens = smooth_ratio(block_sum(lambda a, b: np.where(cls[a:b] == LAND, inv_area[old_id[a:b]], 0)), land_count)
-n_land = sum(1 for d in defs if d['kind'] == LAND)
 
 sea_count = block_sum(lambda a, b: cls[a:b] == SEA)
 coast_dist = ndi.distance_transform_edt(sea_count >= F * F * 0.999)  # coarse cells to the nearest land
@@ -287,7 +288,15 @@ def generate(kind, dens):
     log(f'{KIND_NAME[kind]}: assigned')
 
 
-generate(LAND, land_dens * (n_land / max((land_dens * land_count).sum(), 1e-9)))
+def land_plan(k):
+    return np.maximum(land_dens * k, 1.0 / MAX_LAND_AREA)
+
+
+lo, hi = 0.0, 100.0  # scale the old density so that, with the size cap, LAND_COUNT provinces are planned
+for _ in range(60):
+    mid = (lo + hi) / 2
+    lo, hi = (mid, hi) if (land_plan(mid) * land_count).sum() < LAND_COUNT else (lo, mid)
+generate(LAND, land_plan(hi))
 generate(MOUNT, np.full((HC, WC), 1.0 / MOUNT_AREA))
 generate(SEA, sea_dens)
 
