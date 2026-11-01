@@ -1,0 +1,14 @@
+# Province density per region, read by tools/opengs_map.py: [name, south, west, north, east, factor].
+# Factors multiply the density taken from the previous map (overlapping boxes multiply; edges are blurred over
+# ~150 km). Only ratios matter: the total land count is fixed by LAND_COUNT.
+- [India, 6, 66, 31, 92, 2.5]
+- [China, 20, 100, 41, 123, 2.5]
+- [Korea and Japan, 30, 124, 46, 146, 2.0]
+- [Southeast Asia, -10, 92, 22, 125, 1.8]
+- [Sahel and West Africa, 4, -18, 16, 16, 1.5]
+- [East Africa, -12, 28, 16, 52, 1.3]
+- [Central Asian steppe, 40, 46, 56, 90, 0.7]
+- [Siberia, 50, 60, 76, 180, 0.5]
+- [Canada and Alaska, 50, -180, 76, -50, 0.4]
+- [Australia, -45, 110, -10, 155, 0.6]
+- [South America, -56, -82, 13, -34, 0.8]
