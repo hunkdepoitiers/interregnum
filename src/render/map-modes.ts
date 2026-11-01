@@ -22,6 +22,9 @@ const KIND_COLOR: Record<Exclude<ProvinceKind, 'land'>, Rgb> = {
   mountain: [92, 84, 78],
 };
 
+/** Lookup alpha tells the shader the province kind: 255 land (240 unowned), 224 wasteland, 176 mountain, below 153 water. */
+const KIND_ALPHA: Record<Exclude<ProvinceKind, 'land'>, number> = { wasteland: 224, mountain: 176, sea: 128, lake: 112 };
+
 export function hexToRgb(hex: string): Rgb {
   const c = parseInt(hex.slice(1), 16);
   return [(c >> 16) & 255, (c >> 8) & 255, c & 255];
@@ -30,7 +33,7 @@ export function hexToRgb(hex: string): Rgb {
 /**
  * Builds the lookup texture the map shader reads, indexed by province id (layout: see LOOKUP_WIDTH).
  * Layer 0: base colour (the owner's colour in political mode). Layer 1: the controller's colour, drawn as
- * stripes where it differs from layer 0. Alpha 255 = land/wasteland/mountain, 128 = water (fainter borders).
+ * stripes where it differs from layer 0. Alpha encodes the province kind (KIND_ALPHA).
  */
 export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null): Uint8Array {
   const lut = new Uint8Array(LOOKUP_WIDTH * LOOKUP_HEIGHT * 4);
@@ -48,7 +51,7 @@ export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null
 
   for (const p of map.provinces) {
     if (p.kind !== 'land') {
-      const alpha = p.kind === 'wasteland' || p.kind === 'mountain' ? 255 : 128;
+      const alpha = KIND_ALPHA[p.kind];
       put(0, p.id, KIND_COLOR[p.kind], alpha);
       put(1, p.id, KIND_COLOR[p.kind], alpha);
       continue;
@@ -64,8 +67,10 @@ export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null
       base = [0, 1, 2].map((k) => Math.round(PARCHMENT[k]! * 0.8 + tint[k]! * 0.2)) as Rgb;
       held = base;
     }
-    put(0, p.id, base, 255);
-    put(1, p.id, held, 255);
+    // Unowned land is drawn as bare paper.
+    const alpha = mode === 'political' && !world?.owner[p.id] ? 240 : 255;
+    put(0, p.id, base, alpha);
+    put(1, p.id, held, alpha);
   }
   return lut;
 }

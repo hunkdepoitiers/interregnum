@@ -1,14 +1,17 @@
 import {
-  Application, BufferImageSource, Container, Geometry, GlProgram, Graphics, ImageSource, Mesh, Shader, UniformGroup,
+  Application, BufferImageSource, Container, Geometry, GlProgram, Graphics, ImageSource, Mesh, Shader, Text, TextStyle,
+  UniformGroup,
 } from 'pixi.js';
 import { lonLatToPixel, type MapData, type RiverData } from '../content/map';
+import type { RealmLabel } from './labels';
 import { LOOKUP_HEIGHT, LOOKUP_ROWS, LOOKUP_WIDTH } from './map-modes';
 
 /**
  * The map is a grid of quads, one per id-map tile (WebGL textures max out at 4096 px). The fragment shader reads
  * the province id at each pixel from its tile's id texture,
- * looks up that province's colours in a small lookup texture (see map-modes.ts), stripes occupied provinces
- * in the occupier's colour, and draws borders: faint between provinces, strong between realms.
+ * looks up that province's colours in a small lookup texture (see map-modes.ts) and paints it like an old
+ * hand-drawn map: realm colours as a muted wash on paper, umber sea with a ripple line round the coasts, drawn
+ * peaks on mountains, stippled deserts and ink borders. Occupied provinces are striped in the occupier's colour.
  * Recolouring the map (map modes, conquests) only rewrites the lookup texture.
  */
 const vertex = /* glsl */ `
@@ -30,12 +33,15 @@ out vec4 finalColor;
 uniform sampler2D uIdMap;
 uniform sampler2D uLookup;
 uniform vec2 uTileSize;
+uniform vec2 uTileOrigin;
 uniform float uHover;
 uniform float uSelected;
 uniform float uZoom;
 uniform vec4 uRealmHighlight; // rgb: owner colour to highlight; a: 1 when active
 
-const vec3 INK = vec3(0.08, 0.06, 0.05);
+const vec3 INK = vec3(0.17, 0.12, 0.08);
+const vec3 PAPER = vec3(0.91, 0.86, 0.73);
+const vec3 SEA = vec3(0.43, 0.37, 0.28);
 
 float idAt(vec2 uv) {
   vec4 c = texture(uIdMap, uv);
@@ -49,38 +55,132 @@ vec2 lookupUv(float id, float layer) {
 vec4 baseOf(float id) { return texture(uLookup, lookupUv(id, 0.0)); }
 vec4 heldOf(float id) { return texture(uLookup, lookupUv(id, 1.0)); }
 bool sameColor(vec3 a, vec3 b) { return distance(a, b) < 0.004; }
+// Lookup alpha encodes the province kind (KIND_ALPHA in map-modes.ts).
+bool isWater(float a) { return a < 0.6; }
+bool terrain(float a) { return a > 0.6 && a < 0.92; } // mountain or wasteland
 
-// 0 = same province, 1 = province border, 2 = realm border (base colour changes).
-float edgeTo(vec2 uv, float id, vec3 own) {
-  float n = idAt(uv);
-  if (n == id) return 0.0;
-  return sameColor(baseOf(n).rgb, own) ? 1.0 : 2.0;
+float hash(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }
+  return v;
+}
+
+// A realm colour as a muted wash over the paper.
+vec3 wash(vec3 c) {
+  float grey = dot(c, vec3(0.3, 0.59, 0.11));
+  return mix(PAPER, mix(vec3(grey), c, 0.75), 0.55);
+}
+
+// Hand-drawn peaks, one per cell; cells are ~26 screen px wide, snapped to powers of two so they do not shimmer.
+vec3 mountains(vec3 rgb, vec2 mapPx) {
+  float cell = exp2(floor(log2(26.0 / uZoom)));
+  vec2 g = mapPx / cell;
+  if (mod(floor(g.y), 2.0) > 0.5) g.x += 0.5;
+  vec2 c = floor(g);
+  vec2 q = fract(g);
+  float cx = 0.5 + (hash(c) - 0.5) * 0.3;
+  float top = 0.15 + hash(c + 7.0) * 0.2;
+  float bottom = 0.85;
+  float line = 1.1 / (cell * uZoom);
+  if (q.y > top && q.y < bottom) {
+    float halfWidth = (q.y - top) / (bottom - top) * 0.42;
+    float dx = q.x - cx;
+    if (abs(dx) < halfWidth) {
+      rgb = dx > 0.0 ? mix(rgb, INK, 0.3) : mix(rgb, vec3(1.0), 0.07);
+      if (halfWidth - abs(dx) < line * 1.4) rgb = mix(rgb, INK, 0.85);
+    }
+  }
+  return rgb;
 }
 
 void main() {
   float id = idAt(vUV);
   vec4 base = baseOf(id);
-  vec3 rgb = base.rgb;
+  vec2 mapPx = uTileOrigin + vUV * uTileSize;
+  vec2 screenPx = mapPx * uZoom;
+  float paper = 0.93 + 0.1 * fbm(mapPx / 60.0) + 0.04 * (noise(screenPx * 0.7) - 0.5);
+  vec2 px = max(1.0, 1.0 / uZoom) / uTileSize; // one screen pixel, at least one map pixel
+  bool water = isWater(base.a);
 
-  // Occupied: diagonal stripes in the controller's colour, ~12 screen pixels apart.
-  vec3 held = heldOf(id).rgb;
-  vec2 screenPx = vUV * uTileSize * uZoom;
-  if (!sameColor(held, base.rgb) && mod(screenPx.x + screenPx.y, 12.0) < 5.0) rgb = held;
+  vec3 rgb;
+  if (water) {
+    rgb = SEA * (0.94 + 0.12 * fbm(mapPx / 90.0));
+    // A ripple line round the coasts, ~5 screen px out.
+    bool near = false;
+    bool far = false;
+    for (int i = 0; i < 8; i++) {
+      float a = float(i) * 0.785398;
+      vec2 d = vec2(cos(a), sin(a)) * px;
+      if (!isWater(baseOf(idAt(vUV + d * 4.0)).a)) near = true;
+      if (!isWater(baseOf(idAt(vUV + d * 6.0)).a)) far = true;
+    }
+    if (far && !near) rgb = mix(rgb, PAPER, 0.22);
+  } else {
+    bool owned = base.a > 0.99;
+    rgb = owned ? wash(base.rgb) : PAPER * 0.97;
+    if (base.a > 0.8 && base.a < 0.92) { // wasteland: pale sand with stipple
+      rgb = mix(PAPER, vec3(0.95, 0.9, 0.76), 0.6);
+      vec2 cell = floor(screenPx / 5.0);
+      vec2 dot = 0.5 + (vec2(hash(cell + 3.1), hash(cell + 5.7)) - 0.5) * 0.6;
+      if (hash(cell) > 0.8 && distance(fract(screenPx / 5.0), dot) < 0.18) rgb = mix(rgb, INK, 0.35);
+    }
+    if (base.a > 0.6 && base.a <= 0.8) rgb = mountains(mix(PAPER, vec3(0.8, 0.74, 0.62), 0.5), mapPx);
 
-  if (uRealmHighlight.a > 0.5 && id > 0.0 && sameColor(base.rgb, uRealmHighlight.rgb)) rgb = mix(rgb, vec3(1.0), 0.3);
-  if (id > 0.0 && id == uSelected) rgb = mix(rgb, vec3(1.0, 0.85, 0.35), 0.45);
-  else if (id > 0.0 && id == uHover) rgb = mix(rgb, vec3(1.0), 0.25);
+    // Occupied: diagonal stripes in the controller's colour, ~12 screen pixels apart.
+    vec3 held = heldOf(id).rgb;
+    if (!sameColor(held, base.rgb) && mod(screenPx.x + screenPx.y, 12.0) < 5.0) rgb = wash(held);
 
-  // Neighbours one screen pixel (at least one map pixel) away.
-  vec2 step = max(1.0, 1.0 / uZoom) / uTileSize;
-  float edge = max(max(edgeTo(vUV + vec2(step.x, 0.0), id, base.rgb), edgeTo(vUV - vec2(step.x, 0.0), id, base.rgb)),
-                   max(edgeTo(vUV + vec2(0.0, step.y), id, base.rgb), edgeTo(vUV - vec2(0.0, step.y), id, base.rgb)));
-  // Lookup alpha < 0.75 marks water: its borders stay faint.
-  if (edge > 0.0) rgb = mix(rgb, INK, base.a < 0.75 ? 0.25 : (edge > 1.5 ? 0.7 : 0.22));
+    // A deeper wash just inside realm borders, like the edge of a watercolour.
+    if (owned) {
+      bool rim = false;
+      for (int i = 0; i < 8; i++) {
+        float a = float(i) * 0.785398;
+        vec4 n = baseOf(idAt(vUV + vec2(cos(a), sin(a)) * px * 4.0));
+        if (!sameColor(n.rgb, base.rgb)) rim = true;
+      }
+      if (rim) rgb = mix(rgb, base.rgb * 0.85, 0.35);
+    }
+  }
+  rgb *= paper;
+
+  if (uRealmHighlight.a > 0.5 && id > 0.0 && sameColor(base.rgb, uRealmHighlight.rgb)) rgb = mix(rgb, vec3(1.0), 0.25);
+  if (id > 0.0 && id == uSelected) rgb = mix(rgb, vec3(1.0, 0.85, 0.4), 0.45);
+  else if (id > 0.0 && id == uHover) rgb = mix(rgb, vec3(1.0), 0.2);
+
+  // Ink between realms and along coasts; province borders fade in as you zoom in.
+  float ink = 0.0;
+  for (int i = 0; i < 4; i++) {
+    vec2 d = i == 0 ? vec2(px.x, 0.0) : i == 1 ? vec2(-px.x, 0.0) : i == 2 ? vec2(0.0, px.y) : vec2(0.0, -px.y);
+    float n = idAt(vUV + d);
+    if (n == id) continue;
+    vec4 nb = baseOf(n);
+    if (water != isWater(nb.a)) ink = max(ink, 0.8);
+    else if (water) ink = max(ink, 0.06);
+    else if (terrain(base.a) || terrain(nb.a)) ink = max(ink, 0.3); // mountains and deserts are drawn, not outlined
+    else if (!sameColor(nb.rgb, base.rgb)) ink = max(ink, 0.7);
+    else ink = max(ink, 0.2 * smoothstep(0.3, 1.0, uZoom));
+  }
+  rgb = mix(rgb, INK, ink);
   finalColor = vec4(rgb, 1.0);
 }`;
 
 const MAX_ZOOM = 8;
+/** Realm names smaller than this on screen are hidden; larger ones are capped. */
+const MIN_LABEL_PX = 9;
+const MAX_LABEL_PX = 110;
+export const LABEL_FONT = '"IM Fell English SC", "Iowan Old Style", Palatino, Georgia, serif';
 const MAX_DECODED_TILES = 6;
 
 export class MapView {
@@ -102,7 +202,7 @@ export class MapView {
   ) {}
 
   async mount(host: HTMLElement) {
-    await this.app.init({ resizeTo: host, preference: 'webgl', background: '#0b1622', antialias: false });
+    await this.app.init({ resizeTo: host, preference: 'webgl', background: '#6e5f48', antialias: false });
     host.appendChild(this.app.canvas);
 
     this.lookupSource = new BufferImageSource({
@@ -124,7 +224,10 @@ export class MapView {
         indexBuffer: [0, 1, 2, 0, 2, 3],
       });
       const idSource = new ImageSource({ resource: bitmap, scaleMode: 'nearest', autoGenerateMipmaps: false });
-      const tileUniforms = new UniformGroup({ uTileSize: { value: new Float32Array([w, h]), type: 'vec2<f32>' } });
+      const tileUniforms = new UniformGroup({
+        uTileSize: { value: new Float32Array([w, h]), type: 'vec2<f32>' },
+        uTileOrigin: { value: new Float32Array([x, y]), type: 'vec2<f32>' },
+      });
       const shader = new Shader({
         glProgram,
         resources: { uIdMap: idSource, uLookup: this.lookupSource, mapUniforms: this.uniforms, tileUniforms },
@@ -132,6 +235,8 @@ export class MapView {
       this.world.addChild(new Mesh({ geometry, shader }));
     });
     this.app.stage.addChild(this.world);
+    this.labelLayer.eventMode = 'none';
+    this.app.stage.addChild(this.labelLayer);
 
     this.fitToScreen();
     this.app.renderer.on('resize', () => this.clampCamera());
@@ -162,8 +267,48 @@ export class MapView {
       for (const line of r.lines) {
         g.moveTo(line[0]!, line[1]!);
         for (let i = 2; i < line.length; i += 2) g.lineTo(line[i]!, line[i + 1]!);
-        g.stroke({ width, color: 0x3d6f9a, alpha: 0.85, cap: 'round', join: 'round' });
+        g.stroke({ width, color: 0x6a6650, alpha: 0.75, cap: 'round', join: 'round' });
       }
+    }
+  }
+
+  private readonly labelLayer = new Container();
+  private labels: { label: RealmLabel; text: Text }[] = [];
+  private labelZoom = 0;
+
+  /**
+   * Realm names, kept in screen space and laid out again as the camera moves: text scaled with the map would
+   * blur when zoomed in.
+   */
+  setLabels(labels: RealmLabel[]) {
+    for (const l of this.labels) l.text.destroy();
+    this.labels = labels.map((label) => {
+      const style = new TextStyle({ fontFamily: LABEL_FONT, fill: 0x2a1f14, stroke: { color: 0xeadfc4, width: 2, join: 'round' } });
+      const text = new Text({ text: label.text, style, anchor: 0.5 });
+      text.rotation = label.angle;
+      text.alpha = 0.88;
+      this.labelLayer.addChild(text);
+      return { label, text };
+    });
+    this.labelZoom = 0;
+    this.layoutLabels();
+  }
+
+  private layoutLabels() {
+    const s = this.world.scale.x;
+    const restyle = Math.abs(s / this.labelZoom - 1) > 0.1;
+    if (restyle) this.labelZoom = s;
+    for (const { label, text } of this.labels) {
+      const px = label.size * s;
+      text.visible = px >= MIN_LABEL_PX;
+      if (!text.visible) continue;
+      if (restyle) {
+        const size = Math.round(Math.min(px, MAX_LABEL_PX));
+        text.style.fontSize = size;
+        text.style.letterSpacing = size * 0.18;
+        text.style.stroke = { color: 0xeadfc4, width: Math.max(1.5, size * 0.12), join: 'round' };
+      }
+      text.position.set(this.world.x + label.x * s, this.world.y + label.y * s);
     }
   }
 
@@ -258,6 +403,7 @@ export class MapView {
     const mh = this.map.height * s;
     this.world.x = mw <= width ? (width - mw) / 2 : Math.min(0, Math.max(width - mw, this.world.x));
     this.world.y = mh <= height ? (height - mh) / 2 : Math.min(0, Math.max(height - mh, this.world.y));
+    this.layoutLabels();
   }
 
   private bindInput() {

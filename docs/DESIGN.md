@@ -67,6 +67,8 @@ Performance budget: daily tick < 5 ms at 500 provinces / 70 realms on a mid-rang
 ### 4.5 Renderer: PixiJS v8 over Canvas 2D
 With a colour bitmap of 20,440×10,520 px (~215M pixels), Canvas 2D would recolour on the CPU per pixel for every map-mode change or conquest (tens of ms, janky) and redraw the whole bitmap on pan/zoom. With WebGL the map is a grid of quads, one per 4,096 px id tile: a fragment shader reads the tile's province-ID texture and a small 2D lookup texture (4,096 × 32: province id → colour for the current map mode, base and controller layers) and draws borders by comparing neighbouring IDs (offset = one screen pixel, from a zoom uniform; `fwidth` is not available on WebGL1-level contexts). A change of ownership updates one texel; pan/zoom is a matrix change. Pixi also handles army markers, siege icons and labels as sprites. Cost: one custom shader (~60 lines).
 
+**Map style: an old hand-drawn map.** The shader paints realm colours as a muted wash on paper grain, with a deeper wash just inside realm borders, umber sea with a ripple line round the coasts, drawn peaks on mountain provinces and stipple on deserts, and ink lines for coasts and realm borders (province borders fade in only when zoomed in). Realm names (`src/render/labels.ts`) are set in IM Fell English SC along the long axis of each realm's largest piece of land, in screen space so they stay sharp; names too small to read are hidden.
+
 ### 4.6 Map pipeline (colour bitmap)
 - `data/map/provinces.png`: RGB, one colour per province, no anti-aliasing.
 - `data/map/definitions.yaml`: `color → id, key, name, kind (land | sea | wasteland | lake)`.

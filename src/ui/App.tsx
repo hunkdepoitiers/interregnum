@@ -4,7 +4,8 @@ import { command, startGame, world } from '../bridge/client';
 import type { MapData, RiverData } from '../content/map';
 import type { Scenario } from '../content/scenario';
 import { buildLookup, hexToRgb, type MapMode } from '../render/map-modes';
-import { loadIdTiles, MapView } from '../render/map-view';
+import { computeLabels } from '../render/labels';
+import { LABEL_FONT, loadIdTiles, MapView } from '../render/map-view';
 import { MapModeBar } from './MapModeBar';
 import { ProvincePanel } from './ProvincePanel';
 import { RealmPanel } from './RealmPanel';
@@ -56,7 +57,10 @@ effect(() => {
   const map = mapData.value;
   const w = world.value;
   const mode = hasRealms.value ? mapMode.value : 'terrain';
-  if (map && view) view.setLookup(buildLookup(map, mode, w));
+  if (map && view) {
+    view.setLookup(buildLookup(map, mode, w));
+    view.setLabels(mode === 'political' && w ? computeLabels(map, w) : []);
+  }
 });
 
 /**
@@ -86,7 +90,8 @@ export function App() {
         fetch(`${base}generated/map.json`).then((r) => r.json() as Promise<MapData>),
         fetch(`${base}generated/scenario.json`).then((r) => r.json() as Promise<Scenario>),
       ]);
-      const tiles = await loadIdTiles(base, map);
+      // Labels are drawn to canvas, so the font must be ready first; without it they fall back to a system serif.
+      const [tiles] = await Promise.all([loadIdTiles(base, map), document.fonts.load(`32px ${LABEL_FONT}`).catch(() => [])]);
       if (cancelled || !host.current) return;
       view = new MapView(map, tiles);
       const riversReady = fetch(`${base}generated/rivers.json`).then((r) => r.json() as Promise<RiverData>);
