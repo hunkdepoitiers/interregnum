@@ -1,8 +1,14 @@
 import type { MapData, ProvinceKind } from '../content/map';
 import type { WorldView } from '../worker/protocol';
 
-/** Width of the lookup texture, i.e. the highest province id + 1 the renderer supports. */
-export const LOOKUP_SIZE = 4096;
+/**
+ * The lookup texture is LOOKUP_WIDTH wide; province id i sits at column i % LOOKUP_WIDTH and row
+ * floor(i / LOOKUP_WIDTH). Rows 0..LOOKUP_ROWS-1 hold base colours, the next LOOKUP_ROWS rows the controller
+ * colours. 4096 x 16 covers every 16-bit province id.
+ */
+export const LOOKUP_WIDTH = 4096;
+export const LOOKUP_ROWS = 16;
+export const LOOKUP_HEIGHT = LOOKUP_ROWS * 2;
 
 export type MapMode = 'political' | 'terrain';
 
@@ -22,14 +28,14 @@ export function hexToRgb(hex: string): Rgb {
 }
 
 /**
- * Builds the 2-row lookup texture the map shader reads, indexed by province id.
- * Row 0: base colour (the owner's colour in political mode). Row 1: the controller's colour, drawn as
- * stripes where it differs from row 0. Alpha 255 = land/wasteland, 128 = water (fainter borders).
+ * Builds the lookup texture the map shader reads, indexed by province id (layout: see LOOKUP_WIDTH).
+ * Layer 0: base colour (the owner's colour in political mode). Layer 1: the controller's colour, drawn as
+ * stripes where it differs from layer 0. Alpha 255 = land/wasteland/mountain, 128 = water (fainter borders).
  */
 export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null): Uint8Array {
-  const lut = new Uint8Array(LOOKUP_SIZE * 2 * 4);
+  const lut = new Uint8Array(LOOKUP_WIDTH * LOOKUP_HEIGHT * 4);
   const put = (row: number, id: number, rgb: Rgb, alpha: number) => {
-    const o = (row * LOOKUP_SIZE + id) * 4;
+    const o = ((row * LOOKUP_ROWS + Math.floor(id / LOOKUP_WIDTH)) * LOOKUP_WIDTH + (id % LOOKUP_WIDTH)) * 4;
     lut[o] = rgb[0];
     lut[o + 1] = rgb[1];
     lut[o + 2] = rgb[2];

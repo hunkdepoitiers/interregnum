@@ -140,13 +140,20 @@ function countComponents(idMap: Uint16Array, W: number, H: number, maxId: number
   return comps;
 }
 
-/** Encodes the id map as RGBA: R = low byte, G = high byte. Read back in the renderer and picker. */
-export function encodeIdMap(idMap: Uint16Array): Uint8Array {
-  const out = new Uint8Array(idMap.length * 4);
-  for (let p = 0; p < idMap.length; p++) {
-    out[p * 4] = idMap[p]! & 255;
-    out[p * 4 + 1] = idMap[p]! >> 8;
-    out[p * 4 + 3] = 255;
+/**
+ * Encodes a w x h tile of the id map, starting at (x0, y0), as RGBA: R = low byte, G = high byte.
+ * Read back in the renderer and picker.
+ */
+export function encodeIdTile(idMap: Uint16Array, mapWidth: number, x0: number, y0: number, w: number, h: number): Uint8Array {
+  const out = new Uint8Array(w * h * 4);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const id = idMap[(y0 + y) * mapWidth + x0 + x]!;
+      const o = (y * w + x) * 4;
+      out[o] = id & 255;
+      out[o + 1] = id >> 8;
+      out[o + 3] = 255;
+    }
   }
   return out;
 }

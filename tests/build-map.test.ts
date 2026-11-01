@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ProvinceDefinition } from '../src/content/map';
-import { buildMap, encodeIdMap } from '../tools/map-lib';
+import { buildMap, encodeIdTile } from '../tools/map-lib';
 
 const COLORS: Record<string, number> = { A: 0xff0000, B: 0x00ff00, S: 0x0000ff, X: 0x123456 };
 
@@ -58,6 +58,12 @@ describe('buildMap', () => {
   });
 
   it('encodes ids above 255 across R and G', () => {
-    expect([...encodeIdMap(Uint16Array.from([0x1234]))]).toEqual([0x34, 0x12, 0, 255]);
+    expect([...encodeIdTile(Uint16Array.from([0x1234]), 1, 0, 0, 1, 1)]).toEqual([0x34, 0x12, 0, 255]);
+  });
+
+  it('encodes a tile from the middle of the map', () => {
+    // 3x2 map; the tile is the 2x1 block starting at (1, 1).
+    const ids = Uint16Array.from([1, 2, 3, 4, 5, 0x0106]);
+    expect([...encodeIdTile(ids, 3, 1, 1, 2, 1)]).toEqual([5, 0, 0, 255, 6, 1, 0, 255]);
   });
 });

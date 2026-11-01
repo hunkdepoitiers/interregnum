@@ -1,16 +1,18 @@
 /**
- * Validates data/map and writes public/generated/{province-ids.png, map.json, rivers.json}.
+ * Validates data/map and writes public/generated/{province-ids-<col>-<row>.png tiles, map.json, rivers.json}.
  * Runs as part of `npm run build`.
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { parse } from 'yaml';
 import {
   definitionsSchema, lonLatToPixel, projectionSchema, projectionSize, straitsSchema, type MapData, type RiverData,
 } from '../src/content/map';
-import { buildMap, encodeIdMap } from './map-lib';
+import { buildMap, encodeIdTile } from './map-lib';
 
 const OUT_DIR = 'public/generated';
+/** WebGL textures may not exceed 4096 px, so the id map is split into tiles of this size. */
+const TILE_SIZE = 4096;
 
 const projection = projectionSchema.parse(parse(readFileSync('data/map/projection.yaml', 'utf8')));
 const defs = definitionsSchema.parse(parse(readFileSync('data/map/definitions.yaml', 'utf8')));
@@ -31,10 +33,23 @@ if (built.errors.length) {
 }
 
 mkdirSync(OUT_DIR, { recursive: true });
-const ids = new PNG({ width: png.width, height: png.height });
-ids.data = Buffer.from(encodeIdMap(built.idMap));
-writeFileSync(`${OUT_DIR}/province-ids.png`, PNG.sync.write(ids, { colorType: 2 }));
-const mapData: MapData = { width: png.width, height: png.height, projection, provinces: built.provinces };
+for (const f of readdirSync(OUT_DIR)) if (f.startsWith('province-ids')) rmSync(`${OUT_DIR}/${f}`);
+const tileCols = Math.ceil(png.width / TILE_SIZE);
+const tileRows = Math.ceil(png.height / TILE_SIZE);
+for (let row = 0; row < tileRows; row++) {
+  for (let col = 0; col < tileCols; col++) {
+    const x0 = col * TILE_SIZE;
+    const y0 = row * TILE_SIZE;
+    const w = Math.min(TILE_SIZE, png.width - x0);
+    const h = Math.min(TILE_SIZE, png.height - y0);
+    const tile = new PNG({ width: w, height: h });
+    tile.data = Buffer.from(encodeIdTile(built.idMap, png.width, x0, y0, w, h));
+    writeFileSync(`${OUT_DIR}/province-ids-${col}-${row}.png`, PNG.sync.write(tile, { colorType: 2 }));
+  }
+}
+const mapData: MapData = {
+  width: png.width, height: png.height, tileSize: TILE_SIZE, tileCols, tileRows, projection, provinces: built.provinces,
+};
 writeFileSync(`${OUT_DIR}/map.json`, JSON.stringify(mapData));
 
 // Rivers (data/map/rivers.json, from tools/build-rivers.ts) converted to map pixels for the renderer.

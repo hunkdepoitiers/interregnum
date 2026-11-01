@@ -4,7 +4,7 @@ import { command, startGame, world } from '../bridge/client';
 import type { MapData, RiverData } from '../content/map';
 import type { Scenario } from '../content/scenario';
 import { buildLookup, hexToRgb, type MapMode } from '../render/map-modes';
-import { loadIdMap, MapView } from '../render/map-view';
+import { loadIdTiles, MapView } from '../render/map-view';
 import { MapModeBar } from './MapModeBar';
 import { ProvincePanel } from './ProvincePanel';
 import { RealmPanel } from './RealmPanel';
@@ -86,9 +86,9 @@ export function App() {
         fetch(`${base}generated/map.json`).then((r) => r.json() as Promise<MapData>),
         fetch(`${base}generated/scenario.json`).then((r) => r.json() as Promise<Scenario>),
       ]);
-      const { bitmap, ids } = await loadIdMap(`${base}generated/province-ids.png`, map.width, map.height);
+      const tiles = await loadIdTiles(base, map);
       if (cancelled || !host.current) return;
-      view = new MapView(map, ids, bitmap);
+      view = new MapView(map, tiles);
       const riversReady = fetch(`${base}generated/rivers.json`).then((r) => r.json() as Promise<RiverData>);
       view.onHover = (id, x, y) => {
         view!.setHover(id);

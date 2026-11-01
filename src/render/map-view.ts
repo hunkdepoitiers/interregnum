@@ -2,10 +2,11 @@ import {
   Application, BufferImageSource, Container, Geometry, GlProgram, Graphics, ImageSource, Mesh, Shader, UniformGroup,
 } from 'pixi.js';
 import { lonLatToPixel, type MapData, type RiverData } from '../content/map';
-import { LOOKUP_SIZE } from './map-modes';
+import { LOOKUP_HEIGHT, LOOKUP_ROWS, LOOKUP_WIDTH } from './map-modes';
 
 /**
- * The whole map is one quad. The fragment shader reads the province id at each pixel from the id texture,
+ * The map is a grid of quads, one per id-map tile (WebGL textures max out at 4096 px). The fragment shader reads
+ * the province id at each pixel from its tile's id texture,
  * looks up that province's colours in a small lookup texture (see map-modes.ts), stripes occupied provinces
  * in the occupier's colour, and draws borders: faint between provinces, strong between realms.
  * Recolouring the map (map modes, conquests) only rewrites the lookup texture.
@@ -28,7 +29,7 @@ in vec2 vUV;
 out vec4 finalColor;
 uniform sampler2D uIdMap;
 uniform sampler2D uLookup;
-uniform vec2 uMapSize;
+uniform vec2 uTileSize;
 uniform float uHover;
 uniform float uSelected;
 uniform float uZoom;
@@ -40,8 +41,13 @@ float idAt(vec2 uv) {
   vec4 c = texture(uIdMap, uv);
   return floor(c.r * 255.0 + 0.5) + floor(c.g * 255.0 + 0.5) * 256.0;
 }
-vec4 baseOf(float id) { return texture(uLookup, vec2((id + 0.5) / ${LOOKUP_SIZE}.0, 0.25)); }
-vec4 heldOf(float id) { return texture(uLookup, vec2((id + 0.5) / ${LOOKUP_SIZE}.0, 0.75)); }
+vec2 lookupUv(float id, float layer) {
+  float col = mod(id, ${LOOKUP_WIDTH}.0);
+  float row = floor(id / ${LOOKUP_WIDTH}.0) + layer * ${LOOKUP_ROWS}.0;
+  return vec2((col + 0.5) / ${LOOKUP_WIDTH}.0, (row + 0.5) / ${LOOKUP_HEIGHT}.0);
+}
+vec4 baseOf(float id) { return texture(uLookup, lookupUv(id, 0.0)); }
+vec4 heldOf(float id) { return texture(uLookup, lookupUv(id, 1.0)); }
 bool sameColor(vec3 a, vec3 b) { return distance(a, b) < 0.004; }
 
 // 0 = same province, 1 = province border, 2 = realm border (base colour changes).
@@ -58,7 +64,7 @@ void main() {
 
   // Occupied: diagonal stripes in the controller's colour, ~12 screen pixels apart.
   vec3 held = heldOf(id).rgb;
-  vec2 screenPx = vUV * uMapSize * uZoom;
+  vec2 screenPx = vUV * uTileSize * uZoom;
   if (!sameColor(held, base.rgb) && mod(screenPx.x + screenPx.y, 12.0) < 5.0) rgb = held;
 
   if (uRealmHighlight.a > 0.5 && id > 0.0 && sameColor(base.rgb, uRealmHighlight.rgb)) rgb = mix(rgb, vec3(1.0), 0.3);
@@ -66,7 +72,7 @@ void main() {
   else if (id > 0.0 && id == uHover) rgb = mix(rgb, vec3(1.0), 0.25);
 
   // Neighbours one screen pixel (at least one map pixel) away.
-  vec2 step = max(1.0, 1.0 / uZoom) / uMapSize;
+  vec2 step = max(1.0, 1.0 / uZoom) / uTileSize;
   float edge = max(max(edgeTo(vUV + vec2(step.x, 0.0), id, base.rgb), edgeTo(vUV - vec2(step.x, 0.0), id, base.rgb)),
                    max(edgeTo(vUV + vec2(0.0, step.y), id, base.rgb), edgeTo(vUV - vec2(0.0, step.y), id, base.rgb)));
   // Lookup alpha < 0.75 marks water: its borders stay faint.
@@ -75,6 +81,7 @@ void main() {
 }`;
 
 const MAX_ZOOM = 8;
+const MAX_DECODED_TILES = 6;
 
 export class MapView {
   readonly app = new Application();
@@ -86,38 +93,44 @@ export class MapView {
   onHover: (id: number, clientX: number, clientY: number) => void = () => {};
   onClick: (id: number) => void = () => {};
 
+  /** Decoded id arrays of recently hovered tiles (least recently used first), for picking. */
+  private readonly tileIds = new Map<number, Uint16Array>();
+
   constructor(
     private readonly map: MapData,
-    private readonly ids: Uint16Array,
-    private readonly idBitmap: ImageBitmap,
+    private readonly tiles: ImageBitmap[],
   ) {}
 
   async mount(host: HTMLElement) {
     await this.app.init({ resizeTo: host, preference: 'webgl', background: '#0b1622', antialias: false });
     host.appendChild(this.app.canvas);
 
-    const { width: W, height: H } = this.map;
-    const idSource = new ImageSource({ resource: this.idBitmap, scaleMode: 'nearest', autoGenerateMipmaps: false });
     this.lookupSource = new BufferImageSource({
-      resource: new Uint8Array(LOOKUP_SIZE * 2 * 4), width: LOOKUP_SIZE, height: 2, format: 'rgba8unorm', scaleMode: 'nearest',
+      resource: new Uint8Array(LOOKUP_WIDTH * LOOKUP_HEIGHT * 4), width: LOOKUP_WIDTH, height: LOOKUP_HEIGHT,
+      format: 'rgba8unorm', scaleMode: 'nearest',
       alphaMode: 'no-premultiply-alpha', // alpha is a water flag, not transparency
     });
     this.uniforms = new UniformGroup({
-      uMapSize: { value: new Float32Array([W, H]), type: 'vec2<f32>' },
       uHover: { value: 0, type: 'f32' },
       uSelected: { value: 0, type: 'f32' },
       uZoom: { value: 1, type: 'f32' },
       uRealmHighlight: { value: new Float32Array(4), type: 'vec4<f32>' },
     });
-    const geometry = new Geometry({
-      attributes: { aPosition: [0, 0, W, 0, W, H, 0, H], aUV: [0, 0, 1, 0, 1, 1, 0, 1] },
-      indexBuffer: [0, 1, 2, 0, 2, 3],
+    const glProgram = GlProgram.from({ vertex, fragment, name: 'province-map' });
+    this.tiles.forEach((bitmap, i) => {
+      const { x, y, w, h } = this.tileRect(i);
+      const geometry = new Geometry({
+        attributes: { aPosition: [x, y, x + w, y, x + w, y + h, x, y + h], aUV: [0, 0, 1, 0, 1, 1, 0, 1] },
+        indexBuffer: [0, 1, 2, 0, 2, 3],
+      });
+      const idSource = new ImageSource({ resource: bitmap, scaleMode: 'nearest', autoGenerateMipmaps: false });
+      const tileUniforms = new UniformGroup({ uTileSize: { value: new Float32Array([w, h]), type: 'vec2<f32>' } });
+      const shader = new Shader({
+        glProgram,
+        resources: { uIdMap: idSource, uLookup: this.lookupSource, mapUniforms: this.uniforms, tileUniforms },
+      });
+      this.world.addChild(new Mesh({ geometry, shader }));
     });
-    const shader = new Shader({
-      glProgram: GlProgram.from({ vertex, fragment, name: 'province-map' }),
-      resources: { uIdMap: idSource, uLookup: this.lookupSource, mapUniforms: this.uniforms },
-    });
-    this.world.addChild(new Mesh({ geometry, shader }));
     this.app.stage.addChild(this.world);
 
     this.fitToScreen();
@@ -186,7 +199,36 @@ export class MapView {
     const x = Math.floor((clientX - rect.left - this.world.x) / s);
     const y = Math.floor((clientY - rect.top - this.world.y) / s);
     if (x < 0 || y < 0 || x >= this.map.width || y >= this.map.height) return 0;
-    return this.ids[y * this.map.width + x]!;
+    const { tileSize: T, tileCols } = this.map;
+    const i = Math.floor(y / T) * tileCols + Math.floor(x / T);
+    const r = this.tileRect(i);
+    return this.tileIdArray(i)[(y - r.y) * r.w + (x - r.x)]!;
+  }
+
+  private tileRect(i: number) {
+    const { tileSize: T, tileCols, width, height } = this.map;
+    const x = (i % tileCols) * T;
+    const y = Math.floor(i / tileCols) * T;
+    return { x, y, w: Math.min(T, width - x), h: Math.min(T, height - y) };
+  }
+
+  /** Decodes a tile's ids on first use; keeps the few most recent so memory stays bounded. */
+  private tileIdArray(i: number): Uint16Array {
+    const cached = this.tileIds.get(i);
+    if (cached) {
+      this.tileIds.delete(i);
+      this.tileIds.set(i, cached);
+      return cached;
+    }
+    const { w, h } = this.tileRect(i);
+    const ctx = new OffscreenCanvas(w, h).getContext('2d', { willReadFrequently: true })!;
+    ctx.drawImage(this.tiles[i]!, 0, 0);
+    const rgba = ctx.getImageData(0, 0, w, h).data;
+    const ids = new Uint16Array(w * h);
+    for (let p = 0; p < ids.length; p++) ids[p] = rgba[p * 4]! | (rgba[p * 4 + 1]! << 8);
+    this.tileIds.set(i, ids);
+    if (this.tileIds.size > MAX_DECODED_TILES) this.tileIds.delete(this.tileIds.keys().next().value!);
+    return ids;
   }
 
   private fitToScreen() {
@@ -251,15 +293,17 @@ export class MapView {
   }
 }
 
-/** Fetches the generated id map and decodes it without colour management, so ids survive exactly. */
-export async function loadIdMap(url: string, width: number, height: number) {
-  const blob = await (await fetch(url)).blob();
-  const bitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
-  const canvas = new OffscreenCanvas(width, height);
-  const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
-  ctx.drawImage(bitmap, 0, 0);
-  const rgba = ctx.getImageData(0, 0, width, height).data;
-  const ids = new Uint16Array(width * height);
-  for (let p = 0; p < ids.length; p++) ids[p] = rgba[p * 4]! | (rgba[p * 4 + 1]! << 8);
-  return { bitmap, ids };
+/** Fetches every id-map tile and decodes it without colour management, so ids survive exactly. */
+export async function loadIdTiles(base: string, map: MapData): Promise<ImageBitmap[]> {
+  const jobs: Promise<ImageBitmap>[] = [];
+  for (let row = 0; row < map.tileRows; row++) {
+    for (let col = 0; col < map.tileCols; col++) {
+      jobs.push(
+        fetch(`${base}generated/province-ids-${col}-${row}.png`)
+          .then((r) => r.blob())
+          .then((blob) => createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })),
+      );
+    }
+  }
+  return Promise.all(jobs);
 }

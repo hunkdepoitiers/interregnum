@@ -79,6 +79,10 @@ export type RiverData = { name: string | null; rank: number; lines: number[][] }
 export interface MapData {
   width: number;
   height: number;
+  /** The id map is served as tiles of at most tileSize x tileSize (WebGL texture limit). */
+  tileSize: number;
+  tileCols: number;
+  tileRows: number;
   projection: Projection;
   provinces: MapProvince[];
 }

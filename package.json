@@ -5,15 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "npm run build:map && npm run build:data && vite",
-    "build:map": "tsx tools/build-map.ts",
+    "build:map": "node --max-old-space-size=7000 --import tsx tools/build-map.ts",
     "build:data": "tsx tools/build-data.ts",
     "build": "npm run build:map && npm run build:data && tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint .",
-    "seed-map": "tsx tools/seed-map.ts",
+    "seed-map": "node --max-old-space-size=16000 --import tsx tools/seed-map.ts",
     "fetch-boundaries": "tsx tools/fetch-boundaries.ts",
-    "build-rivers": "tsx tools/build-rivers.ts"
+    "build-rivers": "tsx tools/build-rivers.ts",
+    "world-seeds": "tsx tools/world-seeds.ts"
   },
   "dependencies": {
     "@preact/signals": "2.11.4",
