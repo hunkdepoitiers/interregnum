@@ -235,7 +235,7 @@ export class MapView {
     const { width, height } = this.app.screen;
     this.minZoom = Math.min(width / this.map.width, height / this.map.height);
     this.world.scale.set(this.minZoom * 2.5);
-    // Start over the Aegean and western Anatolia, where 1302 begins.
+    // Start over the Aegean and western Anatolia, where the game begins.
     const [x, y] = lonLatToPixel(this.map.projection, 27, 39);
     this.centerOn(x, y);
   }

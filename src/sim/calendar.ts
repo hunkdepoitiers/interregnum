@@ -1,5 +1,5 @@
 /**
- * Julian calendar (in use across Europe in 1302). Day 0 of the game is 27 July 1302.
+ * Julian calendar (in use across Europe in 1314). Day 0 of the game is 1 November 1314.
  * Conversions go through the Julian Day Number with integer arithmetic only.
  */
 export interface GameDate {
@@ -13,7 +13,7 @@ export const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ] as const;
 
-export const START_DATE: GameDate = { year: 1302, month: 7, day: 27 };
+export const START_DATE: GameDate = { year: 1314, month: 11, day: 1 };
 
 export function julianToJdn({ year, month, day }: GameDate): number {
   const a = Math.floor((14 - month) / 12);

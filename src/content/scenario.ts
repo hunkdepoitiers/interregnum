@@ -8,6 +8,11 @@ export const governments = [
 ] as const satisfies readonly SimGovernment[];
 
 const key = z.string().regex(/^[a-z0-9_]+$/);
+/** [lat, lon] in degrees. */
+const point = z.tuple([z.number().min(-90).max(90), z.number().min(-180).max(180)]);
+/** A spot on the map: [lat, lon], or the key of a town in data/map/seeds*.yaml. Resolves to the land province there. */
+const place = z.union([point, key]);
+export type Place = z.infer<typeof place>;
 
 const realmSourceSchema = z.object({
   key,
@@ -15,18 +20,21 @@ const realmSourceSchema = z.object({
   rank: z.enum(ranks),
   government: z.enum(governments),
   color: z.string().regex(/^#[0-9a-f]{6}$/i),
-  capital: key,
+  capital: place,
   overlord: key.optional(),
   scripted: z.boolean().default(false),
-  provinces: z.array(key).min(1),
+  /** Outlines; land provinces whose centre lies inside one belong to the realm. Later realms paint over earlier ones. */
+  area: z.array(z.array(point).min(3)).default([]),
+  /** Single provinces taken by place; these (and the capital) override every outline. */
+  add: z.array(place).default([]),
 });
 
 /** Shape of data/scenario/*.yaml. */
 export const scenarioSourceSchema = z.object({
-  /** false = provinces-only map while the map is under construction; realms are kept but not loaded. */
-  enabled: z.boolean().default(true),
-  unclaimed: z.array(key).default([]),
-  occupations: z.record(key, key).default({}),
+  /** Outlines where no land should stay unowned: gaps inside them go to the nearest realm over land. */
+  fill: z.array(z.array(point).min(3)).default([]),
+  /** Controller differs from owner at game start: [place, occupying realm]. */
+  occupations: z.array(z.tuple([place, key])).default([]),
   realms: z.array(realmSourceSchema).min(1),
 });
 export type ScenarioSource = z.infer<typeof scenarioSourceSchema>;

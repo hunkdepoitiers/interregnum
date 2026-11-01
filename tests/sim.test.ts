@@ -47,8 +47,8 @@ describe('tick', () => {
   it('reports month and year starts', () => {
     const s = newGame(1, scenario);
     const results = Array.from({ length: 160 }, () => tick(s));
-    expect(results.filter((r) => r.monthStart).map((r) => r.day)).toEqual([5, 36, 66, 97, 127, 158]);
-    expect(results.filter((r) => r.yearStart).map((r) => r.day)).toEqual([158]);
+    expect(results.filter((r) => r.monthStart).map((r) => r.day)).toEqual([30, 61, 92, 120, 151]);
+    expect(results.filter((r) => r.yearStart).map((r) => r.day)).toEqual([61]);
   });
 
   it('is deterministic over ten years', () => {
@@ -112,7 +112,7 @@ describe('save', () => {
     expect(() => deserialize(text, ctx)).toThrow(/different version of the map/);
   });
 
-  it('upgrades a version 1 save by adding the 1302 map', () => {
+  it('upgrades a version 1 save by adding the start map', () => {
     const v1 = { format: 'interregnum-save', saveVersion: 1, state: { saveVersion: 1, seed: 5, rng: [1, 2, 3, 4], day: 3650, speed: 3, paused: false } };
     const s = deserialize(JSON.stringify(v1), ctx);
     expect(s.saveVersion).toBe(SAVE_VERSION);

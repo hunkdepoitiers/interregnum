@@ -23,7 +23,7 @@ export const toast = signal<string | null>(null);
 const loadError = signal<string | null>(null);
 let view: MapView | null = null;
 
-const START_SEED = 1302;
+const START_SEED = 1314;
 
 export function selectProvince(id: number, center = false) {
   selected.value = id;

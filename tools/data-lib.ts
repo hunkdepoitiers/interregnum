@@ -1,46 +1,111 @@
-import type { MapProvince } from '../src/content/map';
-import type { Scenario, ScenarioRealm, ScenarioSource } from '../src/content/scenario';
+import { lonLatToPixel, type MapProvince, type Projection } from '../src/content/map';
+import type { Place, Scenario, ScenarioRealm, ScenarioSource } from '../src/content/scenario';
 
 export interface CompiledScenario {
   scenario: Scenario;
   errors: string[];
   warnings: string[];
+  /** Land provinces no realm owns (tribal lands and areas not mapped yet). */
+  unowned: number;
+}
+
+export interface MapContext {
+  projection: Projection;
+  /** Town key → [lat, lon], from data/map/seeds*.yaml. */
+  towns: Map<string, [number, number]>;
+  /** Province id at a map pixel, when the id map is at hand; otherwise places resolve by province boxes. */
+  idAt?: (x: number, y: number) => number;
 }
 
 /** Below this RGB distance two bordering realms are hard to tell apart on the political map. */
 const MIN_NEIGHBOUR_COLOR_DISTANCE = 40;
+/** A place this many pixels (~1.4 km each) or more from any land province centre is reported as off the map's land. */
+const MAX_PLACE_DISTANCE = 60;
 
-/** Resolves keys to ids and checks that the scenario is consistent with the map. */
-export function compileScenario(src: ScenarioSource, provinces: MapProvince[]): CompiledScenario {
+type Pt = [number, number];
+
+function insidePolygon([x, y]: Pt, poly: Pt[]): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i]!;
+    const [xj, yj] = poly[j]!;
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+/** Paints realm outlines onto land provinces, resolves places and keys to ids, and checks the result. */
+export function compileScenario(src: ScenarioSource, provinces: MapProvince[], ctx: MapContext): CompiledScenario {
   const errors: string[] = [];
   const warnings: string[] = [];
-  const byKey = new Map(provinces.map((p) => [p.key, p]));
+  const land = provinces.filter((p) => p.kind === 'land');
   const maxId = provinces.reduce((m, p) => Math.max(m, p.id), 0);
   const owner = new Array<number>(maxId + 1).fill(0);
   const realmId = new Map<string, number>();
+  const byId = new Map(provinces.map((p) => [p.id, p]));
+  const toPixel = ([lat, lon]: Pt): Pt => lonLatToPixel(ctx.projection, lon, lat);
 
   src.realms.forEach((r, i) => {
     if (realmId.has(r.key)) errors.push(`Realm ${r.key}: duplicate key`);
     realmId.set(r.key, i + 1);
   });
 
-  const landProvince = (k: string, where: string) => {
-    const p = byKey.get(k);
-    if (!p) { errors.push(`${where}: unknown province ${k}`); return null; }
-    if (p.kind !== 'land') { errors.push(`${where}: ${k} is ${p.kind}, only land can be owned`); return null; }
-    return p;
+  // The land province at a place: the one under it, else (water, mountains, no id map) among those whose box holds
+  // the point the one with the nearest centre.
+  const provinceAt = (place: Place, where: string): MapProvince | null => {
+    let latLon: Pt | undefined;
+    if (typeof place === 'string') {
+      latLon = ctx.towns.get(place);
+      if (!latLon) { errors.push(`${where}: unknown town ${place}`); return null; }
+    } else latLon = place;
+    const [x, y] = toPixel(latLon);
+    const hit = ctx.idAt ? byId.get(ctx.idAt(Math.floor(x), Math.floor(y))) : undefined;
+    if (hit?.kind === 'land') return hit;
+    let best: MapProvince | null = null;
+    let bestD = Infinity;
+    let bestInBox = false;
+    for (const p of land) {
+      const [x0, y0, x1, y1] = p.bbox;
+      const inBox = x >= x0 && x <= x1 && y >= y0 && y <= y1;
+      const d = Math.hypot(p.centroid[0] - x, p.centroid[1] - y);
+      if ((inBox && !bestInBox) || (inBox === bestInBox && d < bestD)) { best = p; bestD = d; bestInBox = inBox; }
+    }
+    if (!best || (!bestInBox && bestD > MAX_PLACE_DISTANCE)) {
+      errors.push(`${where}: ${JSON.stringify(place)} is not on land`);
+      return null;
+    }
+    return best;
   };
 
+  // Outlines, in file order: a later realm paints over an earlier one.
+  src.realms.forEach((r, i) => {
+    for (const outline of r.area) {
+      const poly = outline.map(toPixel);
+      const xs = poly.map((q) => q[0]);
+      const ys = poly.map((q) => q[1]);
+      const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+      for (const p of land) {
+        const c = p.centroid as Pt;
+        if (c[0] >= x0 && c[0] <= x1 && c[1] >= y0 && c[1] <= y1 && insidePolygon(c, poly)) owner[p.id] = i + 1;
+      }
+    }
+  });
+
+  // Capitals and single provinces override outlines; two realms may not both name the same province.
+  const named = new Map<number, number>();
   const realms: ScenarioRealm[] = src.realms.map((r, i) => {
     const id = i + 1;
-    for (const k of r.provinces) {
-      const p = landProvince(k, `Realm ${r.key}`);
-      if (!p) continue;
-      const prev = owner[p.id]!;
-      if (prev) errors.push(`Province ${k} is owned by both ${src.realms[prev - 1]!.key} and ${r.key}`);
-      else owner[p.id] = id;
-    }
-    if (!r.provinces.includes(r.capital)) errors.push(`Realm ${r.key}: capital ${r.capital} is not one of its provinces`);
+    const take = (place: Place, what: string) => {
+      const p = provinceAt(place, `Realm ${r.key} ${what}`);
+      if (!p) return null;
+      const prev = named.get(p.id);
+      if (prev && prev !== id) errors.push(`Province ${p.key} is named by both ${src.realms[prev - 1]!.key} and ${r.key}`);
+      named.set(p.id, id);
+      owner[p.id] = id;
+      return p;
+    };
+    for (const place of r.add) take(place, `add ${JSON.stringify(place)}`);
+    const capital = take(r.capital, 'capital');
     let overlord = 0;
     if (r.overlord) {
       overlord = realmId.get(r.overlord) ?? 0;
@@ -49,9 +114,29 @@ export function compileScenario(src: ScenarioSource, provinces: MapProvince[]): 
     }
     return {
       id, key: r.key, name: r.name, rank: r.rank, government: r.government, color: r.color.toLowerCase(),
-      capital: byKey.get(r.capital)?.id ?? 0, overlord, scripted: r.scripted,
+      capital: capital?.id ?? 0, overlord, scripted: r.scripted,
     };
   });
+
+  // Gaps inside a fill outline go to the nearest realm over land, breadth-first from every owned province.
+  const fills = src.fill.map((o) => o.map(toPixel));
+  const fillable = new Set(land.filter((p) => !owner[p.id] && fills.some((f) => insidePolygon(p.centroid as Pt, f))).map((p) => p.id));
+  for (let frontier = land.filter((p) => owner[p.id]); frontier.length && fillable.size;) {
+    const next: MapProvince[] = [];
+    for (const p of frontier) {
+      for (const n of p.adjacency) {
+        if (!n.border || !fillable.has(n.id)) continue;
+        fillable.delete(n.id);
+        owner[n.id] = owner[p.id]!;
+        next.push(byId.get(n.id)!);
+      }
+    }
+    frontier = next;
+  }
+
+  const counts = new Array<number>(realms.length + 1).fill(0);
+  for (const p of land) counts[owner[p.id]!]!++;
+  for (const r of realms) if (!counts[r.id]) errors.push(`Realm ${r.key} owns no provinces`);
 
   // Overlord chains must end; a cycle would make "top liege" undefined.
   for (const r of realms) {
@@ -62,24 +147,13 @@ export function compileScenario(src: ScenarioSource, provinces: MapProvince[]): 
     }
   }
 
-  const unclaimed = new Set<number>();
-  for (const k of src.unclaimed) {
-    const p = landProvince(k, 'unclaimed');
-    if (!p) continue;
-    if (owner[p.id]) errors.push(`Province ${k} is listed as unclaimed but owned by ${src.realms[owner[p.id]! - 1]!.key}`);
-    unclaimed.add(p.id);
-  }
-  for (const p of provinces) {
-    if (p.kind === 'land' && !owner[p.id] && !unclaimed.has(p.id)) errors.push(`Land province ${p.key} has no owner (list it under unclaimed if intended)`);
-  }
-
   const controller = [...owner];
-  for (const [k, realmKey] of Object.entries(src.occupations)) {
-    const p = landProvince(k, 'occupations');
+  for (const [place, realmKey] of src.occupations) {
+    const p = provinceAt(place, 'occupations');
     const id = realmId.get(realmKey);
     if (!id) errors.push(`occupations: unknown realm ${realmKey}`);
     if (!p || !id) continue;
-    if (!owner[p.id]) errors.push(`occupations: ${k} has no owner to be occupied from`);
+    if (!owner[p.id]) errors.push(`occupations: ${p.key} has no owner to be occupied from`);
     controller[p.id] = id;
   }
 
@@ -103,5 +177,5 @@ export function compileScenario(src: ScenarioSource, provinces: MapProvince[]): 
     }
   }
 
-  return { scenario: { realms, owner, controller }, errors, warnings };
+  return { scenario: { realms, owner, controller }, errors, warnings, unowned: counts[0]! };
 }

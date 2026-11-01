@@ -17,7 +17,7 @@ type Migration = (state: Record<string, unknown>, ctx: MigrationContext) => Reco
 
 /** migrations[n] upgrades a version-n state to version n+1. Add one whenever SAVE_VERSION increases. */
 export const migrations: Record<number, Migration> = {
-  // v2 added realms and province ownership; v1 saves only had the date, so take the 1302 map.
+  // v2 added realms and province ownership; v1 saves only had the date, so take the start map.
   1: (s, { scenario }) => ({ ...s, realms: realmsFromScenario(scenario), provinces: provincesFromScenario(scenario) }),
 };
 

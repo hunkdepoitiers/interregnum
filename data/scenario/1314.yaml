@@ -1,0 +1,2141 @@
+# Political situation on 1 November 1314: after Bannockburn (June) and the double election of Louis of Bavaria and
+# Frederick of Austria (October), during the papal vacancy after Clement V, weeks before Philip IV of France dies.
+# Borders follow Cyowari's maps "Europe ca. AD 1314" and "West and South Asia AD 1314" as a reference (outlines are
+# drawn here by hand, not traced); areas outside those maps are rough.
+#
+# How ownership is worked out (tools/data-lib.ts), so it survives regenerating the province map:
+# - `area`: outlines as [lat, lon] points. A land province belongs to the realm whose outline holds its centre;
+#   realms later in this file paint over earlier ones, so big realms come first and enclaves after them.
+#   Outlines may run out to sea or into wasteland freely: only land provinces are owned.
+# - `add`: single provinces by place ([lat, lon] or a town key from data/map/seeds*.yaml); with the capital they
+#   override every outline.
+# - `fill` (top level): land inside these outlines that no realm reached goes to the nearest realm over land
+#   (minor lordships and free cities merged into a neighbour). Land outside them stays unowned (tribal lands).
+# `overlord` makes a realm a vassal or tributary; `scripted` realms run on data timelines, not AI.
+# `# GUESS` marks simplifications: merged minor lordships, uncertain holders, or approximate borders.
+# Ranks: empire | kingdom | duchy | county. Governments: feudal_monarchy | merchant_republic | theocracy |
+# holy_order | steppe_horde | iqta_sultanate | beylik.
+
+fill:
+  # Europe, Anatolia and the Caucasus
+  # (Finnish interior, Lapland and the Komi forests stay outside: Finns, Sami and Komi are not realms)
+  - [[71.5, -25], [71.5, 16], [64, 16], [60.5, 22], [60.3, 28], [61.2, 29], [61, 33], [60, 42], [56.5, 45], [52, 42], [46, 38], [43, 41], [41.5, 47], [38, 46],
+    [36, 36], [34, 22], [35, -10], [44, -12]]
+  # North Africa, Egypt and the Levant
+  - [[37.8, -18], [37.8, 37], [33, 40], [29, 36], [22, 38], [17, 34], [17, 29], [24, 24], [30, 10], [27, -18]]
+  # Iran, Iraq and the Gulf
+  - [[42.5, 40], [42.5, 50], [38, 62], [30, 62], [25, 57.5], [27, 50], [30, 47], [33, 40], [37, 36]]
+  # Indian subcontinent
+  - [[37, 69], [36, 80], [29, 97], [21, 95], [5, 82], [5, 76], [22, 66], [30, 66]]
+  # China, Korea and Japan (the Lao and hill country of Southeast Asia stays outside)
+  - [[54, 96], [54, 142], [46, 147], [30, 132], [22, 122], [21, 108], [22.5, 101], [24, 97], [30, 97], [40, 95]]
+
+realms:
+  # ======================================================== Large realms first (smaller ones paint over them)
+  - key: golden_horde
+    name: Golden Horde
+    rank: empire
+    government: steppe_horde
+    color: "#d9c56b"
+    capital: [48.6, 45.6]  # Sarai
+    scripted: true
+    area:
+      - [[57.2, 45.5], [58.5, 50.5], [60.5, 58], [57.5, 66], [55.5, 75], [51.5, 80.5], [49.5, 79], [47.5, 76],
+        [46.5, 72], [45, 67], [44.5, 64.5], [43, 61.5], [41.6, 61], [40.6, 59.5], [40.8, 56.5], [41.6, 52.8],
+        [44, 48.5], [43.2, 47.4], [43.4, 45], [43.1, 42], [43.6, 40], [44.6, 37.5], [45.2, 36.6], [44.3, 33.3],
+        [45.8, 32.5], [46.3, 30.6], [45.5, 29.8], [45.2, 28.2], [46.4, 27.6], [47.9, 26.2], [48.6, 27.6],
+        [49.4, 29.8], [49.6, 31.8], [50.6, 32.2], [51.5, 33.6], [52.6, 35.2], [53.6, 38], [53.6, 41.3], [54.4, 42],
+        [55.2, 42.9], [55.9, 44.5], [56.6, 45]]
+
+  - key: yuan
+    name: Great Yuan
+    rank: empire
+    government: steppe_horde
+    color: "#8c6a48"
+    capital: [39.9, 116.4]  # Khanbaliq
+    scripted: true
+    area:
+      - [[53.5, 98], [52.5, 108], [53, 120], [54, 126], [53.5, 135], [49, 141], [43, 132], [42.3, 130.6],
+        [40.1, 124.3], [39, 121.5], [35, 120.5], [30.5, 123], [25, 120.5], [22, 114.5], [20, 110], [17.9, 108.5],
+        [18.5, 110.5], [20.2, 107.3], [21.6, 107.4], [22.9, 105.2], [22.6, 103], [21.4, 101.1], [23.5, 98.2],
+        [27.5, 98.6], [29.2, 98.4], [33, 99.5], [36, 97], [38, 95.5], [42, 96], [44, 95.5], [45, 89], [47.5, 87.5],
+        [50, 88], [51.8, 90], [52.5, 95]]
+
+  - key: chagatai
+    name: Chagatai Khanate
+    rank: empire
+    government: steppe_horde
+    color: "#7d9fa6"
+    capital: [42.85, 74.6]  # Balasagun country; GUESS
+    scripted: true
+    area:
+      - [[45, 67], [46.5, 72], [47.5, 76], [49.5, 79], [49.5, 85], [47.5, 87.5], [45, 89], [44.6, 88.5], [42.6, 88.6],
+        [41.8, 87.2], [40.5, 88.5], [38.5, 90], [36.4, 84], [35.8, 77.5], [35.4, 74], [36.6, 71.5], [35, 69.6],
+        [33.3, 69.2], [32.4, 67.6], [33.5, 66.5], [35, 67.5], [36.6, 66.5], [37.5, 64.5], [37.9, 61.5],
+        [39.5, 62], [41.6, 61], [43, 61.5], [44.5, 64.5]]
+
+  - key: ilkhanate
+    name: Ilkhanate
+    rank: empire
+    government: steppe_horde
+    color: "#b4545e"
+    capital: [36.43, 48.79]  # Soltaniyeh
+    scripted: true
+    area:
+      - [[42.2, 48.5], [41.8, 46.5], [41.3, 45], [41, 43], [40.9, 41.2], [40.7, 39.5], [40.6, 37], [40.4, 35.5],
+        [39.6, 34.4], [38.5, 34.4], [37.4, 34.6], [37.0, 35.9], [36.95, 37.4], [37.3, 38.4], [36.6, 38.8],
+        [36.2, 40], [35, 40.8], [34.3, 41.2], [33.3, 41.8], [32, 43], [30.5, 46], [29.9, 47.9], [29, 49.5],
+        [27, 51.5], [26.4, 56], [25.3, 57.3], [25, 61.6], [26.8, 62.6], [28.5, 61.8], [30.5, 60.8], [33.5, 60.6],
+        [35.5, 61], [36.6, 61.2], [37.6, 59.6], [38.2, 57.5], [38.6, 56], [38, 53.8], [37.2, 54], [37.3, 50],
+        [38.5, 48.8], [40, 49.5], [41, 49.2]]
+
+  - key: delhi
+    name: Delhi Sultanate
+    rank: empire
+    government: iqta_sultanate
+    color: "#9dbb4c"
+    capital: [28.6, 77.2]  # Delhi
+    area:
+      - [[34.6, 71.5], [32.6, 74.8], [32.1, 75.8], [31.1, 77], [30.3, 78.1], [29.1, 80], [27.6, 83.5], [26.4, 85.2],
+        [25.6, 87.6], [24.4, 87.2], [23.4, 85.6], [23, 83], [24.1, 82], [22.1, 80], [21.7, 77.5], [21.2, 74.5],
+        [20.7, 73], [21, 72.4], [22.5, 69], [23.6, 68.6], [24.5, 70], [27.5, 70], [28.6, 70], [30, 70.4],
+        [31.6, 70], [33.6, 71]]
+
+  - key: mamluks
+    name: Mamluk Sultanate
+    rank: empire
+    government: iqta_sultanate
+    color: "#d7a64c"
+    capital: [30.04, 31.24]  # Cairo
+    area:
+      - [[33, 21.5], [32.2, 25], [31.7, 29], [31.5, 32.5], [33.5, 35], [35.6, 35.7], [36.25, 35.9], [36.65, 36.4],
+        [37.0, 36.9], [37.15, 37.9], [36.3, 38.5], [35, 40.6], [34.4, 41], [33, 39], [31, 37.5], [29.6, 36.1],
+        [28.4, 35.1], [26, 35.2], [24, 35.8], [22, 37], [22, 31], [24, 30], [29.5, 27], [30, 25], [31, 22.5]]
+
+  # ======================================================== France
+  - key: france
+    name: Kingdom of France
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#5d6fb8"
+    capital: [48.86, 2.35]  # Paris; Philip IV
+    area:
+      - [[51.2, 1.5], [51.05, 2.55], [50.75, 3.1], [50.6, 3.3], [50.3, 3.6], [50.05, 4.15], [49.75, 4.8], [49.4, 5.0],
+        [49.0, 5.1], [48.6, 5.3], [48.3, 5.5], [47.9, 5.6], [47.5, 5.4], [47.0, 5.15], [46.6, 4.95], [46.2, 4.85],
+        [45.75, 4.85], [45.4, 4.75], [45.0, 4.85], [44.5, 4.7], [44.1, 4.7], [43.6, 4.6], [43.3, 4.7], [42.42, 3.2],
+        [42.5, 1.7], [42.7, 0.7], [42.85, -0.7], [43.2, -1.4], [43.4, -1.8], [48, -5.5], [51.2, -1]]
+  - key: brittany
+    name: Duchy of Brittany
+    rank: duchy
+    government: feudal_monarchy
+    color: "#d08cb4"
+    capital: [47.22, -1.55]  # Nantes; Arthur II
+    overlord: france
+    area:
+      - [[48.95, -5.2], [48.65, -1.55], [48.35, -1.05], [47.65, -1.2], [47.2, -1.7], [47.0, -2.3], [46.8, -4], [48, -5.6]]
+  - key: flanders
+    name: County of Flanders
+    rank: county
+    government: feudal_monarchy
+    color: "#d95a4e"
+    capital: [51.05, 3.72]  # Ghent; Robert of Béthune
+    overlord: france
+    area:
+      - [[51.45, 2.5], [51.4, 4.2], [51.0, 4.2], [50.85, 3.6], [50.72, 3.2], [50.9, 2.4]]
+  - key: burgundy
+    name: Duchy of Burgundy
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5aa060"
+    capital: [47.32, 5.04]  # Dijon; Hugh V
+    overlord: france
+    area:
+      - [[47.95, 4.2], [47.85, 5.2], [47.3, 5.35], [46.6, 4.95], [46.4, 4.7], [46.6, 4.0], [47.2, 3.9], [47.7, 3.9]]
+  - key: foix
+    name: County of Foix-Béarn
+    rank: county
+    government: feudal_monarchy
+    color: "#e0b45a"
+    capital: [43.3, -0.37]  # Pau country; Gaston I
+    overlord: france
+    area:
+      - [[43.6, -1.0], [43.6, 0.0], [43.0, 0.0], [42.85, -0.75], [43.1, -1.0]]
+      - [[43.15, 1.3], [43.15, 2.0], [42.6, 2.0], [42.6, 1.3]]
+  - key: armagnac
+    name: County of Armagnac
+    rank: county
+    government: feudal_monarchy
+    color: "#a07cc0"
+    capital: [43.65, 0.59]  # Auch country
+    overlord: france
+    area:
+      - [[43.95, -0.2], [43.95, 0.8], [43.45, 0.8], [43.45, -0.2]]
+
+  # ======================================================== Iberia
+  - key: castile
+    name: Crown of Castile
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d9a83a"
+    capital: [39.86, -4.02]  # Toledo; Alfonso XI is three, regents rule
+    area:
+      - [[44, -10], [44, -1.6], [43.3, -1.75], [42, -1.75], [41.75, -1.9], [41.3, -1.85], [40.9, -1.6], [40.5, -1.6],
+        [40.2, -1.45], [39.9, -1.5], [39.5, -1.2], [39, -1.15], [38.65, -0.95], [38.3, -1.05], [38, -0.98],
+        [37.6, -0.6], [36.5, -0.6], [35.9, -6], [36.5, -10]]
+    add: [[36.14, -5.35], [36.01, -5.6]]  # Gibraltar (taken 1309), Tarifa
+  - key: portugal
+    name: Kingdom of Portugal
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#4f9a55"
+    capital: [38.72, -9.14]  # Lisbon
+    area:
+      - [[42.2, -9.9], [42.15, -8.2], [41.95, -6.6], [41.6, -6.2], [41.0, -6.8], [40.3, -6.85], [39.65, -7.5],
+        [39.0, -7.05], [38.2, -6.95], [37.2, -7.42], [36.8, -7.5], [36.8, -9.9]]
+  - key: aragon
+    name: Crown of Aragon
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c75a6b"
+    capital: [41.39, 2.17]  # Barcelona
+    area:
+      - [[42.85, -0.75], [42.75, 0.7], [42.55, 1.4], [42.45, 1.8], [42.42, 3.4], [40.5, 1.8], [38.2, 0.6], [37.85, -0.75],
+        [38.1, -0.98], [38.3, -1.05], [38.65, -0.95], [39, -1.15], [39.5, -1.2], [39.9, -1.5], [40.2, -1.45],
+        [40.5, -1.6], [40.9, -1.6], [41.3, -1.85], [41.75, -1.9], [42.1, -1.6], [42.4, -1.1]]
+  - key: navarre
+    name: Kingdom of Navarre
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c9c45a"
+    capital: [42.82, -1.64]  # Pamplona; Louis I of Navarre is also Louis X, heir of France
+    area:
+      - [[43.32, -1.8], [43.3, -1.2], [42.95, -0.75], [42.6, -1.0], [42.35, -1.15], [42.0, -1.4], [41.95, -1.85],
+        [42.15, -1.95], [42.45, -2.1], [42.6, -2.45], [42.9, -2.3], [43.1, -1.95]]
+  - key: granada
+    name: Emirate of Granada
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#c96a4a"
+    capital: [37.18, -3.6]  # Granada; Ismail I took the throne in 1314
+    area:
+      - [[37.25, -5.35], [37.4, -4.6], [37.55, -4.05], [37.7, -3.3], [37.75, -2.6], [37.55, -2.0], [37.35, -1.65],
+        [36.5, -1.6], [35.9, -5.3], [36.15, -5.42], [36.45, -5.5], [36.75, -5.6]]
+  - key: majorca
+    name: Kingdom of Majorca
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#e2876b"
+    capital: [39.57, 2.65]  # Palma
+    overlord: aragon
+    area:
+      - [[40.2, 1.1], [40.2, 4.5], [38.6, 4.5], [38.6, 1.1]]
+      - [[42.95, 1.75], [42.95, 3.3], [42.4, 3.3], [42.38, 1.75]]  # Roussillon and Cerdanya
+    add: [[43.61, 3.88]]  # Montpellier
+
+  # ======================================================== North Africa
+  - key: marinids
+    name: Marinid Sultanate
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#8fae5e"
+    capital: [34.03, -5.0]  # Fez
+    area:
+      - [[36.1, -10.5], [36.1, -5.0], [35.4, -2.2], [35.1, -1.85], [32.5, -1.6], [29.5, -3.5], [28, -9], [27.5, -13.5],
+        [31.5, -10.5]]
+  - key: zayyanids
+    name: Zayyanid Kingdom of Tlemcen
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#c9b66a"
+    capital: [34.88, -1.32]  # Tlemcen
+    area:
+      - [[35.15, -1.85], [36, -1.0], [37, 3.5], [35.5, 3.5], [33, 2.5], [32.5, -1.6]]
+  - key: hafsids
+    name: Hafsid Sultanate of Tunis
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#5f9a7a"
+    capital: [36.8, 10.18]  # Tunis
+    area:
+      - [[37.5, 3.5], [37.5, 11.5], [33.5, 11.5], [32.8, 13.5], [32.2, 15.6], [31, 15.6], [32, 10], [33.5, 5.5],
+        [35.5, 3.5]]
+
+  # ======================================================== British Isles
+  - key: england
+    name: Kingdom of England
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#e0857e"
+    capital: [51.5, -0.12]  # Westminster; Edward II
+    area:
+      - [[55.9, -1.5], [55.6, -2.3], [55.35, -2.6], [55.05, -3.0], [54.95, -3.5], [54.2, -5.6], [51.5, -6], [49.8, -6.2],
+        [50.5, 1.8], [53, 2.1]]
+      - [[55.5, -10.8], [55.5, -5.4], [51.2, -5.8], [51.2, -10.8]]  # Lordship of Ireland
+      - [[45.8, -1.45], [45.65, -0.4], [45.2, 0.3], [44.5, 0.9], [44.0, 0.7], [43.7, -0.1], [43.4, -0.8], [43.35, -1.6],
+        [44.5, -1.5], [45.5, -1.35]]  # Gascony
+    add: [[55.77, -2.0], [50.1, 1.83]]  # Berwick (English until 1318), Ponthieu
+  - key: scotland
+    name: Kingdom of Scotland
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#6f9ed4"
+    capital: [56.4, -3.43]  # Scone / Perth; Robert I
+    area:
+      - [[61, -8.5], [61, -0.5], [55.9, -1.5], [55.6, -2.3], [55.35, -2.6], [55.05, -3.0], [54.95, -3.5], [54.5, -7.5]]
+    add: [[54.2, -4.5]]  # Isle of Man, taken by Bruce in 1313
+  - key: tyrone
+    name: Kingdom of Tír Eoghain
+    rank: county
+    government: feudal_monarchy
+    color: "#7fb069"
+    capital: [54.6, -6.9]  # Tullyhogue
+    area:
+      - [[55.3, -7.4], [55.25, -6.55], [54.5, -6.55], [54.3, -7.4], [54.65, -7.7]]
+  - key: tyrconnell
+    name: Kingdom of Tír Conaill
+    rank: county
+    government: feudal_monarchy
+    color: "#a3c46a"
+    capital: [54.65, -8.1]  # Donegal
+    area:
+      - [[55.5, -8.9], [55.35, -7.45], [54.65, -7.7], [54.35, -8.6]]
+  - key: connacht
+    name: Kingdom of Connacht
+    rank: county
+    government: feudal_monarchy
+    color: "#5d9b6e"
+    capital: [53.75, -8.2]  # Roscommon country; the O'Conors under de Burgh pressure; GUESS
+    area:
+      - [[54.3, -10.4], [54.25, -8.3], [53.45, -7.9], [53.3, -8.7], [53.6, -10.4]]
+  - key: thomond
+    name: Kingdom of Thomond
+    rank: county
+    government: feudal_monarchy
+    color: "#8bbf8f"
+    capital: [52.85, -8.98]  # Ennis country
+    area:
+      - [[53.15, -9.6], [53.1, -8.35], [52.68, -8.45], [52.6, -9.9]]
+  - key: desmond
+    name: Kingdom of Desmond
+    rank: county
+    government: feudal_monarchy
+    color: "#6aa57a"
+    capital: [51.9, -9.5]  # MacCarthy Mór, Kerry and west Cork
+    area:
+      - [[52.3, -10.6], [52.1, -9.25], [51.65, -8.85], [51.4, -10.3]]
+
+  # ======================================================== Low Countries and the Rhineland (Holy Roman Empire)
+  - key: brabant
+    name: Duchy of Brabant
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e6c84a"
+    capital: [50.88, 4.7]  # Leuven / Brussels; John III, a minor
+    area:
+      - [[51.55, 4.3], [51.6, 5.6], [51.2, 5.9], [50.75, 6.0], [50.6, 5.75], [50.6, 4.2], [50.9, 4.15], [51.25, 4.25]]
+  - key: liege
+    name: Prince-Bishopric of Liège
+    rank: county
+    government: theocracy
+    color: "#9a6fb0"
+    capital: [50.63, 5.57]  # Liège; Loon merged in: GUESS
+    area:
+      - [[51.25, 5.1], [51.15, 5.75], [50.62, 5.72], [50.4, 5.4], [50.0, 4.9], [49.95, 4.4], [50.25, 4.3], [50.55, 5.05],
+        [50.9, 5.0]]
+  - key: hainaut
+    name: Counties of Hainaut and Holland
+    rank: county
+    government: feudal_monarchy
+    color: "#e08a4a"
+    capital: [50.45, 3.95]  # Mons; William I of Avesnes
+    area:
+      - [[50.75, 3.3], [50.7, 4.25], [50.15, 4.3], [50.0, 4.05], [50.2, 3.6], [50.45, 3.4]]
+      - [[53.05, 4.6], [52.9, 5.2], [52.35, 5.1], [52.0, 4.95], [51.75, 4.6], [51.55, 4.25], [51.3, 3.4], [51.7, 3.3],
+        [52.5, 4.4]]
+  - key: utrecht
+    name: Prince-Bishopric of Utrecht
+    rank: county
+    government: theocracy
+    color: "#b57a6a"
+    capital: [52.09, 5.12]  # Utrecht
+    area:
+      - [[52.25, 4.95], [52.25, 5.6], [51.95, 5.6], [51.95, 4.95]]
+      - [[53.2, 6.0], [53.0, 7.0], [52.25, 7.0], [52.25, 6.0], [52.6, 5.9]]  # Oversticht
+  - key: guelders
+    name: County of Guelders
+    rank: county
+    government: feudal_monarchy
+    color: "#5aa6a0"
+    capital: [51.98, 5.91]  # Arnhem; Reginald II
+    area:
+      - [[52.5, 5.6], [52.3, 6.6], [51.85, 6.4], [51.5, 6.25], [51.15, 6.1], [51.3, 5.6], [51.85, 5.0], [52.2, 5.5]]
+  - key: cleves
+    name: County of Cleves
+    rank: county
+    government: feudal_monarchy
+    color: "#c75a8a"
+    capital: [51.79, 6.14]  # Kleve
+    area:
+      - [[51.9, 5.95], [51.85, 6.8], [51.5, 6.8], [51.5, 6.0]]
+  - key: julich
+    name: County of Jülich
+    rank: county
+    government: feudal_monarchy
+    color: "#8fb35a"
+    capital: [50.92, 6.36]  # Jülich
+    area:
+      - [[51.15, 6.0], [51.1, 6.6], [50.6, 6.65], [50.5, 6.2], [50.85, 6.0]]
+  - key: berg
+    name: County of Berg
+    rank: county
+    government: feudal_monarchy
+    color: "#d9a0b0"
+    capital: [51.22, 6.78]  # Düsseldorf country
+    area:
+      - [[51.35, 6.85], [51.3, 7.4], [50.85, 7.4], [50.85, 7.0]]
+  - key: cologne
+    name: Archbishopric of Cologne
+    rank: duchy
+    government: theocracy
+    color: "#b8b04a"
+    capital: [50.73, 7.1]  # Bonn; Henry II of Virneburg, elector
+    area:
+      - [[51.2, 6.6], [51.15, 7.0], [50.6, 7.25], [50.55, 6.9], [50.9, 6.62]]
+      - [[51.6, 7.7], [51.55, 8.6], [51.1, 8.6], [51.15, 7.8]]  # Duchy of Westphalia
+  - key: mark
+    name: County of Mark
+    rank: county
+    government: feudal_monarchy
+    color: "#e07a5a"
+    capital: [51.36, 7.47]  # Hagen country
+    area:
+      - [[51.6, 7.1], [51.65, 7.7], [51.3, 7.75], [51.25, 7.2]]
+  - key: munster
+    name: Prince-Bishopric of Münster
+    rank: county
+    government: theocracy
+    color: "#7a8fc0"
+    capital: [51.96, 7.63]  # Münster; Osnabrück and Paderborn merged in: GUESS
+    area:
+      - [[52.7, 6.9], [52.6, 8.6], [51.75, 9.2], [51.65, 7.9], [51.8, 6.9]]
+  - key: oldenburg
+    name: County of Oldenburg
+    rank: county
+    government: feudal_monarchy
+    color: "#c0a07a"
+    capital: [53.14, 8.21]  # Oldenburg
+    area:
+      - [[53.6, 7.9], [53.45, 8.5], [52.85, 8.6], [52.9, 7.95]]
+  - key: bremen
+    name: Archbishopric of Bremen
+    rank: county
+    government: theocracy
+    color: "#8ab0d0"
+    capital: [53.08, 8.8]  # Bremen
+    area:
+      - [[53.9, 8.5], [53.9, 9.6], [53.3, 9.6], [53.1, 8.8], [53.4, 8.45]]
+  - key: trier
+    name: Archbishopric of Trier
+    rank: duchy
+    government: theocracy
+    color: "#a0b46a"
+    capital: [49.75, 6.64]  # Trier; Baldwin of Luxembourg, elector
+    area:
+      - [[50.4, 6.4], [50.45, 7.6], [50.0, 7.7], [49.6, 6.8], [49.75, 6.4]]
+  - key: luxembourg
+    name: County of Luxembourg
+    rank: county
+    government: feudal_monarchy
+    color: "#e8d06a"
+    capital: [49.61, 6.13]  # Luxembourg; held by John, King of Bohemia
+    overlord: bohemia
+    area:
+      - [[50.2, 5.7], [50.15, 6.38], [49.45, 6.38], [49.5, 5.75], [49.8, 5.4]]
+  - key: bar
+    name: County of Bar
+    rank: county
+    government: feudal_monarchy
+    color: "#70c0a8"
+    capital: [48.77, 5.16]  # Bar-le-Duc; Edward I
+    area:
+      - [[49.35, 4.95], [49.2, 5.75], [48.6, 5.85], [48.4, 5.4], [48.8, 5.0]]
+  - key: lorraine
+    name: Duchy of Lorraine
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e0a050"
+    capital: [48.69, 6.18]  # Nancy; Frederick IV; Metz and Toul merged in: GUESS
+    area:
+      - [[49.4, 5.75], [49.2, 7.1], [48.2, 7.1], [48.0, 6.0], [48.3, 5.6], [48.7, 5.88]]
+  - key: county_burgundy
+    name: County of Burgundy
+    rank: county
+    government: feudal_monarchy
+    color: "#d65a5a"
+    capital: [47.24, 6.02]  # Besançon country; held by Philip of Poitiers through his wife Joan
+    area:
+      - [[47.95, 5.5], [47.85, 6.8], [47.45, 7.0], [46.5, 6.15], [46.3, 5.4], [46.8, 5.25], [47.3, 5.4]]
+  - key: palatinate
+    name: County Palatine of the Rhine
+    rank: county
+    government: feudal_monarchy
+    color: "#6a90c8"
+    capital: [49.41, 8.69]  # Heidelberg; Rudolf I, elector
+    area:
+      - [[49.75, 7.65], [49.75, 8.7], [49.25, 8.75], [49.05, 8.2], [49.3, 7.75]]
+  - key: mainz
+    name: Archbishopric of Mainz
+    rank: duchy
+    government: theocracy
+    color: "#c07070"
+    capital: [50.0, 8.27]  # Mainz; Peter of Aspelt, elector
+    area:
+      - [[50.12, 7.8], [50.15, 8.35], [49.85, 8.45], [49.8, 7.95]]
+      - [[50.15, 8.9], [50.05, 9.6], [49.6, 9.6], [49.75, 8.95]]  # Aschaffenburg
+      - [[51.45, 9.9], [51.45, 10.5], [51.2, 10.5], [51.2, 9.9]]  # Eichsfeld
+  - key: hesse
+    name: Landgraviate of Hesse
+    rank: county
+    government: feudal_monarchy
+    color: "#7ab07a"
+    capital: [51.32, 9.5]  # Kassel; Otto I
+    area:
+      - [[51.6, 8.65], [51.5, 9.95], [50.9, 10.05], [50.6, 9.5], [50.55, 8.6], [51.05, 8.45]]
+  - key: wurttemberg
+    name: County of Württemberg
+    rank: county
+    government: feudal_monarchy
+    color: "#d0b060"
+    capital: [48.78, 9.18]  # Stuttgart; Eberhard I
+    area:
+      - [[49.1, 8.8], [49.15, 9.9], [48.7, 10.0], [48.25, 9.5], [48.3, 8.7], [48.75, 8.6]]
+  - key: baden
+    name: Margraviate of Baden
+    rank: county
+    government: feudal_monarchy
+    color: "#b05050"
+    capital: [48.76, 8.24]  # Baden
+    area:
+      - [[49.1, 8.15], [49.0, 8.6], [48.4, 8.35], [48.6, 7.9]]
+  - key: wurzburg
+    name: Prince-Bishopric of Würzburg
+    rank: county
+    government: theocracy
+    color: "#9ab0c8"
+    capital: [49.79, 9.93]  # Würzburg
+    area:
+      - [[50.3, 9.5], [50.35, 10.6], [49.6, 10.5], [49.6, 9.4]]
+  - key: bamberg
+    name: Prince-Bishopric of Bamberg
+    rank: county
+    government: theocracy
+    color: "#c8a0c0"
+    capital: [49.89, 10.89]  # Bamberg
+    area:
+      - [[50.15, 10.7], [50.2, 11.4], [49.7, 11.35], [49.7, 10.7]]
+  - key: nuremberg
+    name: Burgraviate of Nuremberg
+    rank: county
+    government: feudal_monarchy
+    color: "#e0e0a0"
+    capital: [49.45, 11.08]  # Nuremberg; Frederick IV of Hohenzollern
+    area:
+      - [[49.65, 10.5], [49.6, 11.3], [49.15, 11.3], [49.15, 10.5]]
+  - key: henneberg
+    name: County of Henneberg
+    rank: county
+    government: feudal_monarchy
+    color: "#a07a50"
+    capital: [50.6, 10.4]  # Schleusingen country
+    area:
+      - [[50.75, 10.15], [50.7, 10.9], [50.35, 10.9], [50.35, 10.15]]
+
+  # ======================================================== Swabia, the Alps and Bavaria
+  - key: habsburg
+    name: Duchy of Austria
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e8e8e8"
+    capital: [48.21, 16.37]  # Vienna; Frederick the Fair, elected King of the Romans by one party in October 1314
+    area:
+      - [[48.95, 15.0], [48.8, 16.95], [48.0, 17.15], [47.7, 16.55], [47.0, 16.15], [46.55, 15.95], [46.5, 14.95],
+        [46.95, 13.95], [47.45, 13.75], [47.8, 13.5], [48.3, 13.45], [48.6, 13.85]]
+      - [[47.95, 7.0], [47.9, 7.6], [47.6, 8.4], [47.25, 8.45], [47.2, 7.9], [47.45, 7.2]]  # Aargau and Upper Alsace
+  - key: salzburg
+    name: Archbishopric of Salzburg
+    rank: county
+    government: theocracy
+    color: "#c05a6a"
+    capital: [47.8, 13.04]  # Salzburg
+    area:
+      - [[48.05, 12.75], [47.95, 13.65], [47.25, 13.75], [47.05, 12.9], [47.4, 12.4]]
+  - key: carinthia
+    name: Duchy of Carinthia and Tyrol
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5a8a6a"
+    capital: [46.62, 14.31]  # Klagenfurt; Henry of Carinthia, Count of Tyrol
+    area:
+      - [[47.75, 10.45], [47.6, 12.5], [46.75, 12.6], [46.4, 11.6], [45.85, 11.0], [46.5, 10.4], [47.0, 10.1]]
+      - [[46.95, 12.7], [46.95, 15.0], [46.5, 15.05], [46.45, 13.6], [46.65, 12.7]]
+      - [[46.45, 13.7], [46.45, 15.5], [45.5, 15.3], [45.5, 14.0]]  # Carniola
+  - key: aquileia
+    name: Patriarchate of Aquileia
+    rank: county
+    government: theocracy
+    color: "#d8c890"
+    capital: [46.06, 13.24]  # Udine
+    area:
+      - [[46.6, 12.4], [46.45, 13.6], [46.1, 13.6], [45.7, 13.2], [45.7, 12.6], [46.1, 12.35]]
+  - key: gorizia
+    name: County of Gorizia
+    rank: county
+    government: feudal_monarchy
+    color: "#a0d0e0"
+    capital: [45.94, 13.62]  # Gorizia; Henry II
+    area:
+      - [[46.15, 13.45], [46.1, 13.75], [45.65, 13.85], [45.75, 13.35]]
+      - [[45.4, 13.8], [45.35, 14.2], [45.1, 14.2], [45.1, 13.8]]  # inner Istria
+  - key: swiss
+    name: Swiss Confederacy
+    rank: county
+    government: merchant_republic
+    color: "#e05050"
+    capital: [47.02, 8.65]  # Schwyz; Uri, Schwyz and Unterwalden
+    area:
+      - [[47.1, 8.35], [47.12, 8.9], [46.55, 8.75], [46.75, 8.2]]
+  - key: bavaria
+    name: Duchy of Upper Bavaria
+    rank: duchy
+    government: feudal_monarchy
+    color: "#6aaad8"
+    capital: [48.14, 11.58]  # Munich; Louis IV, elected King of the Romans by the other party
+    area:
+      - [[48.8, 10.8], [48.9, 12.0], [48.3, 12.6], [47.6, 12.6], [47.45, 11.0], [47.6, 10.5], [48.3, 10.7]]
+      - [[49.9, 11.4], [50.0, 12.4], [49.2, 12.8], [49.05, 11.6]]  # Upper Palatinate
+  - key: lower_bavaria
+    name: Duchy of Lower Bavaria
+    rank: duchy
+    government: feudal_monarchy
+    color: "#a0c8e8"
+    capital: [48.54, 12.15]  # Landshut; young dukes under Louis's guardianship
+    area:
+      - [[49.15, 12.0], [49.0, 13.8], [48.6, 13.85], [48.3, 13.45], [48.25, 12.6], [48.75, 12.0]]
+  - key: savoy
+    name: County of Savoy
+    rank: county
+    government: feudal_monarchy
+    color: "#e8a8a0"
+    capital: [45.7, 6.2]  # Chambéry country; Amadeus V
+    area:
+      - [[46.85, 6.6], [46.85, 7.1], [46.4, 7.15], [45.95, 7.6], [45.6, 7.9], [45.1, 7.65], [44.9, 7.2], [45.15, 6.6],
+        [45.5, 6.1], [45.6, 5.6], [46.05, 5.0], [46.4, 5.1], [46.35, 6.0]]
+  - key: dauphine
+    name: Dauphiné of Viennois
+    rank: county
+    government: feudal_monarchy
+    color: "#7aa0e0"
+    capital: [45.19, 5.72]  # Grenoble; John II
+    area:
+      - [[45.75, 4.9], [45.6, 5.6], [45.5, 6.1], [45.15, 6.6], [44.9, 7.0], [44.4, 6.9], [44.2, 5.6], [44.5, 4.8],
+        [45.0, 4.9]]
+  - key: provence
+    name: County of Provence
+    rank: county
+    government: feudal_monarchy
+    color: "#e0a070"
+    capital: [43.53, 5.45]  # Aix; Robert of Naples is count
+    overlord: naples
+    area:
+      - [[44.4, 4.65], [44.35, 5.5], [44.3, 6.9], [44.05, 7.7], [43.7, 7.6], [43.0, 6.0], [43.3, 4.7]]
+
+  # ======================================================== Northern Germany
+  - key: brandenburg
+    name: Margraviate of Brandenburg
+    rank: duchy
+    government: feudal_monarchy
+    color: "#8a9ab0"
+    capital: [52.41, 12.55]  # Brandenburg; Waldemar, elector
+    area:
+      - [[53.5, 11.2], [53.6, 12.5], [53.45, 13.8], [53.4, 14.4], [53.3, 15.6], [53.0, 16.2], [52.4, 15.6], [51.9, 15.4],
+        [51.4, 15.2], [51.0, 15.0], [50.9, 14.5], [51.2, 13.9], [51.6, 13.2], [51.9, 12.2], [52.0, 11.3], [52.5, 10.9],
+        [53.0, 11.0]]
+      - [[54.65, 16.3], [54.6, 17.35], [54.1, 17.35], [54.1, 16.3]]  # Sławno and Słupsk, held 1308–1317
+  - key: magdeburg
+    name: Archbishopric of Magdeburg
+    rank: county
+    government: theocracy
+    color: "#c0c0e0"
+    capital: [52.13, 11.62]  # Magdeburg
+    area:
+      - [[52.4, 11.3], [52.35, 12.2], [51.9, 12.2], [51.75, 11.7], [52.0, 11.2]]
+  - key: saxe_wittenberg
+    name: Duchy of Saxe-Wittenberg
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e0c060"
+    capital: [51.87, 12.65]  # Wittenberg; Rudolf I
+    area:
+      - [[52.0, 12.3], [51.95, 13.2], [51.65, 13.2], [51.7, 12.3]]
+  - key: saxe_lauenburg
+    name: Duchy of Saxe-Lauenburg
+    rank: duchy
+    government: feudal_monarchy
+    color: "#d0d070"
+    capital: [53.37, 10.56]  # Lauenburg
+    area:
+      - [[53.75, 10.3], [53.75, 11.0], [53.35, 10.95], [53.35, 10.4]]
+  - key: thuringia
+    name: Landgraviate of Thuringia and Meissen
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5aa070"
+    capital: [51.16, 13.47]  # Meissen; Frederick I the Brave of Wettin
+    area:
+      - [[51.45, 10.0], [51.55, 11.5], [51.4, 12.2], [51.3, 13.0], [51.15, 14.0], [50.75, 14.25], [50.4, 13.0],
+        [50.3, 12.1], [50.4, 11.3], [50.5, 10.2], [50.85, 10.0]]
+  - key: brunswick_luneburg
+    name: Duchy of Brunswick-Lüneburg
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e8e070"
+    capital: [53.25, 10.41]  # Lüneburg; Otto II the Strict
+    area:
+      - [[53.45, 9.65], [53.3, 11.0], [52.5, 11.0], [52.35, 10.2], [52.6, 9.55], [53.1, 9.45]]
+  - key: brunswick
+    name: Duchy of Brunswick
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c8b040"
+    capital: [52.26, 10.52]  # Brunswick; Wolfenbüttel, Göttingen and Grubenhagen merged: GUESS
+    area:
+      - [[52.35, 9.95], [52.3, 10.9], [51.9, 11.0], [51.45, 10.5], [51.4, 9.6], [51.9, 9.65]]
+  - key: holstein
+    name: County of Holstein
+    rank: county
+    government: feudal_monarchy
+    color: "#d07a90"
+    capital: [54.09, 9.98]  # Neumünster country; the Holstein counts merged: GUESS
+    area:
+      - [[54.45, 9.0], [54.4, 11.2], [54.0, 11.0], [53.55, 10.3], [53.55, 9.4], [53.9, 8.85]]
+  - key: mecklenburg
+    name: Lordship of Mecklenburg
+    rank: county
+    government: feudal_monarchy
+    color: "#e09a50"
+    capital: [53.63, 11.41]  # Schwerin country; Henry II the Lion; Schwerin and Rostock merged: GUESS
+    area:
+      - [[54.15, 10.8], [54.35, 12.4], [53.9, 12.4], [53.4, 12.0], [53.3, 11.2], [53.7, 10.8]]
+  - key: werle
+    name: Lordship of Werle
+    rank: county
+    government: feudal_monarchy
+    color: "#a0b070"
+    capital: [53.79, 12.18]  # Güstrow
+    area:
+      - [[54.0, 12.3], [53.95, 13.2], [53.35, 13.2], [53.3, 12.05]]
+  - key: pomerania_wolgast
+    name: Duchy of Pomerania-Wolgast
+    rank: duchy
+    government: feudal_monarchy
+    color: "#70b0b0"
+    capital: [54.05, 13.77]  # Wolgast; Rügen merged in: GUESS
+    area:
+      - [[54.75, 12.9], [54.7, 14.2], [53.85, 14.1], [53.9, 12.9]]
+  - key: pomerania_stettin
+    name: Duchy of Pomerania-Stettin
+    rank: duchy
+    government: feudal_monarchy
+    color: "#90c0a0"
+    capital: [53.43, 14.55]  # Stettin; Otto I
+    area:
+      - [[53.95, 14.1], [54.3, 15.0], [54.6, 16.25], [54.1, 16.25], [53.6, 15.6], [53.35, 14.5], [53.5, 14.1]]
+
+  # ======================================================== Bohemia, Poland and Silesia
+  - key: bohemia
+    name: Kingdom of Bohemia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d68ab0"
+    capital: [50.09, 14.42]  # Prague; John of Luxembourg; Moravia included
+    area:
+      - [[51.05, 14.3], [50.85, 15.0], [50.6, 16.3], [50.3, 16.7], [50.05, 17.7], [49.75, 18.4], [49.3, 18.2],
+        [48.8, 17.3], [48.6, 16.4], [48.8, 15.0], [48.6, 14.0], [49.0, 13.0], [49.4, 12.6], [50.25, 12.1], [50.4, 12.7],
+        [50.75, 13.8]]
+    add: [[49.94, 17.9]]  # Opava
+  - key: glogow
+    name: Duchy of Głogów
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e07a7a"
+    capital: [51.66, 16.08]  # Głogów; sons of Henry III
+    area:
+      - [[52.2, 15.3], [52.05, 17.1], [51.5, 17.3], [51.4, 16.0], [51.45, 15.25]]
+  - key: wroclaw
+    name: Duchy of Wrocław
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c85a80"
+    capital: [51.11, 17.03]  # Wrocław; Henry VI the Good (Legnica merged in: GUESS)
+    area:
+      - [[51.4, 15.6], [51.35, 17.3], [50.8, 17.5], [50.75, 16.6], [51.05, 15.6]]
+  - key: swidnica
+    name: Duchy of Świdnica-Jawor
+    rank: duchy
+    government: feudal_monarchy
+    color: "#b07ab0"
+    capital: [50.84, 16.49]  # Świdnica; Bernard
+    area:
+      - [[51.05, 15.3], [51.0, 16.4], [50.55, 16.5], [50.8, 15.4]]
+  - key: upper_silesia
+    name: Upper Silesian Duchies
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e0a0a0"
+    capital: [50.67, 17.93]  # Opole; Opole, Racibórz, Bytom and Cieszyn merged: GUESS
+    area:
+      - [[51.0, 17.4], [50.9, 19.0], [50.3, 19.4], [49.6, 18.9], [49.9, 18.05], [50.3, 17.5]]
+  - key: poland
+    name: Kingdom of Poland
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d84a4a"
+    capital: [50.06, 19.94]  # Kraków; Władysław the Elbow-high, master of Greater Poland since 1314; Kuyavia merged: GUESS
+    area:
+      - [[53.2, 16.2], [53.05, 17.8], [52.95, 18.6], [52.5, 19.4], [52.2, 19.9], [51.65, 20.3], [51.3, 21.8], [51.5, 22.4],
+        [50.95, 23.0], [50.4, 23.2], [49.6, 22.7], [49.3, 21.3], [49.4, 20.0], [49.6, 19.4], [50.2, 19.4], [50.7, 18.9],
+        [51.1, 18.2], [51.4, 17.4], [51.75, 16.5], [52.05, 15.8], [52.6, 15.8]]
+  - key: masovia_plock
+    name: Duchy of Płock
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e8a0c8"
+    capital: [52.55, 19.7]  # Płock; Wenceslaus
+    area:
+      - [[53.25, 19.3], [53.1, 20.2], [52.5, 20.3], [52.45, 19.4], [52.8, 19.1]]
+  - key: masovia_czersk
+    name: Duchy of Masovia
+    rank: duchy
+    government: feudal_monarchy
+    color: "#f0c0d8"
+    capital: [51.96, 21.23]  # Czersk; Trojden I and Siemowit II (Warsaw merged in)
+    area:
+      - [[53.4, 20.2], [53.2, 22.0], [52.3, 22.6], [51.8, 21.6], [51.9, 20.6], [52.4, 20.3]]
+
+  # ======================================================== Baltic
+  - key: teutonic_order
+    name: State of the Teutonic Order
+    rank: duchy
+    government: holy_order
+    color: "#7a8698"
+    capital: [54.04, 19.03]  # Marienburg, seat of the Grand Master since 1309
+    area:
+      - [[54.85, 17.4], [54.8, 18.4], [55.4, 21.2], [55.1, 22.6], [54.4, 22.8], [53.7, 22.1], [53.35, 21.0], [53.25, 19.5],
+        [53.0, 19.0], [53.0, 18.3], [53.3, 17.5], [53.6, 17.3], [54.2, 17.3]]
+      - [[58.85, 22.0], [59.0, 24.0], [58.8, 26.5], [59.0, 27.9], [58.0, 27.7], [57.5, 27.9], [56.5, 28.2], [56.0, 27.0],
+        [56.0, 26.0], [56.35, 24.8], [56.15, 23.0], [56.4, 22.0], [55.9, 21.0], [57.8, 20.8], [58.5, 21.6]]  # Livonia
+    add: [[55.71, 21.13]]  # Memel
+  - key: riga
+    name: Archbishopric of Riga
+    rank: county
+    government: theocracy
+    color: "#a8b4c8"
+    capital: [56.95, 24.11]  # Riga
+    area:
+      - [[57.4, 24.4], [57.5, 26.2], [56.65, 26.6], [56.6, 25.0], [56.95, 24.25]]
+  - key: dorpat
+    name: Bishopric of Dorpat
+    rank: county
+    government: theocracy
+    color: "#b8c0d8"
+    capital: [58.38, 26.72]  # Dorpat
+    area:
+      - [[58.75, 26.2], [58.75, 27.5], [57.9, 27.65], [57.9, 26.2]]
+  - key: lithuania
+    name: Grand Duchy of Lithuania
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#e0a848"
+    capital: [54.9, 23.9]  # Kernavė and Trakai country; Vytenis; Black Ruthenia and Polotsk included
+    area:
+      - [[56.3, 21.15], [56.4, 22.5], [56.15, 23.4], [56.35, 24.8], [56.0, 26.3], [56.0, 27.0], [56.2, 28.5], [55.7, 29.2],
+        [55.0, 28.8], [54.0, 28.2], [53.5, 27.6], [53.0, 26.5], [52.6, 25.4], [52.6, 24.0], [53.0, 23.6], [53.5, 23.5],
+        [54.3, 22.8], [55.1, 22.6], [55.35, 21.3]]
+
+  # ======================================================== Scandinavia
+  - key: sweden
+    name: Kingdom of Sweden
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#6ab0e0"
+    capital: [59.33, 18.07]  # Stockholm; Birger, at odds with his brothers the dukes
+    area:
+      - [[66.0, 15.0], [66.0, 24.0], [65.0, 26.0], [63.5, 25.0], [62.5, 26.5], [61.6, 28.5], [60.75, 28.95], [60.2, 29.0],
+        [59.5, 23.0], [56.0, 17.5], [55.8, 13.0], [57.3, 11.9], [58.0, 11.7], [58.9, 11.6], [59.4, 11.9], [60.2, 12.6],
+        [61.3, 12.4], [62.5, 12.2], [64.0, 14.0]]
+  - key: denmark
+    name: Kingdom of Denmark
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#f0b070"
+    capital: [55.64, 12.08]  # Roskilde; Eric VI Menved; Schleswig included
+    area:
+      - [[57.9, 7.9], [57.8, 10.8], [56.6, 11.3], [57.3, 12.05], [56.7, 13.3], [56.45, 14.2], [56.3, 16.3], [55.0, 15.7],
+        [54.5, 12.5], [54.4, 11.0], [54.45, 9.8], [54.35, 9.0], [54.85, 8.0]]
+      - [[59.7, 23.4], [59.7, 28.3], [59.15, 28.25], [59.0, 27.0], [58.95, 25.5], [59.1, 23.4]]  # Duchy of Estonia
+    add: [[55.12, 14.92]]  # Bornholm
+  - key: norway
+    name: Kingdom of Norway
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c06a90"
+    capital: [59.91, 10.75]  # Oslo; Haakon V
+    area:
+      - [[71.5, 24], [70.5, 31.5], [69.2, 29.5], [68.6, 20.0], [66.2, 15.2], [64.6, 14.2], [63.6, 14.6], [62.2, 14.2],
+        [61.8, 12.4], [60.2, 12.5], [59.4, 11.9], [58.9, 11.6], [57.72, 11.85], [57.7, 11.0], [58.0, 6.5], [62, 4],
+        [66, 11], [69, 15]]
+      - [[66.7, -24.7], [66.7, -13.2], [63.2, -13.2], [63.2, -24.7]]  # Iceland
+      - [[60.9, -2.0], [60.9, -0.6], [58.6, -0.6], [58.6, -3.5], [59.4, -3.5]]  # Shetland and Orkney
+      - [[62.4, -7.8], [62.4, -6.2], [61.3, -6.2], [61.3, -7.8]]  # Faroes
+      - [[61.5, -48.5], [61.5, -44.5], [59.8, -44.5], [59.8, -48.5]]  # Greenland, Eastern Settlement
+      - [[65.0, -53.5], [65.0, -49.5], [63.6, -49.5], [63.6, -53.5]]  # Greenland, Western Settlement
+
+  # ======================================================== Italy and its islands
+  - key: papal_states
+    name: Papal States
+    rank: kingdom
+    government: theocracy
+    color: "#f0e6a0"
+    capital: [41.9, 12.45]  # Rome; the see is vacant since Clement V died in April 1314; Ferrara held since 1309
+    area:
+      - [[45.0, 11.9], [44.85, 12.6], [44.0, 12.75], [43.6, 13.65], [42.9, 13.95], [42.95, 13.4], [42.55, 13.05],
+        [42.2, 13.2], [41.75, 13.45], [41.35, 13.05], [41.2, 12.5], [42.4, 11.4], [42.9, 11.8], [43.2, 12.0],
+        [43.5, 12.2], [43.8, 11.9], [44.3, 11.6], [44.75, 11.5]]
+    add: [[44.06, 5.05], [41.13, 14.78]]  # Comtat Venaissin, Benevento
+  - key: naples
+    name: Kingdom of Naples
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#7aa0c8"
+    capital: [40.85, 14.27]  # Naples; Robert the Wise
+    area:
+      - [[42.9, 13.95], [42.95, 13.4], [42.55, 13.05], [42.2, 13.2], [41.75, 13.45], [41.35, 13.05], [40.5, 14.0],
+        [38.35, 15.8], [37.85, 15.85], [38.2, 16.6], [39.0, 17.4], [40.4, 18.8], [42.0, 16.2], [42.9, 14.2]]
+    add: [[39.62, 19.92], [41.32, 19.45]]  # Corfu, Durazzo (Kingdom of Albania)
+  - key: trinacria
+    name: Kingdom of Trinacria
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#e8c04a"
+    capital: [38.12, 13.36]  # Palermo; Frederick III
+    area:
+      - [[38.4, 12.2], [38.33, 15.7], [36.6, 15.3], [37.0, 12.2]]
+  - key: florence
+    name: Republic of Florence
+    rank: county
+    government: merchant_republic
+    color: "#d86060"
+    capital: [43.77, 11.25]  # Florence
+    area:
+      - [[44.2, 10.95], [44.1, 11.8], [43.5, 11.95], [43.3, 11.4], [43.5, 10.95], [43.85, 10.85]]
+  - key: siena
+    name: Republic of Siena
+    rank: county
+    government: merchant_republic
+    color: "#a0a0d0"
+    capital: [43.32, 11.33]  # Siena
+    area:
+      - [[43.38, 11.0], [43.3, 11.8], [42.7, 11.9], [42.55, 11.2], [42.9, 10.9]]
+  - key: pisa
+    name: Republic of Pisa
+    rank: county
+    government: merchant_republic
+    color: "#c05a80"
+    capital: [43.72, 10.4]  # Pisa; Uguccione della Faggiuola, lord of Pisa and Lucca since June 1314
+    area:
+      - [[44.05, 10.15], [43.85, 10.85], [43.5, 10.95], [43.1, 10.95], [42.9, 10.5], [43.3, 10.25]]
+      - [[39.6, 8.4], [39.6, 9.9], [38.8, 9.9], [38.8, 8.3]]  # Cagliari
+      - [[41.3, 9.1], [41.3, 9.9], [40.5, 9.9], [40.6, 9.1]]  # Gallura
+  - key: arborea
+    name: Judicate of Arborea
+    rank: county
+    government: feudal_monarchy
+    color: "#70b0a0"
+    capital: [39.9, 8.59]  # Oristano; Hugh II
+    area:
+      - [[40.35, 8.3], [40.3, 9.2], [39.55, 9.2], [39.55, 8.3]]
+  - key: sassari
+    name: Republic of Sassari
+    rank: county
+    government: merchant_republic
+    color: "#a0d080"
+    capital: [40.73, 8.56]  # Sassari
+    area:
+      - [[41.25, 8.0], [41.1, 9.05], [40.38, 9.05], [40.38, 8.0]]
+  - key: genoa
+    name: Republic of Genoa
+    rank: county
+    government: merchant_republic
+    color: "#d03a4a"
+    capital: [44.41, 8.93]  # Genoa
+    area:
+      - [[44.65, 7.75], [44.6, 10.0], [44.0, 9.9], [43.7, 7.5], [44.05, 7.5]]
+      - [[43.1, 8.4], [43.1, 9.7], [41.3, 9.7], [41.3, 8.4]]  # Corsica
+      - [[38.65, 25.75], [38.65, 26.2], [38.1, 26.2], [38.1, 25.75]]  # Chios, held by the Zaccaria
+    add: [[45.03, 35.38], [44.84, 34.97]]  # Caffa, Soldaia
+  - key: milan
+    name: Lordship of Milan
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5a9a5a"
+    capital: [45.46, 9.19]  # Milan; Matteo I Visconti, imperial vicar
+    area:
+      - [[46.3, 8.65], [46.25, 9.5], [45.6, 9.75], [45.0, 9.85], [45.0, 9.3], [45.3, 8.6], [45.8, 8.6]]
+  - key: verona
+    name: Lordship of Verona
+    rank: county
+    government: feudal_monarchy
+    color: "#d0a050"
+    capital: [45.44, 10.99]  # Verona; Cangrande della Scala, also lord of Vicenza
+    area:
+      - [[45.8, 10.6], [45.9, 11.7], [45.45, 11.75], [45.15, 11.3], [45.25, 10.7]]
+  - key: padua
+    name: Commune of Padua
+    rank: county
+    government: merchant_republic
+    color: "#b0d0a0"
+    capital: [45.41, 11.88]  # Padua
+    area:
+      - [[45.65, 11.75], [45.5, 12.1], [45.15, 12.05], [45.2, 11.65]]
+  - key: mantua
+    name: Lordship of Mantua
+    rank: county
+    government: feudal_monarchy
+    color: "#a07ac0"
+    capital: [45.16, 10.79]  # Mantua; the Bonacolsi
+    area:
+      - [[45.35, 10.4], [45.3, 11.1], [44.9, 11.15], [44.95, 10.4]]
+  - key: bologna
+    name: Commune of Bologna
+    rank: county
+    government: merchant_republic
+    color: "#e0c0a0"
+    capital: [44.49, 11.34]  # Bologna
+    area:
+      - [[44.65, 11.0], [44.7, 11.7], [44.25, 11.75], [44.2, 11.0]]
+  - key: montferrat
+    name: Marquisate of Montferrat
+    rank: county
+    government: feudal_monarchy
+    color: "#c0a0e0"
+    capital: [45.14, 8.45]  # Casale; Theodore I Palaiologos
+    area:
+      - [[45.3, 7.95], [45.25, 8.6], [44.65, 8.75], [44.45, 8.2], [44.8, 7.95]]
+  - key: venice
+    name: Republic of Venice
+    rank: kingdom
+    government: merchant_republic
+    color: "#c84a6a"
+    capital: [45.44, 12.33]  # Venice; Doge Giovanni Soranzo
+    area:
+      - [[45.65, 12.15], [45.6, 12.65], [45.1, 12.45], [45.2, 12.1]]  # Dogado
+      - [[45.65, 13.5], [45.45, 13.8], [44.8, 13.95], [44.85, 13.55], [45.5, 13.45]]  # Istrian coast
+      - [[35.75, 23.3], [35.75, 26.4], [34.8, 26.4], [34.8, 23.3]]  # Crete
+    add: [[44.12, 15.23], [42.65, 18.09], [36.8, 21.96], [36.92, 21.7]]  # Zara, Ragusa, Coron, Modon
+
+  # ======================================================== Hungary and the Balkans
+  - key: hungary
+    name: Kingdom of Hungary
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#e8b080"
+    capital: [47.19, 18.41]  # Székesfehérvár; Charles I, still fighting the oligarchs
+    area:
+      - [[49.55, 18.9], [49.4, 21.5], [48.75, 22.9], [48.3, 24.0], [47.8, 25.0], [47.2, 25.6], [46.6, 26.2], [45.6, 26.0],
+        [45.45, 24.5], [45.3, 23.0], [44.8, 21.5], [44.9, 20.0], [45.1, 19.0], [45.6, 18.0], [45.4, 16.5], [45.5, 15.3],
+        [46.4, 16.0], [46.85, 16.1], [47.7, 16.6], [48.1, 17.1], [48.6, 16.95], [49.2, 18.1]]
+  - key: croatia
+    name: Banate of Croatia
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c09060"
+    capital: [43.73, 15.9]  # Bribir and Šibenik country; Mladen II Šubić, ban of Croatia and Bosnia
+    overlord: hungary
+    area:
+      - [[45.5, 14.6], [45.45, 15.3], [45.3, 16.3], [44.9, 16.6], [44.3, 17.3], [43.5, 17.2], [43.4, 16.4], [44.2, 14.8],
+        [45.3, 14.2]]
+  - key: bosnia
+    name: Banate of Bosnia
+    rank: duchy
+    government: feudal_monarchy
+    color: "#9a7ac0"
+    capital: [44.0, 18.0]  # Visoko country; under Mladen II Šubić: GUESS
+    overlord: croatia
+    area:
+      - [[45.2, 16.3], [45.15, 17.9], [44.5, 18.6], [43.6, 18.8], [43.3, 17.6], [43.9, 16.6], [44.6, 16.2]]
+  - key: syrmia
+    name: Kingdom of Syrmia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#b06a70"
+    capital: [44.82, 20.46]  # Belgrade; Stefan Dragutin (dies 1316)
+    area:
+      - [[45.3, 19.0], [45.2, 20.4], [44.85, 20.7], [44.3, 21.3], [43.9, 19.5], [44.4, 18.6], [44.9, 18.7]]
+  - key: severin
+    name: Banate of Severin
+    rank: county
+    government: feudal_monarchy
+    color: "#d08a50"
+    capital: [45.0, 22.5]  # Severin country
+    overlord: hungary
+    area:
+      - [[45.2, 22.3], [45.1, 23.3], [44.5, 23.4], [44.4, 22.5], [44.8, 22.1]]
+  - key: wallachia
+    name: Wallachia
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c8d890"
+    capital: [45.14, 24.67]  # Curtea de Argeș; Basarab I
+    overlord: hungary
+    area:
+      - [[45.6, 23.5], [45.75, 26.5], [45.3, 27.3], [44.2, 27.3], [43.7, 25.3], [43.7, 23.5], [44.3, 22.8], [45.2, 23.4]]
+  - key: serbia
+    name: Kingdom of Serbia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#7a8ab0"
+    capital: [42.66, 21.17]  # Priština country; Stefan Milutin
+    area:
+      - [[44.3, 21.2], [43.9, 22.5], [42.8, 22.8], [42.2, 22.9], [41.6, 22.9], [41.3, 22.7], [41.0, 22.0], [40.85, 20.9],
+        [41.3, 20.4], [41.9, 19.3], [42.3, 18.6], [42.6, 18.0], [43.3, 17.6], [43.6, 18.8], [43.9, 19.5]]
+  - key: bulgaria
+    name: Bulgarian Empire
+    rank: empire
+    government: feudal_monarchy
+    color: "#8ab860"
+    capital: [43.08, 25.63]  # Tarnovo; Theodore Svetoslav
+    area:
+      - [[44.15, 22.6], [43.8, 25.0], [44.1, 27.0], [45.1, 28.8], [44.7, 29.2], [43.5, 28.8], [42.4, 27.9], [42.1, 27.9],
+        [42.0, 26.6], [41.75, 26.0], [41.9, 25.0], [41.6, 24.5], [41.8, 23.5], [42.2, 22.9], [42.8, 22.8], [43.6, 22.6]]
+  - key: vidin
+    name: Despotate of Vidin
+    rank: duchy
+    government: feudal_monarchy
+    color: "#b0d070"
+    capital: [43.99, 22.88]  # Vidin; Michael Shishman
+    overlord: bulgaria
+    area:
+      - [[44.3, 22.4], [44.05, 23.5], [43.5, 23.4], [43.3, 22.6], [43.9, 22.2]]
+
+  # ======================================================== Byzantium and Latin Greece
+  - key: byzantium
+    name: Roman Empire
+    rank: empire
+    government: feudal_monarchy
+    color: "#c46ab0"
+    capital: [41.01, 28.98]  # Constantinople; Andronikos II Palaiologos
+    area:
+      - [[42.15, 28.0], [42.0, 26.6], [41.75, 26.0], [41.6, 24.5], [41.5, 23.3], [41.3, 22.7], [41.0, 22.0], [40.7, 21.0],
+        [40.4, 20.6], [40.0, 20.3], [39.8, 21.2], [39.95, 22.0], [40.2, 22.6], [40.0, 24.5], [40.3, 26.2], [40.6, 27.5],
+        [41.0, 29.2], [41.35, 29.2], [41.7, 28.3]]
+      - [[41.35, 29.25], [41.4, 31.6], [41.0, 31.7], [40.5, 30.3], [40.3, 29.5], [40.4, 28.8], [40.4, 28.0], [40.9, 29.0]]  # Bithynia
+      - [[37.4, 22.0], [37.5, 23.2], [36.4, 23.3], [36.4, 22.4], [37.0, 22.0]]  # Mystras and Monemvasia
+      - [[39.45, 25.8], [39.45, 26.7], [38.9, 26.7], [38.9, 25.8]]  # Lesbos
+      - [[40.15, 24.9], [40.15, 25.5], [39.75, 25.5], [39.75, 24.9]]  # Lemnos
+    add: [[38.35, 28.52]]  # Philadelphia
+  - key: epirus
+    name: Despotate of Epirus
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e090a0"
+    capital: [39.16, 20.98]  # Arta; Thomas I Komnenos Doukas
+    area:
+      - [[40.3, 19.8], [40.0, 21.0], [39.4, 21.4], [39.0, 21.5], [38.6, 21.3], [38.3, 20.9], [39.2, 20.0], [39.7, 19.9]]
+  - key: thessaly
+    name: Despotate of Thessaly
+    rank: duchy
+    government: feudal_monarchy
+    color: "#d0a0d0"
+    capital: [39.36, 22.94]  # Neopatras country; John II Doukas
+    area:
+      - [[39.95, 21.5], [40.05, 22.6], [39.3, 23.3], [38.85, 22.9], [39.0, 21.7]]
+  - key: athens
+    name: Duchy of Athens
+    rank: duchy
+    government: feudal_monarchy
+    color: "#4aa0a8"
+    capital: [37.98, 23.73]  # Athens; the Catalan Company, under Frederick of Sicily since 1312
+    overlord: trinacria
+    area:
+      - [[38.9, 22.2], [38.85, 23.6], [38.3, 24.1], [37.85, 24.1], [37.9, 23.0], [38.4, 22.0]]
+  - key: negroponte
+    name: Triarchy of Negroponte
+    rank: county
+    government: feudal_monarchy
+    color: "#90c0e0"
+    capital: [38.46, 23.6]  # Chalkis
+    overlord: venice
+    add: [[38.85, 23.3], [38.1, 24.4]]
+  - key: achaea
+    name: Principality of Achaea
+    rank: duchy
+    government: feudal_monarchy
+    color: "#5a8ad0"
+    capital: [37.92, 21.15]  # Clarenza and Andravida; Matilda of Hainaut and Louis of Burgundy
+    overlord: naples
+    area:
+      - [[38.3, 21.2], [38.2, 22.7], [37.6, 23.2], [37.4, 22.0], [37.0, 21.6], [37.6, 21.05]]
+  - key: cephalonia
+    name: County Palatine of Cephalonia and Zakynthos
+    rank: county
+    government: feudal_monarchy
+    color: "#a0e0c0"
+    capital: [38.2, 20.5]  # Cephalonia; John I Orsini
+    overlord: achaea
+    add: [[37.8, 20.85], [38.7, 20.65]]
+  - key: archipelago
+    name: Duchy of the Archipelago
+    rank: county
+    government: feudal_monarchy
+    color: "#e0e070"
+    capital: [37.1, 25.38]  # Naxos; Nicholas I Sanudo
+    area:
+      - [[37.7, 24.2], [37.7, 25.9], [36.3, 25.9], [36.3, 24.2]]
+  - key: hospitallers
+    name: Knights Hospitaller
+    rank: county
+    government: holy_order
+    color: "#303030"
+    capital: [36.43, 28.22]  # Rhodes, taken in 1310
+    area:
+      - [[36.5, 27.6], [36.5, 28.3], [35.85, 28.3], [35.85, 27.6]]
+      - [[36.95, 26.9], [36.95, 27.4], [36.7, 27.4], [36.7, 26.9]]  # Kos
+  - key: cyprus
+    name: Kingdom of Cyprus
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#5ab8c8"
+    capital: [35.17, 33.36]  # Nicosia; Henry II
+    area:
+      - [[35.8, 32.1], [35.8, 34.7], [34.5, 34.7], [34.5, 32.1]]
+
+  # ======================================================== Ruthenia and the Rus principalities (tributaries of the Horde)
+  - key: galicia_volhynia
+    name: Kingdom of Galicia-Volhynia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#6fae6a"
+    capital: [50.85, 24.32]  # Volodymyr; Andrew and Leo II
+    area:
+      - [[52.6, 23.6], [52.5, 25.5], [52.0, 27.0], [51.3, 27.5], [50.6, 27.9], [50.0, 27.8], [49.5, 27.0], [48.8, 26.2],
+        [48.3, 25.5], [48.0, 24.5], [48.6, 23.0], [49.1, 22.5], [49.5, 22.7], [50.4, 23.2], [50.95, 23.0], [51.5, 23.6],
+        [52.1, 23.4]]
+  - key: kiev
+    name: Principality of Kiev
+    rank: duchy
+    government: feudal_monarchy
+    color: "#b8c070"
+    capital: [50.45, 30.52]  # Kiev; Stanislav, under the Horde: GUESS
+    overlord: golden_horde
+    area:
+      - [[51.6, 28.2], [51.5, 31.2], [50.6, 32.0], [49.6, 31.8], [49.4, 30.0], [50.2, 28.3]]
+  - key: chernigov
+    name: Principality of Chernigov
+    rank: duchy
+    government: feudal_monarchy
+    color: "#98b880"
+    capital: [51.49, 31.29]  # Chernigov
+    overlord: golden_horde
+    area:
+      - [[52.6, 30.8], [52.5, 33.2], [51.5, 33.6], [50.9, 32.2], [51.3, 30.7]]
+  - key: novgorod
+    name: Novgorod Republic
+    rank: kingdom
+    government: merchant_republic
+    color: "#5f9a50"
+    capital: [58.52, 31.27]  # Novgorod; Pskov included
+    overlord: golden_horde
+    area:
+      - [[61.2, 27.8], [60.75, 28.95], [59.9, 28.0], [59.35, 28.2], [59.0, 27.85], [58.0, 27.6], [57.5, 27.9], [56.5, 28.2],
+        [56.2, 29.5], [56.8, 30.5], [57.0, 32.0], [57.4, 33.5], [58.2, 34.5], [59.0, 35.0], [59.8, 36.5], [60.8, 38.0],
+        [61.3, 40.5], [61.0, 42.5], [60.5, 44.5], [61.0, 46.5], [62.5, 48.0], [64.5, 52.0], [67.0, 53.5], [68.5, 45],
+        [67.0, 41.5], [66.5, 38], [66.8, 33], [65.0, 30.0], [63.0, 30.5], [61.8, 29.6]]
+  - key: tver
+    name: Grand Principality of Tver
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#7ab870"
+    capital: [56.86, 35.9]  # Tver; Mikhail Yaroslavich, Grand Prince of Vladimir
+    overlord: golden_horde
+    area:
+      - [[57.6, 34.0], [57.4, 36.6], [56.6, 36.9], [56.25, 35.5], [56.6, 34.0], [57.2, 33.6]]
+      - [[56.6, 39.4], [56.6, 41.3], [55.85, 41.5], [55.85, 39.7]]  # Vladimir, the grand prince's domain
+  - key: moscow
+    name: Principality of Moscow
+    rank: duchy
+    government: feudal_monarchy
+    color: "#a6c860"
+    capital: [55.75, 37.62]  # Moscow; Yuri Danilovich
+    overlord: golden_horde
+    area:
+      - [[56.9, 38.2], [56.75, 39.3], [55.9, 39.6], [55.1, 38.9], [55.2, 37.9], [55.55, 36.0], [55.95, 35.8], [56.3, 36.9],
+        [56.5, 37.8]]
+  - key: rostov
+    name: Principality of Rostov
+    rank: duchy
+    government: feudal_monarchy
+    color: "#8ab098"
+    capital: [57.19, 39.41]  # Rostov
+    overlord: golden_horde
+    area:
+      - [[57.4, 38.6], [57.6, 40.2], [56.95, 40.5], [56.8, 39.3]]
+  - key: yaroslavl
+    name: Principality of Yaroslavl
+    rank: duchy
+    government: feudal_monarchy
+    color: "#b0c8a0"
+    capital: [57.63, 39.87]  # Yaroslavl
+    overlord: golden_horde
+    area:
+      - [[58.3, 38.5], [58.2, 40.5], [57.6, 40.3], [57.45, 38.8]]
+  - key: beloozero
+    name: Principality of Beloozero
+    rank: duchy
+    government: feudal_monarchy
+    color: "#90a870"
+    capital: [60.03, 37.79]  # Beloozero
+    overlord: golden_horde
+    area:
+      - [[60.5, 36.5], [60.4, 39.5], [59.3, 39.5], [59.0, 37.5], [59.5, 36.2]]
+  - key: galich
+    name: Principality of Galich
+    rank: duchy
+    government: feudal_monarchy
+    color: "#a8b878"
+    capital: [58.38, 42.35]  # Galich Mersky
+    overlord: golden_horde
+    area:
+      - [[59.0, 40.5], [59.2, 43.5], [57.9, 44.0], [57.6, 41.5], [58.2, 40.4]]
+  - key: nizhny
+    name: Principality of Nizhny Novgorod-Suzdal
+    rank: duchy
+    government: feudal_monarchy
+    color: "#70a080"
+    capital: [56.33, 44.0]  # Nizhny Novgorod
+    overlord: golden_horde
+    area:
+      - [[57.0, 40.7], [57.2, 43.0], [56.6, 45.0], [55.9, 44.5], [56.0, 41.8], [56.6, 41.2]]
+  - key: murom
+    name: Principality of Murom
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c0d090"
+    capital: [55.58, 42.05]  # Murom
+    overlord: golden_horde
+    area:
+      - [[55.9, 41.6], [55.95, 42.8], [55.2, 42.9], [55.15, 41.7]]
+  - key: ryazan
+    name: Principality of Ryazan
+    rank: duchy
+    government: feudal_monarchy
+    color: "#60a868"
+    capital: [54.6, 39.7]  # Pereyaslavl-Ryazansky
+    overlord: golden_horde
+    area:
+      - [[55.3, 38.9], [55.2, 40.8], [54.4, 42.0], [53.6, 41.3], [53.4, 39.6], [54.3, 38.5], [54.9, 38.6]]
+  - key: smolensk
+    name: Principality of Smolensk
+    rank: duchy
+    government: feudal_monarchy
+    color: "#88b0a0"
+    capital: [54.78, 32.05]  # Smolensk
+    overlord: golden_horde
+    area:
+      - [[56.0, 30.8], [55.95, 33.8], [55.3, 35.2], [54.6, 34.8], [54.1, 33.5], [54.0, 31.5], [54.6, 30.6], [55.3, 30.5]]
+  - key: toropets
+    name: Principality of Toropets
+    rank: county
+    government: feudal_monarchy
+    color: "#b8d0b0"
+    capital: [56.5, 31.64]  # Toropets
+    overlord: golden_horde
+    area:
+      - [[56.8, 30.6], [56.8, 32.3], [56.15, 32.3], [56.15, 30.6]]
+  - key: bryansk
+    name: Principality of Bryansk
+    rank: duchy
+    government: feudal_monarchy
+    color: "#a0c0c0"
+    capital: [53.25, 34.37]  # Bryansk
+    overlord: golden_horde
+    area:
+      - [[53.9, 32.6], [53.8, 34.9], [52.6, 35.0], [52.5, 33.2], [53.3, 32.4]]
+  - key: upper_oka
+    name: Upper Oka Principalities
+    rank: county
+    government: feudal_monarchy
+    color: "#c8c890"
+    capital: [53.6, 36.5]  # Kozelsk country; Karachev, Novosil, Tarusa and Kozelsk merged: GUESS
+    overlord: golden_horde
+    area:
+      - [[54.6, 34.8], [54.5, 37.5], [53.6, 38.0], [52.7, 37.0], [52.7, 35.0], [53.8, 34.9]]
+
+  # ======================================================== Caucasus
+  - key: georgia_west
+    name: Western Kingdom of Georgia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c8c050"
+    capital: [42.27, 42.7]  # Kutaisi; Constantine I
+    area:
+      - [[43.45, 40.0], [43.0, 41.6], [42.75, 43.5], [42.0, 43.3], [41.6, 42.6], [41.5, 41.6], [42.0, 41.55], [43.0, 40.1]]
+  - key: georgia_east
+    name: Eastern Kingdom of Georgia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#a8a040"
+    capital: [41.69, 44.8]  # Tbilisi; George V the Brilliant; Samtskhe merged in: GUESS
+    overlord: ilkhanate
+    area:
+      - [[42.6, 43.6], [42.3, 46.0], [41.4, 46.6], [41.0, 45.5], [41.1, 44.0], [41.3, 43.0], [41.6, 42.6], [42.0, 43.3]]
+  - key: shirvan
+    name: Shirvanshahs
+    rank: duchy
+    government: iqta_sultanate
+    color: "#d08070"
+    capital: [40.63, 48.64]  # Shamakhi
+    overlord: ilkhanate
+    area:
+      - [[41.8, 47.6], [41.3, 49.3], [40.3, 49.6], [40.3, 48.0], [41.2, 47.0]]
+  - key: trebizond
+    name: Empire of Trebizond
+    rank: empire
+    government: feudal_monarchy
+    color: "#e05a8a"
+    capital: [41.0, 39.72]  # Trebizond; Alexios II
+    area:
+      - [[41.3, 37.6], [41.25, 39.5], [41.6, 41.5], [41.25, 41.6], [40.85, 40.6], [40.8, 39.0], [40.95, 37.7]]
+
+  # ======================================================== Anatolia
+  - key: rum
+    name: Sultanate of Rum
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#7a9a6a"
+    capital: [37.87, 32.49]  # Konya; Seljuk remnant under Ilkhanid governors: GUESS
+    overlord: ilkhanate
+    area:
+      - [[40.0, 31.2], [39.8, 33.5], [39.3, 34.5], [38.3, 34.5], [37.5, 33.8], [37.6, 32.2], [38.4, 31.6], [39.3, 31.2]]
+  - key: ottomans
+    name: Beylik of the Ottomans
+    rank: duchy
+    government: beylik
+    color: "#5a9a70"
+    capital: [40.03, 30.18]  # Söğüt; Osman I
+    area:
+      - [[40.55, 29.4], [40.6, 30.25], [40.2, 31.0], [39.6, 31.0], [39.6, 29.8], [40.0, 29.5]]
+  - key: karasi
+    name: Beylik of Karasi
+    rank: duchy
+    government: beylik
+    color: "#c0a060"
+    capital: [39.65, 27.88]  # Balıkesir
+    area:
+      - [[40.35, 26.5], [40.35, 28.3], [39.6, 28.3], [39.2, 27.0], [39.5, 26.5], [40.1, 26.2]]
+  - key: saruhan
+    name: Beylik of Saruhan
+    rank: duchy
+    government: beylik
+    color: "#8a70b0"
+    capital: [38.61, 27.43]  # Manisa
+    area:
+      - [[39.2, 27.0], [39.0, 28.6], [38.42, 28.4], [38.42, 27.2], [38.75, 26.85]]
+  - key: aydin
+    name: Beylik of Aydın
+    rank: duchy
+    government: beylik
+    color: "#d0904a"
+    capital: [38.22, 28.0]  # Birgi
+    area:
+      - [[38.42, 26.85], [38.42, 28.6], [37.75, 28.7], [37.7, 27.3], [38.1, 27.0]]
+  - key: menteshe
+    name: Beylik of Menteşe
+    rank: duchy
+    government: beylik
+    color: "#c05a5a"
+    capital: [37.22, 28.36]  # Milas country
+    area:
+      - [[37.7, 27.2], [37.6, 29.0], [36.6, 29.4], [36.5, 27.3], [37.1, 27.2]]
+  - key: germiyan
+    name: Beylik of Germiyan
+    rank: duchy
+    government: beylik
+    color: "#b8a040"
+    capital: [39.42, 29.98]  # Kütahya
+    area:
+      - [[39.7, 28.6], [39.6, 30.4], [39.0, 30.3], [38.42, 30.0], [38.42, 28.6], [39.1, 28.5]]
+  - key: sahib_ata
+    name: Beylik of the Sahib Ataids
+    rank: county
+    government: beylik
+    color: "#a0b0d0"
+    capital: [38.76, 30.54]  # Karahisar
+    area:
+      - [[39.0, 30.0], [39.0, 31.2], [38.42, 31.3], [38.42, 30.0]]
+  - key: hamid
+    name: Beylik of Hamid
+    rank: duchy
+    government: beylik
+    color: "#6a90a0"
+    capital: [37.87, 30.85]  # Eğirdir; the Teke branch at Antalya merged in
+    area:
+      - [[38.42, 30.0], [38.42, 31.3], [37.4, 31.6], [36.8, 31.1], [36.2, 30.3], [36.6, 29.6], [37.6, 29.5]]
+  - key: ladik
+    name: Beylik of Lâdik
+    rank: county
+    government: beylik
+    color: "#d0b080"
+    capital: [37.78, 29.09]  # Lâdik (Denizli)
+    area:
+      - [[38.05, 28.8], [38.0, 29.6], [37.5, 29.6], [37.5, 28.8]]
+  - key: eshref
+    name: Beylik of Eşrefoğulları
+    rank: county
+    government: beylik
+    color: "#90c080"
+    capital: [37.68, 31.72]  # Beyşehir
+    area:
+      - [[38.3, 31.3], [38.2, 32.1], [37.4, 32.0], [37.45, 31.4]]
+  - key: karaman
+    name: Beylik of Karaman
+    rank: duchy
+    government: beylik
+    color: "#7a6ab0"
+    capital: [37.18, 33.22]  # Larende
+    area:
+      - [[37.5, 32.3], [37.45, 34.3], [36.6, 34.5], [36.1, 33.0], [36.25, 32.5], [37.0, 32.05]]
+  - key: alaiye
+    name: Beylik of Alaiye
+    rank: county
+    government: beylik
+    color: "#e0c080"
+    capital: [36.54, 32.0]  # Alanya
+    area:
+      - [[36.75, 31.65], [36.65, 32.5], [36.1, 32.5], [36.4, 31.6]]
+  - key: candar
+    name: Beylik of Candar
+    rank: duchy
+    government: beylik
+    color: "#d8b850"
+    capital: [41.38, 33.78]  # Kastamonu
+    area:
+      - [[42.0, 32.4], [41.85, 34.6], [40.9, 34.9], [40.6, 33.0], [41.0, 32.0], [41.5, 31.9]]
+  - key: pervane
+    name: Beylik of Pervâneoğlu
+    rank: county
+    government: beylik
+    color: "#a0d0d0"
+    capital: [42.03, 35.15]  # Sinop
+    area:
+      - [[42.15, 34.6], [42.1, 35.45], [41.6, 35.45], [41.6, 34.6]]
+  - key: bafra
+    name: Beylik of Bafra
+    rank: county
+    government: beylik
+    color: "#c0b0e0"
+    capital: [41.57, 35.91]  # Bafra
+    area:
+      - [[41.8, 35.45], [41.75, 36.4], [41.35, 36.4], [41.35, 35.45]]
+  - key: tasan
+    name: Beylik of Taşanoğulları
+    rank: county
+    government: beylik
+    color: "#e0a0b0"
+    capital: [40.87, 35.46]  # Merzifon
+    area:
+      - [[41.1, 35.0], [41.05, 36.0], [40.6, 36.0], [40.65, 35.0]]
+  - key: tacettin
+    name: Beylik of Taceddinoğulları
+    rank: county
+    government: beylik
+    color: "#b0e0a0"
+    capital: [40.59, 36.95]  # Niksar
+    area:
+      - [[41.2, 36.6], [41.1, 37.6], [40.45, 37.6], [40.5, 36.6]]
+  - key: cilicia
+    name: Armenian Kingdom of Cilicia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#e09050"
+    capital: [37.45, 35.82]  # Sis; Oshin
+    area:
+      - [[38.0, 34.6], [38.0, 36.3], [37.2, 37.0], [36.6, 36.7], [36.3, 36.1], [36.2, 34.8], [36.8, 34.3], [37.5, 34.3]]
+
+  # ======================================================== Iran and the Gulf (vassals of the Ilkhanate)
+  - key: kartids
+    name: Kartids
+    rank: duchy
+    government: iqta_sultanate
+    color: "#e09848"
+    capital: [34.35, 62.2]  # Herat; Ghiyath ad-Din
+    overlord: ilkhanate
+    area:
+      - [[37.8, 60.6], [37.5, 64.5], [36.6, 66.5], [35.0, 67.5], [33.5, 66.5], [32.5, 64.5], [32.6, 62.0], [33.7, 61.0],
+        [35.5, 61.0], [36.6, 61.2]]
+  - key: mihrabanids
+    name: Mihrabanids
+    rank: county
+    government: iqta_sultanate
+    color: "#8a8ab0"
+    capital: [31.03, 61.5]  # Zaranj, Sistan
+    overlord: ilkhanate
+    area:
+      - [[32.6, 60.6], [32.5, 64.5], [31.0, 66.0], [29.6, 64.5], [30.0, 61.5], [31.0, 60.7]]
+  - key: hazaraspids
+    name: Hazaraspids
+    rank: county
+    government: iqta_sultanate
+    color: "#7aa070"
+    capital: [31.83, 49.87]  # Izeh, Greater Luristan
+    overlord: ilkhanate
+    area:
+      - [[33.5, 48.0], [33.2, 50.5], [31.8, 51.0], [31.0, 49.5], [32.2, 48.0]]
+  - key: yazd
+    name: Atabegs of Yazd
+    rank: county
+    government: iqta_sultanate
+    color: "#909090"
+    capital: [31.9, 54.37]  # Yazd
+    overlord: ilkhanate
+    area:
+      - [[32.3, 53.6], [32.3, 55.0], [31.5, 55.0], [31.5, 53.6]]
+  - key: artuqids
+    name: Artuqids of Mardin
+    rank: county
+    government: iqta_sultanate
+    color: "#70b080"
+    capital: [37.31, 40.74]  # Mardin
+    overlord: ilkhanate
+    area:
+      - [[37.6, 40.2], [37.6, 41.6], [37.0, 41.6], [37.0, 40.2]]
+  - key: bavandids
+    name: Bavandids
+    rank: county
+    government: iqta_sultanate
+    color: "#40a0a0"
+    capital: [36.47, 52.35]  # Amol
+    overlord: ilkhanate
+    area:
+      - [[36.8, 52.0], [36.75, 53.6], [36.3, 53.6], [36.3, 52.0]]
+  - key: badusapanids
+    name: Badusapanids
+    rank: county
+    government: iqta_sultanate
+    color: "#d070a0"
+    capital: [36.57, 51.4]  # Rustamdar
+    overlord: ilkhanate
+    area:
+      - [[36.8, 50.9], [36.7, 52.0], [36.2, 52.0], [36.2, 50.9]]
+  - key: hormuz
+    name: Kingdom of Hormuz
+    rank: county
+    government: merchant_republic
+    color: "#e0d070"
+    capital: [27.1, 56.45]  # Hormuz; tributary of the Ilkhans
+    overlord: ilkhanate
+    area:
+      - [[27.5, 55.8], [27.45, 57.5], [26.5, 57.5], [26.5, 55.8]]
+  - key: usfurids
+    name: Usfurids
+    rank: duchy
+    government: iqta_sultanate
+    color: "#8a90d8"
+    capital: [25.38, 49.58]  # al-Hasa
+    area:
+      - [[28.5, 48.0], [26.5, 50.5], [24.0, 51.6], [23.5, 49.0], [25.5, 48.0], [27.5, 47.5]]
+  - key: nabhanids
+    name: Nabhanids
+    rank: duchy
+    government: iqta_sultanate
+    color: "#b8c060"
+    capital: [22.93, 57.53]  # Bahla
+    area:
+      - [[26.4, 56.0], [24.0, 58.5], [22.5, 59.9], [21.0, 59.0], [20.5, 57.5], [22.5, 55.5], [24.0, 55.8], [25.5, 55.8]]
+
+  # ======================================================== Arabia and Africa
+  - key: mecca
+    name: Sharifate of Mecca
+    rank: duchy
+    government: theocracy
+    color: "#90b050"
+    capital: [21.42, 39.83]  # Mecca
+    overlord: mamluks
+    area:
+      - [[29.4, 34.9], [28.5, 37.5], [26.0, 38.5], [24.0, 40.0], [21.5, 41.0], [19.8, 42.0], [19.5, 41.0], [22.0, 38.8],
+        [25.5, 36.5], [28.0, 34.8]]
+  - key: rasulids
+    name: Rasulid Sultanate
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#a07060"
+    capital: [13.58, 44.02]  # Taiz
+    area:
+      - [[18.5, 42.3], [18.5, 46.0], [17.0, 50.0], [16.5, 52.0], [17.2, 54.5], [16.5, 55.2], [13.0, 48.5], [12.6, 43.4],
+        [14.5, 42.6], [16.5, 42.6]]
+  - key: makuria
+    name: Kingdom of Makuria
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#909080"
+    capital: [18.22, 30.75]  # Old Dongola; kings set up by the Mamluks
+    overlord: mamluks
+    area:
+      - [[22.0, 29.5], [22.0, 34.0], [17.2, 34.0], [17.2, 29.5]]
+  - key: alodia
+    name: Kingdom of Alodia
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d8a040"
+    capital: [15.52, 32.68]  # Soba
+    area:
+      - [[17.2, 31.5], [17.2, 35.5], [13.0, 35.0], [12.5, 31.5]]
+  - key: ethiopia
+    name: Ethiopian Empire
+    rank: empire
+    government: feudal_monarchy
+    color: "#9a7a60"
+    capital: [9.6, 39.4]  # Tegulet, Shewa; Amda Seyon I
+    area:
+      - [[15.5, 36.8], [14.6, 39.5], [13.5, 40.0], [12.0, 40.0], [10.0, 40.0], [8.5, 39.0], [9.0, 37.4], [11.0, 36.4],
+        [13.0, 36.4]]
+  - key: medri_bahri
+    name: Medri Bahri
+    rank: county
+    government: feudal_monarchy
+    color: "#40a0a8"
+    capital: [15.4, 38.9]  # Debarwa
+    overlord: ethiopia
+    area:
+      - [[16.3, 38.3], [15.8, 40.0], [14.8, 40.0], [14.6, 38.4]]
+  - key: ifat
+    name: Sultanate of Ifat
+    rank: duchy
+    government: iqta_sultanate
+    color: "#d89040"
+    capital: [10.6, 39.85]  # Ifat
+    area:
+      - [[10.6, 40.0], [11.5, 41.5], [11.5, 43.0], [10.0, 44.0], [9.0, 42.5], [8.5, 40.5], [9.5, 39.8]]
+  - key: damot
+    name: Kingdom of Damot
+    rank: county
+    government: feudal_monarchy
+    color: "#a070a0"
+    capital: [7.8, 37.3]  # Damot
+    area:
+      - [[8.5, 36.4], [8.5, 38.0], [7.0, 38.0], [7.0, 36.4]]
+  - key: mogadishu
+    name: Sultanate of Mogadishu
+    rank: county
+    government: merchant_republic
+    color: "#60b0a0"
+    capital: [2.04, 45.34]  # Mogadishu
+    area:
+      - [[3.0, 44.5], [2.6, 46.0], [1.6, 45.0], [1.8, 44.0]]
+  - key: kilwa
+    name: Kilwa Sultanate
+    rank: duchy
+    government: merchant_republic
+    color: "#c0a070"
+    capital: [-8.96, 39.51]  # Kilwa
+    area:
+      - [[-6.0, 38.5], [-6.0, 40.5], [-10.5, 40.5], [-10.5, 38.8]]
+  - key: mali
+    name: Mali Empire
+    rank: empire
+    government: feudal_monarchy
+    color: "#c89840"
+    capital: [11.4, -8.4]  # Niani country; Mansa Musa
+    area:
+      - [[16.8, -17.5], [17.2, -5.0], [16.7, 0.5], [15.0, 1.5], [13.0, 1.0], [11.0, -3.0], [9.0, -8.0], [10.0, -12.0],
+        [11.5, -15.5], [13.5, -17.5]]
+  - key: kanem
+    name: Kanem Empire
+    rank: empire
+    government: feudal_monarchy
+    color: "#b07a50"
+    capital: [13.9, 15.5]  # Njimi country
+    area:
+      - [[17.0, 13.0], [17.0, 19.5], [14.5, 20.0], [12.0, 16.0], [11.5, 13.0], [13.5, 11.5]]
+  - key: zimbabwe
+    name: Kingdom of Zimbabwe
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#a08050"
+    capital: [-20.27, 30.93]  # Great Zimbabwe
+    area:
+      - [[-17.5, 28.5], [-17.5, 33.0], [-21.5, 33.0], [-21.5, 28.5]]
+
+  # ======================================================== Indian subcontinent
+  - key: seuna
+    name: Seuna Yadava Kingdom
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#b08880"
+    capital: [19.94, 75.21]  # Devagiri; tributary of Delhi since 1308
+    overlord: delhi
+    area:
+      - [[22.0, 73.0], [21.6, 77.0], [20.5, 79.5], [19.0, 78.0], [17.5, 77.0], [16.0, 75.5], [15.5, 74.0], [16.5, 73.2],
+        [19.0, 72.6], [21.0, 72.8]]
+  - key: kakatiya
+    name: Kakatiya Kingdom
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#70a8a0"
+    capital: [17.97, 79.6]  # Warangal; Prataparudra, tributary since 1310
+    overlord: delhi
+    area:
+      - [[19.5, 78.5], [19.5, 81.5], [17.5, 82.5], [16.0, 81.6], [14.5, 80.3], [14.0, 78.5], [15.5, 77.5], [17.5, 77.0],
+        [18.5, 78.0]]
+  - key: hoysala
+    name: Hoysala Empire
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#8a78c0"
+    capital: [13.16, 75.86]  # Dwarasamudra; Veera Ballala III, tributary since 1311
+    overlord: delhi
+    area:
+      - [[16.0, 74.0], [15.5, 77.5], [14.0, 78.5], [13.0, 79.5], [12.0, 78.5], [11.5, 77.0], [12.5, 75.5], [13.5, 74.6],
+        [15.0, 73.9]]
+  - key: pandya
+    name: Pandya Kingdom
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d0b048"
+    capital: [9.93, 78.12]  # Madurai; contested between the brothers Sundara and Vira Pandya
+    area:
+      - [[13.4, 79.7], [13.5, 80.4], [8.0, 78.6], [8.2, 77.4], [9.5, 77.2], [11.0, 77.0], [12.0, 78.5]]
+  - key: venad
+    name: Venad
+    rank: county
+    government: feudal_monarchy
+    color: "#b080c0"
+    capital: [8.89, 76.6]  # Quilon; Ravi Varma Kulasekhara
+    area:
+      - [[9.8, 76.2], [9.6, 77.3], [8.1, 77.6], [8.1, 76.7], [9.0, 76.4]]
+  - key: cochin
+    name: Kingdom of Cochin
+    rank: county
+    government: feudal_monarchy
+    color: "#50b0c8"
+    capital: [9.97, 76.27]  # Cochin
+    area:
+      - [[10.6, 75.95], [10.6, 76.6], [9.8, 76.6], [9.8, 76.1]]
+  - key: calicut
+    name: Zamorin of Calicut
+    rank: county
+    government: merchant_republic
+    color: "#e07a70"
+    capital: [11.26, 75.78]  # Calicut
+    area:
+      - [[11.6, 75.4], [11.6, 76.3], [10.6, 76.4], [10.6, 75.8]]
+  - key: kolathiri
+    name: Kingdom of Kolathiri
+    rank: county
+    government: feudal_monarchy
+    color: "#70c0a0"
+    capital: [11.87, 75.37]  # Kannur country
+    area:
+      - [[12.5, 74.9], [12.4, 75.8], [11.6, 76.0], [11.6, 75.3]]
+  - key: eastern_gangas
+    name: Eastern Ganga Kingdom
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d898c8"
+    capital: [20.46, 85.88]  # Cuttack
+    area:
+      - [[22.5, 85.5], [22.0, 87.3], [19.5, 85.6], [17.7, 83.4], [18.0, 82.5], [19.5, 82.0], [21.0, 83.0], [22.3, 84.5]]
+  - key: lakhnauti
+    name: Lakhnauti Sultanate
+    rank: kingdom
+    government: iqta_sultanate
+    color: "#7ab0a0"
+    capital: [24.87, 88.13]  # Lakhnauti (Gaur); Shams ad-Din Firuz Shah
+    area:
+      - [[26.5, 87.5], [26.6, 89.5], [25.0, 92.0], [23.5, 91.5], [22.0, 90.6], [21.6, 88.0], [22.5, 87.4], [24.0, 86.9],
+        [25.5, 87.4]]
+  - key: kamata
+    name: Kamata Kingdom
+    rank: duchy
+    government: feudal_monarchy
+    color: "#c0a0d0"
+    capital: [26.3, 89.45]  # Kamatapur
+    area:
+      - [[27.0, 89.2], [27.0, 92.0], [26.0, 92.0], [25.8, 89.8], [26.3, 89.2]]
+  - key: ahom
+    name: Ahom Kingdom
+    rank: duchy
+    government: feudal_monarchy
+    color: "#a0c070"
+    capital: [26.98, 94.63]  # Charaideo
+    area:
+      - [[27.8, 93.5], [27.8, 95.6], [26.6, 95.6], [26.5, 93.5]]
+  - key: tripura
+    name: Kingdom of Tripura
+    rank: county
+    government: feudal_monarchy
+    color: "#d0c080"
+    capital: [23.83, 91.28]  # Udaipur country
+    area:
+      - [[24.5, 91.3], [24.4, 92.3], [23.0, 92.3], [23.0, 91.2]]
+  - key: manipur
+    name: Kingdom of Manipur
+    rank: county
+    government: feudal_monarchy
+    color: "#90d0b0"
+    capital: [24.81, 93.94]  # Imphal
+    area:
+      - [[25.5, 93.4], [25.5, 94.5], [24.0, 94.5], [24.0, 93.4]]
+  - key: karnatas
+    name: Karnata Kingdom of Mithila
+    rank: county
+    government: feudal_monarchy
+    color: "#70c0e0"
+    capital: [26.6, 85.9]  # Simraongarh; Harisimhadeva
+    area:
+      - [[27.1, 85.0], [27.0, 86.8], [25.8, 86.8], [25.8, 85.0]]
+  - key: sindh
+    name: Soomra Sindh
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d890d0"
+    capital: [24.75, 68.8]  # Thatta country
+    area:
+      - [[28.3, 67.5], [28.5, 69.8], [27.5, 70.0], [25.5, 71.0], [24.3, 71.0], [23.7, 68.3], [24.8, 66.8], [25.8, 67.3],
+        [27.0, 67.2]]
+  - key: kutch
+    name: Kingdom of Kutch
+    rank: county
+    government: feudal_monarchy
+    color: "#e0b0c0"
+    capital: [23.25, 69.67]  # Bhuj country
+    area:
+      - [[24.2, 68.6], [24.2, 71.0], [22.9, 70.6], [22.8, 69.0], [23.5, 68.3]]
+  - key: chudasama
+    name: Chudasamas of Saurashtra
+    rank: county
+    government: feudal_monarchy
+    color: "#50a0a0"
+    capital: [21.52, 70.46]  # Junagadh
+    area:
+      - [[22.0, 69.6], [22.0, 71.5], [20.7, 71.5], [20.8, 70.0]]
+  - key: jaisalmer
+    name: Kingdom of Jaisalmer
+    rank: county
+    government: feudal_monarchy
+    color: "#e8d040"
+    capital: [26.91, 70.92]  # Jaisalmer
+    area:
+      - [[28.0, 70.2], [28.0, 72.0], [26.4, 72.2], [26.2, 70.3]]
+  - key: marwar
+    name: Kingdom of Marwar
+    rank: county
+    government: feudal_monarchy
+    color: "#e090c0"
+    capital: [26.3, 73.0]  # Mandore
+    area:
+      - [[26.8, 72.2], [26.8, 74.0], [25.3, 74.0], [25.3, 72.2]]
+  - key: mewar
+    name: Kingdom of Mewar
+    rank: county
+    government: feudal_monarchy
+    color: "#b09050"
+    capital: [24.58, 73.71]  # Udaipur hills
+    area:
+      - [[25.2, 73.2], [25.2, 74.6], [24.0, 74.6], [24.0, 73.2]]
+  - key: ratanpur
+    name: Kalachuris of Ratanpur
+    rank: duchy
+    government: feudal_monarchy
+    color: "#9080c8"
+    capital: [22.29, 82.17]  # Ratanpur
+    area:
+      - [[23.0, 81.5], [23.0, 83.5], [20.5, 83.5], [20.5, 81.0], [21.8, 80.7]]
+  - key: rewa
+    name: Baghela Kingdom
+    rank: county
+    government: feudal_monarchy
+    color: "#e0a050"
+    capital: [24.53, 81.3]  # Rewa country
+    area:
+      - [[25.0, 80.8], [25.0, 82.5], [23.8, 82.5], [23.8, 80.8]]
+  - key: kashmir
+    name: Kingdom of Kashmir
+    rank: duchy
+    government: feudal_monarchy
+    color: "#a09858"
+    capital: [34.08, 74.8]  # Srinagar; Suhadeva of the Lohara line
+    area:
+      - [[35.0, 73.5], [35.2, 75.8], [33.8, 76.0], [32.7, 75.2], [33.7, 73.5]]
+  - key: kangra
+    name: Kangra Kingdom
+    rank: county
+    government: feudal_monarchy
+    color: "#5a80c0"
+    capital: [32.1, 76.27]  # Kangra
+    area:
+      - [[32.5, 75.8], [32.3, 77.0], [31.6, 76.9], [31.8, 75.8]]
+  - key: garhwal
+    name: Garhwal Kingdom
+    rank: county
+    government: feudal_monarchy
+    color: "#c07090"
+    capital: [30.32, 78.03]  # Dehradun country
+    area:
+      - [[31.0, 77.6], [31.1, 79.3], [30.0, 79.3], [29.9, 77.8]]
+  - key: jaffna
+    name: Kingdom of Jaffna
+    rank: county
+    government: feudal_monarchy
+    color: "#70c0b0"
+    capital: [9.66, 80.02]  # Nallur
+    area:
+      - [[9.9, 79.7], [9.9, 81.0], [8.8, 81.0], [8.8, 79.7]]
+  - key: dambadeniya
+    name: Kingdom of Dambadeniya
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#a080d0"
+    capital: [7.49, 80.36]  # Kurunegala
+    area:
+      - [[8.8, 79.6], [8.8, 82.0], [5.8, 82.0], [5.8, 79.6]]
+
+  # ======================================================== Inner Asia and East Asia (rough)
+  - key: qocho
+    name: Qocho Kingdom
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#b07a60"
+    capital: [42.85, 89.53]  # Qara-Khoja (Turfan); the Uyghur idiqut, under the Yuan
+    overlord: yuan
+    area:
+      - [[44.5, 88.0], [44.0, 95.5], [42.0, 96.0], [41.5, 92.0], [42.5, 88.5]]
+  - key: tibet
+    name: Tibet
+    rank: kingdom
+    government: theocracy
+    color: "#9a8060"
+    capital: [28.9, 88.0]  # Sakya; under the Yuan
+    overlord: yuan
+    area:
+      - [[36.5, 77.0], [36.5, 84.0], [37.0, 90], [36.0, 97], [33.0, 99.5], [29.2, 98.4], [28.5, 97.5], [27.8, 92.0],
+        [27.9, 88.5], [28.3, 85.5], [29.3, 82.0], [30.5, 80.5], [31.5, 78.5], [32.7, 78.4], [34.5, 77.5]]
+  - key: goryeo
+    name: Kingdom of Goryeo
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#7aaab0"
+    capital: [37.97, 126.55]  # Kaegyong; Chungsuk, son-in-law of the Yuan
+    overlord: yuan
+    area:
+      - [[39.9, 124.3], [39.5, 127.8], [38.5, 128.9], [34.5, 129.6], [34.0, 125.5], [38.0, 124.0]]
+  - key: japan
+    name: Kamakura Shogunate
+    rank: empire
+    government: feudal_monarchy
+    color: "#e0e0f0"
+    capital: [35.32, 139.55]  # Kamakura; the Hōjō regents rule for the shogun
+    area:
+      - [[41.6, 139.5], [41.5, 142.0], [35.0, 141.8], [31.0, 131.6], [30.9, 129.4], [33.5, 129.2], [34.5, 131.0],
+        [37.0, 136.5], [38.5, 139.0], [40.5, 139.6]]
+  - key: dai_viet
+    name: Đại Việt
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d0605a"
+    capital: [21.03, 105.85]  # Thăng Long; Trần Minh Tông
+    area:
+      - [[23.3, 105.3], [22.5, 107.0], [21.5, 108.1], [20.0, 107.0], [17.5, 107.2], [16.2, 108.3], [16.0, 107.6],
+        [17.5, 106.0], [19.0, 104.3], [20.6, 103.5], [22.4, 102.6]]
+  - key: champa
+    name: Champa
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c0a060"
+    capital: [13.9, 109.1]  # Vijaya
+    area:
+      - [[16.0, 108.4], [15.5, 108.9], [12.0, 109.5], [10.8, 108.0], [10.5, 107.0], [11.8, 107.6], [13.5, 107.6],
+        [15.0, 107.4], [16.0, 107.6]]
+  - key: khmer
+    name: Khmer Empire
+    rank: empire
+    government: feudal_monarchy
+    color: "#8aa060"
+    capital: [13.44, 103.86]  # Angkor
+    area:
+      - [[15.5, 102.0], [15.0, 105.0], [14.4, 106.5], [13.5, 107.6], [11.8, 107.6], [10.5, 107.0], [9.0, 105.5],
+        [10.4, 104.3], [11.8, 102.8], [13.0, 101.8], [14.5, 101.5]]
+  - key: sukhothai
+    name: Kingdom of Sukhothai
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#e0a070"
+    capital: [17.01, 99.82]  # Sukhothai; Loe Thai
+    area:
+      - [[18.0, 98.8], [17.8, 100.8], [15.8, 101.2], [14.0, 100.8], [13.0, 99.8], [10.0, 99.3], [8.0, 99.8], [8.0, 98.3],
+        [11.0, 98.5], [14.0, 99.0], [16.0, 98.6]]
+  - key: lanna
+    name: Kingdom of Lan Na
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#a0c0d0"
+    capital: [18.79, 98.98]  # Chiang Mai; Mangrai (dies 1317)
+    area:
+      - [[20.5, 98.0], [20.5, 100.6], [18.0, 100.8], [18.0, 98.8], [19.0, 97.8]]
+  - key: martaban
+    name: Kingdom of Martaban
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#d0c060"
+    capital: [16.53, 97.62]  # Martaban
+    area:
+      - [[17.8, 96.0], [17.8, 98.0], [14.5, 98.6], [14.5, 97.6], [16.5, 95.5]]
+  - key: pinya
+    name: Kingdom of Pinya
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#c0c0a0"
+    capital: [21.84, 95.98]  # Pinya, founded 1313
+    area:
+      - [[23.0, 94.5], [23.0, 96.8], [19.5, 96.8], [19.0, 95.0], [21.0, 94.0]]
+  - key: arakan
+    name: Kingdom of Launggyet
+    rank: duchy
+    government: feudal_monarchy
+    color: "#e0a0c0"
+    capital: [20.6, 93.2]  # Launggyet
+    area:
+      - [[21.5, 92.2], [21.5, 94.0], [18.0, 94.6], [18.0, 93.8], [20.0, 92.5]]
+  - key: majapahit
+    name: Majapahit
+    rank: empire
+    government: feudal_monarchy
+    color: "#c05a50"
+    capital: [-7.55, 112.38]  # Trowulan; Jayanegara
+    area:
+      - [[-5.8, 105.0], [-6.5, 114.45], [-8.9, 114.45], [-8.0, 105.0]]
+  - key: pasai
+    name: Samudera Pasai
+    rank: county
+    government: merchant_republic
+    color: "#60a070"
+    capital: [5.17, 97.15]  # Pasai
+    area:
+      - [[5.6, 96.3], [5.4, 97.8], [4.6, 98.0], [4.9, 96.3]]
+  - key: dharmasraya
+    name: Kingdom of Dharmasraya
+    rank: kingdom
+    government: feudal_monarchy
+    color: "#a0b060"
+    capital: [-1.05, 101.6]  # Dharmasraya
+    area:
+      - [[-0.5, 99.5], [0.5, 103.5], [-2.0, 105.0], [-3.0, 102.0]]

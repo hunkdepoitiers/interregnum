@@ -21,7 +21,7 @@ export interface GameState {
   saveVersion: number;
   seed: number;
   rng: RngState;
-  /** Days since 27 July 1302. */
+  /** Days since 1 November 1314. */
   day: number;
   speed: Speed;
   paused: boolean;
