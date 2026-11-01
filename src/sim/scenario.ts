@@ -2,9 +2,12 @@
  * Compiled scenario (public/generated/scenario.json), produced by tools/build-data.ts.
  * Lives in sim so the core can build a new game from it without importing content code.
  */
-export type Rank = 'empire' | 'kingdom' | 'duchy' | 'county';
-export type Government =
-  | 'feudal_monarchy' | 'merchant_republic' | 'theocracy' | 'holy_order' | 'steppe_horde' | 'iqta_sultanate' | 'beylik';
+export const RANKS = ['empire', 'kingdom', 'duchy', 'county'] as const;
+export const GOVERNMENTS = [
+  'feudal_monarchy', 'merchant_republic', 'theocracy', 'holy_order', 'steppe_horde', 'iqta_sultanate', 'beylik',
+] as const;
+export type Rank = (typeof RANKS)[number];
+export type Government = (typeof GOVERNMENTS)[number];
 
 /** Realm ids start at 1; 0 means none. */
 export interface ScenarioRealm {

@@ -1,9 +1,12 @@
-/** Validates data/scenario/1314.yaml against the built map and writes public/generated/scenario.json. Runs after build-map. */
-import { readFileSync, writeFileSync } from 'node:fs';
+/**
+ * Validates data/scenario/1314.yaml (plus the map editor's 1314-edits.yaml, if present) against the built map and writes
+ * public/generated/scenario.json, and the edits as scenario-edits.json for the editor to build on. Runs after build-map.
+ */
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { parse } from 'yaml';
 import { seedsSchema, type MapData } from '../src/content/map';
-import { scenarioSourceSchema } from '../src/content/scenario';
+import { editsSourceSchema, scenarioSourceSchema } from '../src/content/scenario';
 import { compileScenario } from './data-lib';
 
 const SCENARIO = 'data/scenario/1314.yaml';
@@ -13,6 +16,15 @@ if (!parsed.success) {
   for (const issue of parsed.error.issues) console.error(`error: ${SCENARIO} ${issue.path.join('.')}: ${issue.message}`);
   process.exit(1);
 }
+
+const EDITS = 'data/scenario/1314-edits.yaml';
+const editsParsed = editsSourceSchema.safeParse(existsSync(EDITS) ? parse(readFileSync(EDITS, 'utf8')) ?? {} : {});
+if (!editsParsed.success) {
+  for (const issue of editsParsed.error.issues) console.error(`error: ${EDITS} ${issue.path.join('.')}: ${issue.message}`);
+  process.exit(1);
+}
+const edits = editsParsed.data;
+const source = { ...parsed.data, realms: [...parsed.data.realms, ...edits.realms], overrides: edits.overrides };
 
 const towns = new Map<string, [number, number]>();
 for (const file of ['data/map/seeds.yaml', 'data/map/seeds-world.yaml']) {
@@ -36,12 +48,15 @@ function idAt(x: number, y: number): number {
   return ids[(y - row * map.tileSize) * w + (x - col * map.tileSize)]!;
 }
 
-const { scenario, errors, warnings, unowned } = compileScenario(parsed.data, map.provinces, { projection: map.projection, towns, idAt });
+const { scenario, errors, warnings, unowned } = compileScenario(source, map.provinces, {
+  projection: map.projection, towns, idAt, editedFrom: parsed.data.realms.length,
+});
 for (const w of warnings) console.warn(`warning: ${w}`);
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
   process.exit(1);
 }
 writeFileSync('public/generated/scenario.json', JSON.stringify(scenario));
+writeFileSync('public/generated/scenario-edits.json', JSON.stringify(edits));
 const owned = scenario.owner.filter(Boolean).length;
-console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${warnings.length} warnings`);
+console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${warnings.length} warnings`);

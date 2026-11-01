@@ -15,6 +15,8 @@ export interface MapContext {
   towns: Map<string, [number, number]>;
   /** Province id at a map pixel, when the id map is at hand; otherwise places resolve by province boxes. */
   idAt?: (x: number, y: number) => number;
+  /** Realms from this index on come from the map editor; like its overrides, they win over earlier realms. */
+  editedFrom?: number;
 }
 
 /** Below this RGB distance two bordering realms are hard to tell apart on the political map. */
@@ -99,7 +101,7 @@ export function compileScenario(src: ScenarioSource, provinces: MapProvince[], c
       const p = provinceAt(place, `Realm ${r.key} ${what}`);
       if (!p) return null;
       const prev = named.get(p.id);
-      if (prev && prev !== id) errors.push(`Province ${p.key} is named by both ${src.realms[prev - 1]!.key} and ${r.key}`);
+      if (prev && prev !== id && i < (ctx.editedFrom ?? Infinity)) errors.push(`Province ${p.key} is named by both ${src.realms[prev - 1]!.key} and ${r.key}`);
       named.set(p.id, id);
       owner[p.id] = id;
       return p;
@@ -134,9 +136,36 @@ export function compileScenario(src: ScenarioSource, provinces: MapProvince[], c
     frontier = next;
   }
 
-  const counts = new Array<number>(realms.length + 1).fill(0);
-  for (const p of land) counts[owner[p.id]!]!++;
-  for (const r of realms) if (!counts[r.id]) errors.push(`Realm ${r.key} owns no provinces`);
+  const countOwned = () => {
+    const c = new Array<number>(realms.length + 1).fill(0);
+    for (const p of land) c[owner[p.id]!]!++;
+    return c;
+  };
+  const before = countOwned();
+  for (const r of realms) if (!before[r.id]) errors.push(`Realm ${r.key} owns no provinces`);
+
+  // Hand edits from the map editor come last and override everything; null leaves a province unowned.
+  for (const [lat, lon, realmKey] of src.overrides) {
+    const p = provinceAt([lat, lon], `override ${JSON.stringify([lat, lon, realmKey])}`);
+    const id = realmKey === null ? 0 : realmId.get(realmKey);
+    if (id === undefined) errors.push(`override: unknown realm ${realmKey}`);
+    else if (p) owner[p.id] = id;
+  }
+  // A realm the edits painted over completely is left out, and ids close up behind it.
+  const after = countOwned();
+  const newId = new Array<number>(realms.length + 1).fill(0);
+  const kept = realms.filter((r) => {
+    if (before[r.id] && !after[r.id]) warnings.push(`Realm ${r.key} lost all its land to edits and is left out`);
+    return !before[r.id] || after[r.id];
+  });
+  kept.forEach((r, i) => (newId[r.id] = i + 1));
+  if (kept.length < realms.length) {
+    for (let i = 0; i < owner.length; i++) owner[i] = newId[owner[i]!]!;
+    realms.splice(0, realms.length, ...kept.map((r) => ({ ...r, id: newId[r.id]!, overlord: newId[r.overlord]! })));
+    realmId.clear();
+    for (const r of realms) realmId.set(r.key, r.id);
+  }
+  const counts = countOwned();
 
   // Overlord chains must end; a cycle would make "top liege" undefined.
   for (const r of realms) {

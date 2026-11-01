@@ -54,6 +54,18 @@ describe('compileScenario', () => {
     expect(unowned).toBe(1);
   });
 
+  it('applies editor overrides last and leaves out realms they paint over completely', () => {
+    const { scenario, errors, warnings } = compile({
+      realms: [realm('x', { area: [box(-180, -120)] }), realm('y', { capital: [80, -150], color: '#0000ff' }),
+        realm('z', { capital: 'ccity', overlord: 'y', color: '#00ff00' })],
+      overrides: [[80, -150, 'x'], [80, -170, null]],
+    });
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual(['Realm y lost all its land to edits and is left out']);
+    expect(scenario.owner).toEqual([0, 0, 1, 2, 0, 0]);
+    expect(scenario.realms.map((r) => [r.id, r.key, r.overlord])).toEqual([[1, 'x', 0], [2, 'z', 0]]);
+  });
+
   it('rejects unknown towns, places off the land, double naming and empty realms', () => {
     const { errors } = compile({
       realms: [realm('x', { add: ['nowhere', 'atsea'] }), realm('y', { add: ['acity'], capital: 'ccity' }),

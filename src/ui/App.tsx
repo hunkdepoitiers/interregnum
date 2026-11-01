@@ -2,10 +2,12 @@ import { computed, effect, signal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import { command, startGame, world } from '../bridge/client';
 import type { MapData, RiverData } from '../content/map';
-import type { Scenario } from '../content/scenario';
+import type { EditsSource, Scenario } from '../content/scenario';
 import { buildLookup, hexToRgb, type MapMode } from '../render/map-modes';
 import { computeLabels } from '../render/labels';
 import { LABEL_FONT, loadIdTiles, MapView } from '../render/map-view';
+import { editing, paint, restoreEdits, setBaseEdits } from './editor';
+import { EditorPanel } from './EditorPanel';
 import { MapModeBar } from './MapModeBar';
 import { ProvincePanel } from './ProvincePanel';
 import { RealmPanel } from './RealmPanel';
@@ -25,6 +27,18 @@ const loadError = signal<string | null>(null);
 let view: MapView | null = null;
 
 const START_SEED = 1314;
+
+/** The map view, once mounted (the editor needs its pixel lookups). */
+export function currentView(): MapView | null {
+  return view;
+}
+
+// The editor's brush replaces clicking to select.
+effect(() => {
+  const on = editing.value;
+  if (view) view.paintMode = on;
+  if (on) selectProvince(0);
+});
 
 export function selectProvince(id: number, center = false) {
   selected.value = id;
@@ -86,10 +100,12 @@ export function App() {
     let cancelled = false;
     (async () => {
       const base = import.meta.env.BASE_URL;
-      const [map, scenario] = await Promise.all([
+      const [map, scenario, edits] = await Promise.all([
         fetch(`${base}generated/map.json`).then((r) => r.json() as Promise<MapData>),
         fetch(`${base}generated/scenario.json`).then((r) => r.json() as Promise<Scenario>),
+        fetch(`${base}generated/scenario-edits.json`).then((r) => r.json() as Promise<EditsSource>).catch(() => null),
       ]);
+      if (edits) setBaseEdits(edits);
       // Labels are drawn to canvas, so the font must be ready first; without it they fall back to a system serif.
       const [tiles] = await Promise.all([loadIdTiles(base, map), document.fonts.load(`32px ${LABEL_FONT}`).catch(() => [])]);
       if (cancelled || !host.current) return;
@@ -100,9 +116,17 @@ export function App() {
         hovered.value = { id, x, y };
       };
       view.onClick = (id) => selectProvince(id);
+      view.onPaint = paint;
       await view.mount(host.current);
       view.setRivers(await riversReady);
       startGame(START_SEED, scenario);
+      // Replay this browser's unsaved map edits once the game exists.
+      let restored = false;
+      const stop = effect(() => {
+        if (!world.value || restored) return;
+        restored = true;
+        queueMicrotask(() => { stop(); restoreEdits(); });
+      });
       installDebugHooks(map);
       mapData.value = map;
     })().catch((e) => (loadError.value = `Could not load the map: ${String(e)}`));
@@ -120,6 +144,7 @@ export function App() {
       <ProvincePanel />
       <RealmPanel />
       <MapModeBar />
+      <EditorPanel />
       <SaveMenu />
       <a
         class="credits"

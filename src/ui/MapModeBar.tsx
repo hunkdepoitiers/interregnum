@@ -1,5 +1,6 @@
 import type { MapMode } from '../render/map-modes';
 import { hasRealms, mapMode } from './App';
+import { editing } from './editor';
 
 const MODES: { mode: MapMode; label: string; key: string }[] = [
   { mode: 'political', label: 'Political', key: 'q' },
@@ -21,12 +22,22 @@ export function MapModeBar() {
           {m.label}
         </button>
       ))}
+      <button
+        class={editing.value ? 'on' : ''}
+        aria-pressed={editing.value}
+        title="Map editor: paint provinces onto realms (key E)"
+        onClick={() => (editing.value = !editing.value)}
+      >
+        Editor
+      </button>
     </nav>
   );
 }
 
 window.addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLInputElement || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target instanceof HTMLSelectElement) return;
+  if (e.key.toLowerCase() === 'e') { editing.value = !editing.value; return; }
   const m = MODES.find((x) => x.key === e.key.toLowerCase());
   if (m) mapMode.value = m.mode;
 });

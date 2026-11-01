@@ -22,6 +22,12 @@ export function lonLatToPixel(p: Projection, lon: number, lat: number): [number,
   return [(lon - p.west) * k * scale, (p.north - lat) * scale];
 }
 
+export function pixelToLonLat(p: Projection, x: number, y: number): [number, number] {
+  const { scale } = projectionSize(p);
+  const k = Math.cos((p.standardParallel * Math.PI) / 180);
+  return [x / (k * scale) + p.west, p.north - y / scale];
+}
+
 /** wasteland = impassable desert or taiga; mountain = impassable range (data/map/mountains.yaml). */
 export const provinceKinds = ['land', 'sea', 'wasteland', 'mountain', 'lake'] as const;
 export type ProvinceKind = (typeof provinceKinds)[number];

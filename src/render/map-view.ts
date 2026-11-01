@@ -192,6 +192,9 @@ export class MapView {
 
   onHover: (id: number, clientX: number, clientY: number) => void = () => {};
   onClick: (id: number) => void = () => {};
+  /** Map editor brush: left click or drag paints (Shift erases, Alt picks the realm under the cursor); clicks no longer select. */
+  paintMode = false;
+  onPaint: (id: number, x: number, y: number, how: 'paint' | 'erase' | 'pick') => void = () => {};
 
   /** Decoded id arrays of recently hovered tiles (least recently used first), for picking. */
   private readonly tileIds = new Map<number, Uint16Array>();
@@ -273,37 +276,44 @@ export class MapView {
   }
 
   private readonly labelLayer = new Container();
-  private labels: { label: RealmLabel; text: Text }[] = [];
-  private labelZoom = 0;
+  /** By realm id. Text objects are reused so that repainting the map (editor, conquests) stays cheap. */
+  private readonly labels = new Map<number, { label: RealmLabel; text: Text }>();
 
   /**
    * Realm names, kept in screen space and laid out again as the camera moves: text scaled with the map would
    * blur when zoomed in.
    */
   setLabels(labels: RealmLabel[]) {
-    for (const l of this.labels) l.text.destroy();
-    this.labels = labels.map((label) => {
-      const style = new TextStyle({ fontFamily: LABEL_FONT, fill: 0x2a1f14, stroke: { color: 0xeadfc4, width: 2, join: 'round' } });
-      const text = new Text({ text: label.text, style, anchor: 0.5 });
-      text.rotation = label.angle;
-      text.alpha = 0.88;
-      this.labelLayer.addChild(text);
-      return { label, text };
-    });
-    this.labelZoom = 0;
+    const keep = new Set(labels.map((l) => l.realm));
+    for (const [realm, l] of this.labels) {
+      if (!keep.has(realm)) { l.text.destroy(); this.labels.delete(realm); }
+    }
+    for (const label of labels) {
+      let entry = this.labels.get(label.realm);
+      if (!entry) {
+        const style = new TextStyle({ fontFamily: LABEL_FONT, fill: 0x2a1f14, stroke: { color: 0xeadfc4, width: 2, join: 'round' } });
+        const text = new Text({ text: label.text, style, anchor: 0.5 });
+        text.alpha = 0.88;
+        this.labelLayer.addChild(text);
+        entry = { label, text };
+        this.labels.set(label.realm, entry);
+      }
+      entry.label = label;
+      if (entry.text.text !== label.text) entry.text.text = label.text;
+      entry.text.rotation = label.angle;
+    }
     this.layoutLabels();
   }
 
   private layoutLabels() {
     const s = this.world.scale.x;
-    const restyle = Math.abs(s / this.labelZoom - 1) > 0.1;
-    if (restyle) this.labelZoom = s;
-    for (const { label, text } of this.labels) {
+    for (const { label, text } of this.labels.values()) {
       const px = label.size * s;
       text.visible = px >= MIN_LABEL_PX;
       if (!text.visible) continue;
-      if (restyle) {
-        const size = Math.round(Math.min(px, MAX_LABEL_PX));
+      // Re-render the text only when its size moves by more than 10%.
+      const size = Math.round(Math.min(px, MAX_LABEL_PX));
+      if (Math.abs(size / Number(text.style.fontSize) - 1) > 0.1) {
         text.style.fontSize = size;
         text.style.letterSpacing = size * 0.18;
         text.style.stroke = { color: 0xeadfc4, width: Math.max(1.5, size * 0.12), join: 'round' };
@@ -338,11 +348,18 @@ export class MapView {
     this.clampCamera();
   }
 
-  idAtClient(clientX: number, clientY: number): number {
+  /** The map pixel under a point on the page. */
+  pixelAtClient(clientX: number, clientY: number): [number, number] {
     const rect = this.app.canvas.getBoundingClientRect();
     const s = this.world.scale.x;
-    const x = Math.floor((clientX - rect.left - this.world.x) / s);
-    const y = Math.floor((clientY - rect.top - this.world.y) / s);
+    return [Math.floor((clientX - rect.left - this.world.x) / s), Math.floor((clientY - rect.top - this.world.y) / s)];
+  }
+
+  idAtClient(clientX: number, clientY: number): number {
+    return this.idAtPixel(...this.pixelAtClient(clientX, clientY));
+  }
+
+  idAtPixel(x: number, y: number): number {
     if (x < 0 || y < 0 || x >= this.map.width || y >= this.map.height) return 0;
     const { tileSize: T, tileCols } = this.map;
     const i = Math.floor(y / T) * tileCols + Math.floor(x / T);
@@ -409,12 +426,26 @@ export class MapView {
   private bindInput() {
     const canvas = this.app.canvas;
     let drag: { x: number; y: number; wx: number; wy: number; moved: boolean } | null = null;
+    let painting = false;
+    const paint = (e: PointerEvent) => {
+      const [x, y] = this.pixelAtClient(e.clientX, e.clientY);
+      const id = this.idAtPixel(x, y);
+      if (id) this.onPaint(id, x, y, e.altKey ? 'pick' : e.shiftKey ? 'erase' : 'paint');
+    };
 
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     canvas.addEventListener('pointerdown', (e) => {
       canvas.setPointerCapture(e.pointerId);
+      // In paint mode the left button paints and the other buttons pan.
+      if (this.paintMode && e.button === 0) {
+        painting = true;
+        paint(e);
+        return;
+      }
       drag = { x: e.clientX, y: e.clientY, wx: this.world.x, wy: this.world.y, moved: false };
     });
     canvas.addEventListener('pointermove', (e) => {
+      if (painting) paint(e);
       if (drag) {
         const dx = e.clientX - drag.x;
         const dy = e.clientY - drag.y;
@@ -427,8 +458,9 @@ export class MapView {
       this.onHover(this.idAtClient(e.clientX, e.clientY), e.clientX, e.clientY);
     });
     canvas.addEventListener('pointerup', (e) => {
-      if (drag && !drag.moved) this.onClick(this.idAtClient(e.clientX, e.clientY));
+      if (drag && !drag.moved && !this.paintMode) this.onClick(this.idAtClient(e.clientX, e.clientY));
       drag = null;
+      painting = false;
     });
     canvas.addEventListener('pointerleave', () => this.onHover(0, 0, 0));
     canvas.addEventListener('wheel', (e) => {

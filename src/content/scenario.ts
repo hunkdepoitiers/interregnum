@@ -1,11 +1,8 @@
 import { z } from 'zod';
-import type { Government as SimGovernment, Rank as SimRank } from '../sim/scenario';
+import { GOVERNMENTS, RANKS } from '../sim/scenario';
 
-// `satisfies` keeps these lists in step with the sim's Rank/Government types.
-export const ranks = ['empire', 'kingdom', 'duchy', 'county'] as const satisfies readonly SimRank[];
-export const governments = [
-  'feudal_monarchy', 'merchant_republic', 'theocracy', 'holy_order', 'steppe_horde', 'iqta_sultanate', 'beylik',
-] as const satisfies readonly SimGovernment[];
+export const ranks = RANKS;
+export const governments = GOVERNMENTS;
 
 const key = z.string().regex(/^[a-z0-9_]+$/);
 /** [lat, lon] in degrees. */
@@ -33,10 +30,19 @@ const realmSourceSchema = z.object({
 export const scenarioSourceSchema = z.object({
   /** Outlines where no land should stay unowned: gaps inside them go to the nearest realm over land. */
   fill: z.array(z.array(point).min(3)).default([]),
+  /** Hand edits from the in-game map editor: [lat, lon, realm key or null for unowned]; override everything. */
+  overrides: z.array(z.tuple([z.number(), z.number(), key.nullable()])).default([]),
   /** Controller differs from owner at game start: [place, occupying realm]. */
   occupations: z.array(z.tuple([place, key])).default([]),
   realms: z.array(realmSourceSchema).min(1),
 });
 export type ScenarioSource = z.infer<typeof scenarioSourceSchema>;
+
+/** Shape of data/scenario/1314-edits.yaml, written by the map editor: new realms and per-province overrides. */
+export const editsSourceSchema = z.object({
+  realms: z.array(realmSourceSchema).default([]),
+  overrides: z.array(z.tuple([z.number(), z.number(), key.nullable()])).default([]),
+});
+export type EditsSource = z.infer<typeof editsSourceSchema>;
 
 export type { Scenario, ScenarioRealm } from '../sim/scenario';

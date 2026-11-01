@@ -1,11 +1,13 @@
-import type { GameState, Speed } from './state';
+import type { GameState, Realm, Speed } from './state';
 
 export type Command =
   | { type: 'setSpeed'; speed: Speed }
   | { type: 'setPaused'; paused: boolean }
   | { type: 'togglePause' }
-  /** Debug: transfer a province; control follows ownership. */
+  /** Debug and map editor: transfer a province (realm 0 = unowned); control follows ownership. */
   | { type: 'setOwner'; province: number; realm: number }
+  /** Map editor: a new realm, given the next free id. */
+  | { type: 'addRealm'; realm: Omit<Realm, 'id'> }
   /** Debug: occupy a province (realm = its owner ends the occupation). */
   | { type: 'setController'; province: number; realm: number };
 
@@ -23,11 +25,14 @@ export function applyCommand(state: GameState, cmd: Command): boolean {
       return false;
     case 'setOwner': {
       const p = state.provinces[cmd.province];
-      if (!p || cmd.province === 0 || !state.realms[cmd.realm]) return false;
+      if (!p || cmd.province === 0 || (cmd.realm !== 0 && !state.realms[cmd.realm])) return false;
       p.owner = cmd.realm;
       p.controller = cmd.realm;
       return true;
     }
+    case 'addRealm':
+      state.realms.push({ ...cmd.realm, id: state.realms.length });
+      return true;
     case 'setController': {
       const p = state.provinces[cmd.province];
       if (!p || !p.owner || !state.realms[cmd.realm]) return false;

@@ -74,6 +74,16 @@ describe('commands', () => {
     expect(s.provinces[4]).toEqual({ id: 4, owner: 1, controller: 1 });
   });
 
+  it('setOwner to realm 0 leaves a province unowned; addRealm appends a realm', () => {
+    const s = newGame(1, scenario);
+    expect(applyCommand(s, { type: 'setOwner', province: 1, realm: 0 })).toBe(true);
+    expect(s.provinces[1]).toEqual({ id: 1, owner: 0, controller: 0 });
+    const realm = { ...scenario.realms[0]!, key: 'new', name: 'New' };
+    expect(applyCommand(s, { type: 'addRealm', realm })).toBe(true);
+    expect(s.realms[3]).toMatchObject({ id: 3, key: 'new' });
+    expect(applyCommand(s, { type: 'setOwner', province: 1, realm: 3 })).toBe(true);
+  });
+
   it('ignores invalid ownership commands', () => {
     const s = newGame(1, scenario);
     const before = hashState(s);
