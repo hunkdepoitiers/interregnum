@@ -500,8 +500,8 @@ if (existsSync(BOUNDARY_DIR)) {
 
 // --- 4d. Every settled province reachable by land ------------------------------------------------
 // Mountains and deserts can wall in a valley that was reachable in reality. For each group of settled
-// provinces cut off from the main landmass, cut the shortest pass (fewest mountain or wasteland pixels)
-// to the main landmass and give it to the walled-in province. Islands have no land path and stay islands.
+// provinces cut off from the rest of its landmass, cut the shortest pass (fewest mountain or wasteland pixels)
+// to the nearest other settled land and give it to the walled-in province. Lone islands stay islands.
 {
   const PASS_HALF_WIDTH_PX = 2;
   const MAX_PASS_PX = 400;
@@ -538,7 +538,7 @@ if (existsSync(BOUNDARY_DIR)) {
       const p = front.length ? front.pop()! : deque[head++]!;
       const c = cost.get(p)!;
       if (c > MAX_PASS_PX) break;
-      if (settled(owner[p]!) && find(owner[p]!) === find(mainRoot)) { target = p; break; }
+      if (settled(owner[p]!) && find(owner[p]!) !== root) { target = p; break; }
       for (const q of neighbours(p)) {
         if (!land[q]) continue;
         const step = settled(owner[q]!) ? 0 : 1;
@@ -548,7 +548,7 @@ if (existsSync(BOUNDARY_DIR)) {
         if (step === 0) front.push(q); else deque.push(q);
       }
     }
-    if (target < 0) continue; // an island
+    if (target < 0) continue; // an island with nothing else on it
     let from = target;
     while (prev.get(from)! !== -1) from = prev.get(from)!;
     const passOwner = owner[from]!;
