@@ -9,6 +9,8 @@ sources below are ODbL or share-alike. The game code is not covered by this; onl
 
 - **Coastlines:** [Natural Earth](https://www.naturalearthdata.com/) 1:50m land, public domain.
 - **World provinces outside Europe and the Middle East:** Natural Earth 1:10m populated places (seed towns), admin-1 states and provinces (borders where geoBoundaries has no data), geography regions (deserts and mountain ranges), lakes and land, all public domain.
+- **Province shapes:** generated with the method of the [OpenGS Map Tool](https://github.com/Thomas-Holtvedt/opengs-maptool)
+  (MIT licence): density-weighted seeds, Lloyd relaxation, jagged nearest-seed borders (`tools/opengs_map.py`).
 - **Rivers:** [Natural Earth](https://www.naturalearthdata.com/) 1:10m rivers and lake centerlines, public domain.
 - **District boundaries:** [geoBoundaries](https://www.geoboundaries.org/) gbOpen (Runfola et al. 2020, *geoBoundaries: A global
   database of political administrative boundaries*, PLoS ONE 15(4): e0231866), simplified geometries. Province borders

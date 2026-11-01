@@ -1,8 +1,8 @@
 # Extra land-to-land adjacencies across water that armies may cross. Desert routes are land corridors (corridors.yaml).
 - [constantinople, chalcedon]   # Bosporus
-- [gallipoli, abydos]           # Dardanelles
+- [ainos, abydos]           # Dardanelles
 - [messina, reggio]             # Strait of Messina
-- [jerez, ceuta]                # Strait of Gibraltar
+- [jerez, tangier]                # Strait of Gibraltar
 - [roskilde, scania]            # Øresund
 - [caffa, zichia]               # Kerch Strait
 - [otranto_town, valona]        # Strait of Otranto
