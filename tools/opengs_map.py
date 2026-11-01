@@ -11,10 +11,12 @@ over to the new province that overlaps them most. Rerunning on its own output ke
 
 Run: npm run opengs-map   (Python 3.12 with numpy, scipy, pillow; ~10 GB RAM)
 """
+import json
 import math
 import re
 import sys
 import time
+import unicodedata
 from pathlib import Path
 
 import numpy as np
@@ -37,10 +39,10 @@ LLOYD_ITERATIONS = 4  # as OpenGS
 JAGGED = 0.3          # noise amplitude as a fraction of local seed spacing (OpenGS: 0.12 of a single-octave field)
 NOISE_OCTAVES = [(128, 0.55), (32, 0.3), (8, 0.15)]  # (period px, weight)
 MOUNT_AREA = 20_000   # px per mountain province
-SEA_COUNT = 1600
+SEA_COUNT = 900
 LAND_COUNT = 10_000
 MAX_LAND_AREA = 12_000  # px (~24,000 km2): no land province is planned bigger, so deserts and steppes stay playable
-SEA_COAST_BOOST = 2.0  # seas near land get up to 3x the province density
+SEA_COAST_BOOST = 5.0  # seas near land get up to 6x the density of open ocean
 ISLAND_SHARE = 0.25   # a seedless island gets its own province above this share of a local province's area
 MIN_ISLAND = 150      # px
 
@@ -158,7 +160,7 @@ land_dens = smooth_ratio(block_sum(lambda a, b: np.where(cls[a:b] == LAND, inv_a
 
 sea_count = block_sum(lambda a, b: cls[a:b] == SEA)
 coast_dist = ndi.distance_transform_edt(sea_count >= F * F * 0.999)  # coarse cells to the nearest land
-sea_weight = 1 + SEA_COAST_BOOST * np.exp(-coast_dist / 30)
+sea_weight = 1 + SEA_COAST_BOOST * np.exp(-coast_dist / 15)
 sea_dens = sea_weight * SEA_COUNT / (sea_weight * sea_count).sum()
 
 
@@ -391,8 +393,124 @@ for key, name, kind, x, y in town_seeds:
 for k in np.argsort(-overlap, kind='stable'):
     pid, oid = pair_new[k], pair_old[k]
     d = defs[oid - 1]
-    if names[pid] is None and d['key'] not in used and d['kind'] == kind_of[pid - 1]:
+    placeholder = d['kind'] == LAND and re.search(r'_\d+$', d['key'])  # "Toledo 2" from an earlier run
+    if names[pid] is None and d['key'] not in used and d['kind'] == kind_of[pid - 1] and not placeholder:
         take(pid, d['key'], d['name'])
+
+
+def slugify(s):
+    s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode()
+    return re.sub(r'[^a-z0-9]+', '_', s.lower()).strip('_')
+
+
+# Land still unnamed: the biggest Natural Earth town inside, then the district (geoBoundaries) or region (Natural
+# Earth admin-1) holding the province, with a compass word if a neighbour already has that name. Local data only:
+# tools/vendor/ (git-ignored, see tools/fetch-boundaries.ts); without it these steps are skipped.
+VENDOR = ROOT / 'tools' / 'vendor'
+sums = np.zeros((3, n_new + 1))
+for y0 in range(0, H, ROWS):
+    ids = pmap[y0:y0 + ROWS].ravel()
+    ys, xs = np.divmod(np.arange(len(ids)), W)
+    sums[0] += np.bincount(ids, minlength=n_new + 1)
+    sums[1] += np.bincount(ids, xs, n_new + 1)
+    sums[2] += np.bincount(ids, ys + y0, n_new + 1)
+cx, cy = sums[1] / np.maximum(sums[0], 1), sums[2] / np.maximum(sums[0], 1)
+
+
+def to_lonlat(x, y):
+    return x / (cos_sp * scale) + proj['west'], proj['north'] - y / scale
+
+
+places = VENDOR / 'ne_10m_populated_places_simple.geojson'
+if places.exists():
+    feats = json.loads(places.read_text(encoding='utf8'))['features']
+    feats.sort(key=lambda f: -(f['properties'].get('pop_max') or 0))
+    for f in feats:
+        lon, lat = f['geometry']['coordinates']
+        x, y = to_pixel(lat, lon)
+        xi, yi = int(x), int(y)
+        if not (0 <= xi < W and 0 <= yi < H):
+            continue
+        pid = int(pmap[yi, xi])
+        name = f['properties']['name']
+        key = slugify(name)
+        if kind_of[pid - 1] == LAND and names[pid] is None and key and key not in used:
+            take(pid, key, name)
+
+SUFFIX = re.compile(r'\s+(municipal district|district|municipality|raion|rayon|county|province|prefecture|governorate|'
+                    r'region|oblast|krai|kray|okrug|department|sub-district|subdistrict|kommune|landkreis|ilçesi)$', re.I)
+areas = []  # (name, exterior ring as (n, 2) lon/lat array, bbox)
+
+
+def add_areas(path, field):
+    for f in json.loads(path.read_text(encoding='utf8'))['features']:
+        g = f['geometry']
+        if not g:
+            continue
+        polys = [g['coordinates']] if g['type'] == 'Polygon' else g['coordinates'] if g['type'] == 'MultiPolygon' else []
+        name = SUFFIX.sub('', (f['properties'].get(field) or '').strip())
+        for poly in polys:
+            ring = np.asarray(poly[0], np.float64)[:, :2]
+            if name and len(ring) > 2:
+                areas.append((name, ring, (*ring.min(0), *ring.max(0))))
+
+
+if (VENDOR / 'geoboundaries').exists():
+    for path in sorted((VENDOR / 'geoboundaries').glob('*.geojson')):
+        add_areas(path, 'shapeName')
+n_districts = len(areas)
+if (VENDOR / 'ne_10m_admin_1_states_provinces.geojson').exists():
+    add_areas(VENDOR / 'ne_10m_admin_1_states_provinces.geojson', 'name')
+log(f'{n_districts} districts, {len(areas) - n_districts} regions for naming')
+
+
+def inside(lon, lat, ring):
+    x0, y0 = ring[:, 0], ring[:, 1]
+    x1, y1 = np.roll(x0, -1), np.roll(y0, -1)
+    cross = ((y0 > lat) != (y1 > lat)) & (lon < (x1 - x0) * (lat - y0) / np.where(y1 == y0, 1e-30, y1 - y0) + x0)
+    return bool(cross.sum() % 2)
+
+
+boxes = np.array([a[2] for a in areas]) if areas else np.zeros((0, 4))
+holder_of = {}  # key -> province that has it (compass names are placed relative to it)
+COMPASS = ['East', 'North-East', 'North', 'North-West', 'West', 'South-West', 'South', 'South-East']
+for pid in range(1, n_new + 1):
+    if names[pid] is not None:
+        holder_of.setdefault(keys[pid], pid)
+for pid in range(1, n_new + 1):
+    if names[pid] is not None or kind_of[pid - 1] != LAND or not len(boxes):
+        continue
+    # A pixel of the province near its centre (the centroid itself may fall outside a curved province).
+    x, y = int(cx[pid]), int(cy[pid])
+    if pmap[y, x] != pid:
+        win = pmap[max(y - 60, 0):y + 61, max(x - 60, 0):x + 61]
+        yy, xx = np.nonzero(win == pid)
+        if len(yy):
+            k = np.argmin((yy + max(y - 60, 0) - y) ** 2 + (xx + max(x - 60, 0) - x) ** 2)
+            x, y = xx[k] + max(x - 60, 0), yy[k] + max(y - 60, 0)
+    lon, lat = to_lonlat(x + 0.5, y + 0.5)
+    cand = np.nonzero((boxes[:, 0] <= lon) & (boxes[:, 2] >= lon) & (boxes[:, 1] <= lat) & (boxes[:, 3] >= lat))[0]
+    for i in cand:
+        name, ring, _ = areas[i]
+        if not inside(lon, lat, ring):
+            continue
+        if slugify(name) and slugify(name) not in used:
+            take(pid, slugify(name), name)
+            holder_of[slugify(name)] = pid
+        else:
+            other = holder_of.get(slugify(name))
+            if other is None:
+                continue
+            ang = math.degrees(math.atan2(cy[other] - cy[pid], cx[pid] - cx[other])) % 360
+            for step in range(8):  # nearest free compass word
+                for d in (step, -step):
+                    label = f'{COMPASS[int(round(ang / 45) + d) % 8]} {name}'
+                    if names[pid] is None and slugify(label) not in used:
+                        take(pid, slugify(label), label)
+            if names[pid] is None:
+                continue
+        break
+
 best_old = {}
 for k in np.argsort(-overlap, kind='stable'):
     best_old.setdefault(int(pair_new[k]), int(pair_old[k]))
@@ -400,10 +518,11 @@ numbered = 0
 for pid in range(1, n_new + 1):
     if names[pid] is None:
         d = defs[best_old[pid] - 1]
+        base_key, base_name = re.sub(r'(_\d+)+$', '', d['key']), re.sub(r'( \d+)+$', '', d['name'])
         n = 2
-        while f"{d['key']}_{n}" in used:
+        while f'{base_key}_{n}' in used:
             n += 1
-        take(pid, f"{d['key']}_{n}", f"{d['name']} {n}")
+        take(pid, f'{base_key}_{n}', f'{base_name} {n}')
         numbered += 1
 log(f'{numbered} provinces got a numbered name')
 
