@@ -28,6 +28,10 @@ export function pixelToLonLat(p: Projection, x: number, y: number): [number, num
   return [x / (k * scale) + p.west, p.north - y / scale];
 }
 
+/** Terrain of a land province (data/map/terrain.json, from tools/classify_terrain.py). */
+export const terrains = ['farmlands', 'plains', 'hills', 'highlands', 'forest', 'jungle', 'marsh', 'steppe', 'desert', 'tundra'] as const;
+export type Terrain = (typeof terrains)[number];
+
 /** wasteland = impassable desert or taiga; mountain = impassable range (data/map/mountains.yaml). */
 export const provinceKinds = ['land', 'sea', 'wasteland', 'mountain', 'lake'] as const;
 export type ProvinceKind = (typeof provinceKinds)[number];
@@ -77,6 +81,8 @@ export interface MapProvince {
   bbox: [number, number, number, number];
   centroid: [number, number];
   coastal: boolean;
+  /** Land provinces only. */
+  terrain?: Terrain;
   adjacency: { id: number; border: number; strait?: true }[];
 }
 /** public/generated/rivers.json: polylines as flat [x0, y0, x1, y1, ...] in map pixels; rank 0 = largest. */

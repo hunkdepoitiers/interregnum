@@ -18,6 +18,7 @@
     "name-provinces": "py -3.12 -I tools/name_provinces.py .",
     "open-valleys": "py -3.12 -I tools/open_valleys.py .",
     "carve-passes": "py -3.12 -I tools/carve_passes.py .",
+    "classify-terrain": "py -3.12 -I tools/classify_terrain.py .",
     "check-passes": "tsx tools/check-passes.ts",
     "find-pockets": "tsx tools/find-pockets.ts",
     "fetch-boundaries": "tsx tools/fetch-boundaries.ts",

@@ -43,6 +43,12 @@ export function ProvincePanel() {
             )}
           </>
         )}
+        {p.terrain && (
+          <>
+            <dt>Terrain</dt>
+            <dd class="terrain-name">{p.terrain}</dd>
+          </>
+        )}
         <dt>Area</dt>
         <dd>≈ {(Math.round(areaKm2 / 100) * 100).toLocaleString('en')} km²</dd>
         <dt>Key</dt>

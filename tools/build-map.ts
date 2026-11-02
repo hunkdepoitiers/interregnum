@@ -6,7 +6,8 @@ import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { PNG } from 'pngjs';
 import { parse } from 'yaml';
 import {
-  definitionsSchema, lonLatToPixel, projectionSchema, projectionSize, straitsSchema, type MapData, type RiverData,
+  definitionsSchema, lonLatToPixel, projectionSchema, projectionSize, straitsSchema, terrains, type MapData, type RiverData,
+  type Terrain,
 } from '../src/content/map';
 import { buildMap, encodeIdTile } from './map-lib';
 
@@ -26,6 +27,16 @@ if (png.width !== expected.width || png.height !== expected.height) {
 }
 
 const built = buildMap({ width: png.width, height: png.height, data: png.data }, defs, straits);
+// Terrain from tools/classify_terrain.py, by key; a land province it does not know (renamed since) counts as plains.
+const terrainOf = JSON.parse(readFileSync('data/map/terrain.json', 'utf8')) as Record<string, Terrain>;
+let missingTerrain = 0;
+for (const p of built.provinces) {
+  if (p.kind !== 'land') continue;
+  const t = terrainOf[p.key];
+  if (!t || !terrains.includes(t)) missingTerrain++;
+  p.terrain = t && terrains.includes(t) ? t : 'plains';
+}
+if (missingTerrain) console.warn(`warning: ${missingTerrain} land provinces have no terrain in data/map/terrain.json (run classify-terrain); using plains`);
 for (const w of built.warnings) console.warn(`warning: ${w}`);
 if (built.errors.length) {
   for (const e of built.errors) console.error(`error: ${e}`);

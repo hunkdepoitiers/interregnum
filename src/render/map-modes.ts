@@ -1,4 +1,4 @@
-import type { MapData, ProvinceKind } from '../content/map';
+import type { MapData, ProvinceKind, Terrain } from '../content/map';
 import type { WorldView } from '../worker/protocol';
 
 /**
@@ -13,7 +13,12 @@ export const LOOKUP_HEIGHT = LOOKUP_ROWS * 2;
 export type MapMode = 'political' | 'terrain';
 
 type Rgb = [number, number, number];
-const PARCHMENT: Rgb = [214, 196, 158];
+/** Terrain map mode colours, before the shader washes them onto the paper. */
+export const TERRAIN_COLOR: Record<Terrain, Rgb> = {
+  farmlands: [214, 190, 92], plains: [150, 182, 96], hills: [168, 128, 82], highlands: [128, 98, 74],
+  forest: [56, 112, 58], jungle: [24, 88, 52], marsh: [82, 128, 118], steppe: [200, 176, 112],
+  desert: [226, 200, 140], tundra: [176, 186, 196],
+};
 const UNCLAIMED: Rgb = [176, 166, 140];
 const KIND_COLOR: Record<Exclude<ProvinceKind, 'land'>, Rgb> = {
   sea: [44, 74, 104],
@@ -62,9 +67,7 @@ export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null
       base = realmColor(world?.owner[p.id] ?? 0) ?? UNCLAIMED;
       held = realmColor(world?.controller[p.id] ?? 0) ?? base;
     } else {
-      // Terrain placeholder until real terrain exists: parchment tinted by the bitmap colour.
-      const tint = hexToRgb(p.color);
-      base = [0, 1, 2].map((k) => Math.round(PARCHMENT[k]! * 0.8 + tint[k]! * 0.2)) as Rgb;
+      base = TERRAIN_COLOR[p.terrain ?? 'plains'];
       held = base;
     }
     // Unowned land is drawn as bare paper.
