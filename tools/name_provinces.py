@@ -4,7 +4,8 @@ their shapes, ids or colours. Run after tools/opengs_map.py:  py -3.12 -I tools/
 
 Land, wasteland and mountains: the biggest town inside (GeoNames cities1000 in tools/vendor/geonames/, if present),
 a major river through it ("Niger Valley"), the Natural Earth geography region, the district (geoBoundaries) or
-region (Natural Earth admin-1), each with a qualifier ("North-West", "Upper", ...) when a neighbour has it already.
+region (Natural Earth admin-1), each with a qualifier ("North-West", "Upper", ...) when a neighbour has it already;
+last, the nearest free town.
 Sea zones: "Coast of X" after the nearest named land, or "<ocean> off X" in open water. Names written in capitals
 by the sources are title-cased everywhere.
 Province keys change with the names; nothing else refers to numbered keys (realms use lat/lon places).
@@ -27,7 +28,8 @@ MAP = ROOT / 'data' / 'map'
 VENDOR = ROOT / 'tools' / 'vendor'
 ROWS = 512
 COAST_PX = 200        # sea zones whose centre lies within this of land (~280 km) are named after that coast
-RIVER_RANK = 7        # rivers up to this Natural Earth rank name the provinces they cross
+NEAR_TOWN_PX = 140    # last resort for empty land: a free town this close to the centre (~200 km)
+RIVER_RANK = 7       # rivers up to this Natural Earth rank name the provinces they cross
 QUALIFIERS = ['North', 'North-East', 'East', 'South-East', 'South', 'South-West', 'West', 'North-West',
               'Central', 'Upper', 'Lower', 'Inner', 'Outer']
 COMPASS = ['East', 'North-East', 'North', 'North-West', 'West', 'South-West', 'South', 'South-East']
@@ -118,6 +120,7 @@ def interior(pid):
 
 # ---------- name sources ----------
 towns = {}  # pid -> [(population, name)]
+town_xy, town_name = [], []  # every town, for the nearest-town fallback
 geonames = VENDOR / 'geonames' / 'cities1000.txt'
 if geonames.exists():
     for line in geonames.read_text(encoding='utf8').splitlines():
@@ -128,6 +131,8 @@ if geonames.exists():
         xi, yi = int(x), int(y)
         if 0 <= xi < W and 0 <= yi < H:
             towns.setdefault(int(pmap[yi, xi]), []).append((int(f[14] or 0), f[1]))
+            town_xy.append((x, y))
+            town_name.append(f[1])
     for v in towns.values():
         v.sort(reverse=True)
     log(f'GeoNames towns in {len(towns)} provinces')
@@ -251,6 +256,19 @@ for pid in todo:
         cands += ranges.at(lon, lat) + [f'{r} Mountains' for r in regions.at(lon, lat)]
     if not name_from(pid, cands):
         left.append(pid)
+
+# Still unnamed (empty country with no town inside): the nearest free town within NEAR_TOWN_PX.
+if town_xy:
+    town_tree = cKDTree(np.asarray(town_xy))
+    rest = []
+    for pid in left:
+        if defs[pid]['kind'] in ('sea', 'lake'):
+            rest.append(pid)
+            continue
+        dist, idx = town_tree.query([cx[pid], cy[pid]], k=40, distance_upper_bound=NEAR_TOWN_PX)
+        if not name_from(pid, [town_name[i] for d, i in zip(dist, idx) if d < np.inf]):
+            rest.append(pid)
+    left = rest
 
 # ---------- seas and lakes: after the coast they face ----------
 named_land = [i for i, d in defs.items() if d['kind'] == 'land' and not PLACEHOLDER.search(d['key'])]

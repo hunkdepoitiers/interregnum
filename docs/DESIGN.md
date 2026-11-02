@@ -19,7 +19,7 @@ Decisions so far: **EU-style colour bitmap map**, **PixiJS v8 (WebGL)** renderer
 ## 2. v1 scope
 - Map: the whole world from 56°S to 75°N at ~1.4 km per pixel (20,440 x 10,520 px, served as 4,096 px tiles because of the WebGL texture limit). Desktop only: the id textures need ~1 GB of GPU memory. The hand-made region (11°W–54°E, 20.5°N–71.2°N) keeps its CK3-county-density seeds, deserts, mountains and corridors; everywhere else is generated from Natural Earth data (see 4.6). Realms exist for the hand-made region only: 114 realms including vassals and tributaries, with 1302 borders checked against the Euratlas map of 1300. The province budget was raised to ~1,000 in M2; prune seeds in `data/map/seeds.yaml` or merge realms in `data/scenario/1302.yaml` if it proves too much. Ilkhanate and Golden Horde are scripted neighbours (data-driven timelines of tribute demands and invasions, simplified armies).
 - Start 1 November 1314 on the **Julian calendar** (historically correct: leap year every 4 years, so 1316 has 29 February). Daily tick, pause, 5 speeds.
-- Singleplayer, browser (Vercel static site); later a Tauri desktop build.
+- Singleplayer, browser (Vercel static site) and a Tauri desktop app (`src-tauri/`; `npm run app` opens a dev window, `npm run app:build` makes the Windows installer in `src-tauri/target/release/bundle/nsis/`). The app bundles the generated map data, so it opens without downloading it.
 
 ## 3. Deliberately cut from v1
 - **Navies and naval combat.** Sea zones exist for the map, coastal flags and straits; armies cross only at defined straits (Bosporus, Dardanelles, Messina, Otranto, Gibraltar, Øresund…). Ship transport comes later.

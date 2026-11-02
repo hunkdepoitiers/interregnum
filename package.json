@@ -9,6 +9,8 @@
     "build:data": "tsx tools/build-data.ts",
     "build": "npm run build:map && npm run build:data && tsc --noEmit && vite build",
     "preview": "vite preview",
+    "app": "tauri dev",
+    "app:build": "tauri build",
     "test": "vitest run",
     "lint": "eslint .",
     "seed-map": "node --max-old-space-size=16000 --import tsx tools/seed-map.ts",
@@ -29,6 +31,7 @@
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@preact/preset-vite": "2.10.6",
+    "@tauri-apps/cli": "2.12.4",
     "@types/node": "26.6.6",
     "@types/pngjs": "6.0.5",
     "eslint": "10.14.0",
