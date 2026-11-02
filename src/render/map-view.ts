@@ -450,7 +450,7 @@ export class MapView {
       };
       // Copies go to the worker: the originals are the GPU textures.
       for (let i = 0; i < this.tiles.length; i++) {
-        const bitmap = await createImageBitmap(this.tiles[i]!);
+        const bitmap = await createImageBitmap(this.tiles[i]!, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
         worker.postMessage({ index: i, bitmap }, [bitmap]);
       }
     };
