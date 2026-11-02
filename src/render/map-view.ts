@@ -177,6 +177,17 @@ void main() {
 }`;
 
 const MAX_ZOOM = 8;
+/** A missing river layer is built once the zoom has been still this long. */
+const RIVER_SETTLE_MS = 200;
+/** Labels are re-rendered sharp once the camera has been still this long. */
+const LABEL_SETTLE_MS = 150;
+
+function setLabelSize(text: Text, px: number) {
+  const size = Math.round(px);
+  text.style.fontSize = size;
+  text.style.letterSpacing = size * 0.18;
+  text.style.stroke = { color: 0xeadfc4, width: Math.max(1.5, size * 0.12), join: 'round' };
+}
 /** Realm names smaller than this on screen are hidden; larger ones are capped. */
 const MIN_LABEL_PX = 9;
 const MAX_LABEL_PX = 110;
@@ -246,33 +257,64 @@ export class MapView {
     this.bindInput();
   }
 
-  /** Draws rivers over the map. They are redrawn as the zoom changes so major rivers keep a visible width. */
+  /**
+   * Draws rivers over the map. Major rivers keep a visible width on screen, so the drawing depends on the zoom:
+   * one layer per zoom level (powers of two), simplified to what that scale can show, built once. Rebuilding on
+   * every zoom step took ~300 ms; while zooming, the nearest finished layer stands in until the zoom settles.
+   */
   setRivers(rivers: RiverData) {
     this.rivers = rivers;
-    this.riverGraphics.eventMode = 'none';
-    this.world.addChild(this.riverGraphics);
-    this.drawRivers();
+    this.updateRivers(true);
+    // Build the other levels while the browser is idle, one per idle slot, so zooming rarely waits for one.
+    const levels: number[] = [];
+    for (let l = Math.floor(Math.log2(this.minZoom)); l <= Math.log2(MAX_ZOOM); l++) levels.push(l);
+    const next = () => {
+      const l = levels.find((x) => !this.riverLayers.has(x));
+      if (l === undefined) return;
+      this.buildRiverLayer(l);
+      this.updateRivers();
+      requestIdleCallback(next, { timeout: 5000 });
+    };
+    requestIdleCallback(next, { timeout: 5000 });
   }
 
   private rivers: RiverData = [];
-  private readonly riverGraphics = new Graphics();
-  private riverZoom = 0;
+  private readonly riverLayers = new Map<number, Graphics>();
+  private riverTimer: ReturnType<typeof setTimeout> | undefined;
 
-  private drawRivers() {
-    const zoom = this.world.scale.x;
-    this.riverZoom = zoom;
-    const g = this.riverGraphics.clear();
+  private updateRivers(now = false) {
+    if (!this.rivers.length) return;
+    const level = Math.round(Math.log2(this.world.scale.x));
+    if (!this.riverLayers.has(level)) {
+      clearTimeout(this.riverTimer);
+      if (now) this.buildRiverLayer(level);
+      else this.riverTimer = setTimeout(() => this.updateRivers(true), RIVER_SETTLE_MS);
+    }
+    // Show this level, or while it is pending the nearest one already built.
+    let shown = -Infinity;
+    for (const l of this.riverLayers.keys()) if (Math.abs(l - level) < Math.abs(shown - level)) shown = l;
+    for (const [l, g] of this.riverLayers) g.visible = l === shown;
+  }
+
+  private buildRiverLayer(level: number) {
+    const zoom = 2 ** level;
+    const tolerance = 0.6 / zoom; // map pixels that make 0.6 screen pixels at this level
+    const g = new Graphics();
+    g.eventMode = 'none';
     for (const r of this.rivers) {
       // Width in map pixels, but never thinner on screen than the minimum for this river's size.
       const mapWidth = Math.max(1, 3.4 - r.rank * 0.3);
       const minScreen = r.rank <= 3 ? 1.8 : r.rank <= 6 ? 1.2 : 0.8;
       const width = Math.max(mapWidth, minScreen / zoom);
-      for (const line of r.lines) {
+      for (const raw of r.lines) {
+        const line = simplify(raw, tolerance);
         g.moveTo(line[0]!, line[1]!);
         for (let i = 2; i < line.length; i += 2) g.lineTo(line[i]!, line[i + 1]!);
         g.stroke({ width, color: 0x6a6650, alpha: 0.75, cap: 'round', join: 'round' });
       }
     }
+    this.world.addChild(g);
+    this.riverLayers.set(level, g);
   }
 
   private readonly labelLayer = new Container();
@@ -305,20 +347,34 @@ export class MapView {
     this.layoutLabels();
   }
 
+  private labelTimer: ReturnType<typeof setTimeout> | undefined;
+
+  /**
+   * Re-rendering label text costs ~40 ms per zoom step, so while the camera moves labels are scaled images; once it
+   * settles they are drawn sharp again at their exact size (immediately only when a scale is off by more than 2x).
+   */
   private layoutLabels() {
     const s = this.world.scale.x;
     for (const { label, text } of this.labels.values()) {
-      const px = label.size * s;
-      text.visible = px >= MIN_LABEL_PX;
+      text.visible = label.size * s >= MIN_LABEL_PX;
       if (!text.visible) continue;
-      // Re-render the text only when its size moves by more than 10%.
-      const size = Math.round(Math.min(px, MAX_LABEL_PX));
-      if (Math.abs(size / Number(text.style.fontSize) - 1) > 0.1) {
-        text.style.fontSize = size;
-        text.style.letterSpacing = size * 0.18;
-        text.style.stroke = { color: 0xeadfc4, width: Math.max(1.5, size * 0.12), join: 'round' };
-      }
+      const px = Math.min(label.size * s, MAX_LABEL_PX);
+      const ratio = px / Number(text.style.fontSize);
+      if (ratio > 2 || ratio < 0.5) setLabelSize(text, px);
+      text.scale.set(px / Number(text.style.fontSize));
       text.position.set(this.world.x + label.x * s, this.world.y + label.y * s);
+    }
+    clearTimeout(this.labelTimer);
+    this.labelTimer = setTimeout(() => this.sharpenLabels(), LABEL_SETTLE_MS);
+  }
+
+  private sharpenLabels() {
+    const s = this.world.scale.x;
+    for (const { label, text } of this.labels.values()) {
+      if (!text.visible) continue;
+      const px = Math.min(label.size * s, MAX_LABEL_PX);
+      if (Math.abs(px / Number(text.style.fontSize) - 1) > 0.05) setLabelSize(text, px);
+      text.scale.set(px / Number(text.style.fontSize));
     }
   }
 
@@ -415,7 +471,7 @@ export class MapView {
     const { width, height } = this.app.screen;
     const s = this.world.scale.x;
     this.uniforms.uniforms.uZoom = s;
-    if (this.rivers.length && Math.abs(s / this.riverZoom - 1) > 0.15) this.drawRivers();
+    this.updateRivers();
     const mw = this.map.width * s;
     const mh = this.map.height * s;
     this.world.x = mw <= width ? (width - mw) / 2 : Math.min(0, Math.max(width - mw, this.world.x));
@@ -501,6 +557,34 @@ export class MapView {
       this.zoomAt(Math.pow(1.0015, -e.deltaY), e.clientX - rect.left, e.clientY - rect.top);
     }, { passive: false });
   }
+}
+
+/** Douglas-Peucker on a flat [x0, y0, x1, y1, ...] line: drops points within `tolerance` of the simplified line. */
+export function simplify(line: number[], tolerance: number): number[] {
+  const n = line.length / 2;
+  if (n <= 2) return line;
+  const keep = new Uint8Array(n);
+  keep[0] = keep[n - 1] = 1;
+  const stack: [number, number][] = [[0, n - 1]];
+  const t2 = tolerance * tolerance;
+  while (stack.length) {
+    const [a, b] = stack.pop()!;
+    const [ax, ay, bx, by] = [line[2 * a]!, line[2 * a + 1]!, line[2 * b]!, line[2 * b + 1]!];
+    const dx = bx - ax, dy = by - ay;
+    const len2 = dx * dx + dy * dy || 1e-12;
+    let far = -1, farD = t2;
+    for (let i = a + 1; i < b; i++) {
+      const px = line[2 * i]! - ax, py = line[2 * i + 1]! - ay;
+      const t = Math.max(0, Math.min(1, (px * dx + py * dy) / len2));
+      const ex = px - t * dx, ey = py - t * dy;
+      const d = ex * ex + ey * ey;
+      if (d > farD) { farD = d; far = i; }
+    }
+    if (far >= 0) { keep[far] = 1; stack.push([a, far], [far, b]); }
+  }
+  const out: number[] = [];
+  for (let i = 0; i < n; i++) if (keep[i]) out.push(line[2 * i]!, line[2 * i + 1]!);
+  return out;
 }
 
 /** Fetches every id-map tile and decodes it without colour management, so ids survive exactly. */
