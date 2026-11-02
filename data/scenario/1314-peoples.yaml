@@ -2,11 +2,14 @@
 # `area` outlines paint the land provinces whose centre they hold, later entries over earlier ones; `add` takes
 # single places; every land province then gets the culture of the nearest painted land, so nothing is left blank.
 # A province's religion is its culture's `religion`, unless a `religion_areas` outline paints another over it.
-# Outlines are rough, especially outside Europe, the Middle East and India: GUESS. Colours are for the map modes.
+# Cultures follow medieval regional speech (French langues d'oïl and d'oc, German dialects, the Rus lands, Chinese
+# regional cultures), not modern national borders. Outlines are hand-drawn and rough, especially outside Europe,
+# the Middle East and India: GUESS. Colours are for the map modes.
 
 religions:
   - { key: catholic, name: Catholic, family: christian, color: "#c9a227" }
   - { key: orthodox, name: Orthodox, family: christian, color: "#7a5ab0" }
+  - { key: bosnian_church, name: Bosnian Church, family: christian, color: "#4a6aa0" }
   - { key: miaphysite, name: Miaphysite, family: christian, color: "#b0607a" }
   - { key: nestorian, name: Church of the East, family: christian, color: "#5a8ab0" }
   - { key: sunni, name: Sunni, family: islamic, color: "#4f9a55" }
@@ -18,9 +21,10 @@ religions:
   - { key: theravada, name: Theravada Buddhist, family: buddhist, color: "#e0c040" }
   - { key: mahayana, name: Mahayana Buddhist, family: buddhist, color: "#d8a040" }
   - { key: vajrayana, name: Tibetan Buddhist, family: buddhist, color: "#c0702a" }
-  - { key: chinese_folk, name: Confucian and Taoist, family: east_asian, color: "#c84a4a" }
+  - { key: chinese_folk, name: Sanjiao, family: east_asian, color: "#c84a4a" }
   - { key: shinto, name: Shinto, family: east_asian, color: "#d06a8a" }
-  - { key: tengri, name: Tengri, family: pagan, color: "#6a9ad0" }
+  - { key: tengri, name: Tengri, family: pagan, color: "#3a5ac8" }
+  - { key: tungusic, name: Tungusic Shamanism, family: pagan, color: "#8a3a4a" }
   - { key: baltic_pagan, name: Romuva, family: pagan, color: "#9a7040" }
   - { key: uralic_pagan, name: Uralic Pagan, family: pagan, color: "#7a9a8a" }
   - { key: african_traditional, name: African Traditional, family: pagan, color: "#a06a3a" }
@@ -30,9 +34,11 @@ religions:
 
 groups:
   iberian: Iberian
-  frankish: Frankish
+  frankish: Oïl French
+  occitan: Occitano-Romance
   italian: Italian
-  german: German
+  german: High German
+  low_german: Low German
   anglo: Anglo-Saxon
   norse: North Germanic
   celtic: Celtic
@@ -41,9 +47,12 @@ groups:
   east_slavic: East Slavic
   baltic: Baltic
   finno_ugric: Finno-Ugric
+  volga: Volga-Ural
   balkan: Balkan
   caucasian: Caucasian
-  turkic: Turkic
+  greek: Hellenic
+  turkic: Oghuz Turkic
+  kipchak: Kipchak Turkic
   mongolic: Mongolic
   iranian: Iranian
   arabic: Arabic
@@ -53,8 +62,11 @@ groups:
   bantu: Bantu
   indo_aryan: Indo-Aryan
   dravidian: Dravidian
+  tibetan: Tibetan
   tibeto_burman: Tibeto-Burman
+  chinese: Chinese
   east_asian: East Asian
+  tungusic: Tungusic
   southeast_asian: Southeast Asian
   austronesian: Austronesian
   siberian: Siberian
@@ -77,117 +89,107 @@ cultures:
   - { key: aboriginal, name: Aboriginal, group: oceanian, religion: animist, color: "#b07a5a",
       area: [[[-10, 112], [-10, 155], [-45, 155], [-45, 112]]] }
   - { key: polynesian, name: Polynesian, group: oceanian, religion: animist, color: "#6aa0b0",
-      area: [[[30, 160], [30, -120], [-50, -120], [-50, 160]], [[-30, 165], [-30, 180], [-48, 180], [-48, 165]]] }
+      area: [[[30, 160], [30, 180], [-50, 180], [-50, 160]], [[30, -180], [30, -120], [-50, -120], [-50, -180]], [[-30, 165], [-30, 180], [-48, 180], [-48, 165]]] }
 
-  # ======================================================== Europe
+  # ======================================================== France and the Low Countries
+  - { key: francien, name: Francien, group: frankish, religion: catholic, color: "#5d6fb8",
+      area: [[[51.1, 1.5], [51.0, 3.0], [50.4, 4.4], [49.6, 5.5], [48.8, 6.4], [47.5, 6.9], [46.3, 6.3], [45.9, 5.0], [46.0, 3.0], [46.3, 1.0], [46.6, -1.0], [47.5, -2.0], [48.6, -1.6], [49.7, -1.9], [50.3, 1.4]]] }
+  - { key: picard, name: Picard, group: frankish, religion: catholic, color: "#8a7ac8",
+      area: [[[51.1, 1.5], [51.05, 2.6], [50.7, 3.2], [50.0, 4.1], [49.3, 3.6], [49.2, 1.7], [50.0, 1.4]]] }
+  - { key: norman, name: Norman, group: frankish, religion: catholic, color: "#c05a5a",
+      area: [[[50.0, 1.4], [49.2, 1.7], [48.6, 1.5], [48.5, 0.0], [48.6, -1.5], [49.0, -1.7], [49.75, -1.95], [49.4, -0.2]],
+             [[49.75, -2.7], [49.75, -2.0], [49.1, -2.0], [49.1, -2.7]]] }
+  - { key: gallo, name: Gallo, group: frankish, religion: catholic, color: "#b0a0d8",
+      area: [[[48.7, -2.9], [48.6, -1.3], [48.0, -0.6], [47.2, -1.0], [47.2, -2.3], [47.6, -2.9]]] }
+  - { key: breton, name: Breton, group: celtic, religion: catholic, color: "#d08cb4",
+      area: [[[48.95, -5.2], [48.75, -2.9], [47.6, -2.9], [47.2, -4.5]]] }
+  - { key: champenois, name: Champenois, group: frankish, religion: catholic, color: "#a0b0e0",
+      area: [[[49.8, 3.9], [49.6, 5.0], [48.7, 5.3], [47.9, 4.8], [47.9, 3.3], [48.6, 3.0], [49.3, 3.6]]] }
+  - { key: lorrain, name: Lorrain, group: frankish, religion: catholic, color: "#7a90a0",
+      area: [[[49.6, 5.0], [49.5, 6.4], [48.9, 6.9], [48.3, 7.1], [47.8, 6.6], [47.9, 5.6], [48.7, 5.3]]] }
+  - { key: bourguignon, name: Bourguignon, group: frankish, religion: catholic, color: "#a04a6a",
+      area: [[[47.9, 3.3], [47.9, 4.8], [47.8, 5.6], [47.2, 5.9], [46.3, 5.3], [46.2, 4.4], [46.6, 3.6], [47.3, 3.0]]] }
+  - { key: berrichon, name: Berrichon, group: frankish, religion: catholic, color: "#6a8ac0",
+      area: [[[47.6, 1.0], [47.3, 3.0], [46.6, 3.6], [46.3, 2.3], [46.4, 1.2], [47.0, 0.8]]] }
+  - { key: poitevin, name: Poitevin, group: frankish, religion: catholic, color: "#5a9ab0",
+      area: [[[47.2, -2.3], [47.2, -1.0], [47.0, 0.8], [46.4, 1.2], [45.7, 0.6], [45.4, -0.4], [45.6, -1.2], [46.3, -1.5], [46.9, -2.2]]] }
+  - { key: walloon, name: Walloon, group: frankish, religion: catholic, color: "#8a9ac8",
+      area: [[[50.8, 3.3], [50.8, 6.0], [49.8, 6.0], [50.0, 3.9]]] }
+  - { key: arpitan, name: Arpitan, group: occitan, religion: catholic, color: "#d07a40",
+      area: [[[47.8, 5.6], [47.8, 6.8], [47.3, 7.2], [46.9, 7.4], [46.2, 7.6], [45.7, 7.8], [45.1, 7.0], [45.0, 6.0], [45.2, 4.8], [45.6, 4.1], [46.2, 4.4], [46.3, 5.3], [47.2, 5.9]]] }
+  - { key: limousin, name: Limousin, group: occitan, religion: catholic, color: "#e0c070",
+      area: [[[46.4, 1.2], [46.3, 2.3], [45.5, 2.4], [44.9, 1.8], [44.6, 0.6], [45.2, 0.0], [45.7, 0.6]]] }
+  - { key: auvergnat, name: Auvergnat, group: occitan, religion: catholic, color: "#c09040",
+      area: [[[46.3, 2.3], [46.6, 3.6], [46.2, 4.4], [45.6, 4.1], [45.2, 4.0], [44.7, 3.4], [44.6, 2.5], [45.5, 2.4]]] }
+  - { key: gascon, name: Gascon, group: occitan, religion: catholic, color: "#e09a3a",
+      area: [[[45.4, -1.3], [45.4, -0.4], [45.2, 0.0], [44.6, 0.6], [44.0, 1.0], [43.3, 1.0], [42.7, 0.6], [42.8, -0.5], [43.2, -1.4], [43.6, -1.5], [44.6, -1.3]]] }
+  - { key: languedocien, name: Languedocien, group: occitan, religion: catholic, color: "#e8b050",
+      area: [[[44.6, 0.6], [44.9, 1.8], [44.6, 2.5], [44.7, 3.4], [45.2, 4.0], [44.4, 4.7], [43.6, 4.6], [43.3, 3.3], [42.6, 1.8], [42.7, 0.6], [43.3, 1.0], [44.0, 1.0]]] }
+  - { key: provencal, name: Provençal, group: occitan, religion: catholic, color: "#d8c050",
+      area: [[[45.2, 4.8], [45.0, 6.0], [45.1, 7.0], [44.2, 7.7], [43.75, 7.6], [43.0, 6.0], [43.3, 4.6], [44.4, 4.7]]] }
+  - { key: dutch, name: Dutch, group: low_german, religion: catholic, color: "#e08a4a",
+      area: [[[53.5, 3.3], [53.4, 7.1], [51.8, 6.8], [51.1, 6.1], [50.8, 5.8], [50.8, 4.4], [51.4, 4.3], [51.5, 3.3]]] }
+  - { key: flemish, name: Flemish, group: low_german, religion: catholic, color: "#d8a050",
+      area: [[[51.4, 2.5], [51.4, 4.3], [50.8, 4.4], [50.7, 3.2], [51.0, 2.4]]] }
+  - { key: frisian, name: Frisian, group: low_german, religion: catholic, color: "#c0a07a",
+      area: [[[53.5, 4.8], [53.7, 8.5], [53.1, 8.4], [52.9, 5.4]]] }
+
+  # ======================================================== Iberia
   - { key: castilian, name: Castilian, group: iberian, religion: catholic, color: "#d9a83a",
-      area: [[[43.6, -7.2], [43.5, -1.9], [42.1, -1.8], [41.3, -1.9], [40.2, -1.4], [39.0, -1.1], [37.8, -0.7], [36.0, -2.0], [36.0, -7.4], [42.0, -7.2]]] }
+      area: [[[43.6, -6.9], [43.5, -3.3], [42.8, -3.0], [42.8, -1.8], [41.3, -1.9], [40.2, -1.4], [39.0, -1.1], [37.8, -0.9], [37.3, -1.65], [37.7, -2.6], [37.6, -4.0], [37.3, -5.4], [36.5, -5.6], [36.0, -6.0], [37.2, -7.4], [38.2, -6.95], [39.6, -7.5], [41.0, -6.8], [41.95, -6.5], [42.0, -6.8]]] }
+  - { key: asturleonese, name: Asturleonese, group: iberian, religion: catholic, color: "#b0b060",
+      area: [[[43.7, -7.1], [43.5, -4.5], [42.6, -4.8], [41.5, -5.3], [41.0, -6.0], [41.0, -6.8], [41.95, -6.5], [42.3, -7.0]]] }
   - { key: galician, name: Galician, group: iberian, religion: catholic, color: "#7ab0a0",
       area: [[[43.9, -9.5], [43.6, -7.0], [42.0, -6.8], [41.8, -9.0]]] }
   - { key: portuguese, name: Portuguese, group: iberian, religion: catholic, color: "#4f9a55",
       area: [[[41.9, -9.8], [41.95, -6.5], [41.0, -6.8], [39.6, -7.5], [38.2, -6.95], [37.0, -7.4], [36.8, -9.9]]] }
   - { key: basque, name: Basque, group: iberian, religion: catholic, color: "#8a3a3a",
-      area: [[[43.5, -3.3], [43.5, -1.2], [42.8, -1.4], [42.8, -3.0]]] }
+      area: [[[43.5, -3.3], [43.5, -0.9], [42.6, -1.3], [42.6, -2.9]]] }
   - { key: aragonese, name: Aragonese, group: iberian, religion: catholic, color: "#c87a5a",
-      area: [[[42.8, -1.8], [42.7, 0.4], [41.0, 0.3], [40.0, -0.4], [40.2, -1.4], [41.3, -1.9]]] }
-  - { key: catalan, name: Catalan, group: iberian, religion: catholic, color: "#c75a6b",
+      area: [[[42.8, -1.8], [42.7, 0.4], [41.0, 0.3], [40.0, -0.4], [39.9, -1.2], [40.2, -1.4], [41.3, -1.9]]] }
+  - { key: catalan, name: Catalan, group: occitan, religion: catholic, color: "#c75a6b",
       area: [[[42.9, 0.4], [42.9, 3.3], [41.0, 1.8], [39.8, 0.2], [38.6, 0.3], [38.0, -0.8], [39.0, -1.1], [40.0, -0.4], [41.0, 0.3]],
              [[40.2, 1.1], [40.2, 4.5], [38.6, 4.5], [38.6, 1.1]]] }
   - { key: andalusian, name: Andalusi, group: arabic, religion: sunni, color: "#2e8a6e",
       area: [[[37.3, -5.4], [37.6, -4.0], [37.7, -2.6], [37.3, -1.65], [36.5, -1.6], [35.9, -5.3], [36.5, -5.6]]] }
-  - { key: french, name: French, group: frankish, religion: catholic, color: "#5d6fb8",
-      area: [[[51.1, 1.5], [51.0, 3.0], [50.4, 4.4], [49.6, 5.5], [48.8, 6.4], [47.5, 6.9], [46.3, 6.3], [45.9, 5.0], [46.0, 3.0], [46.3, 1.0], [46.6, -1.0], [47.5, -2.0], [48.6, -1.6], [49.7, -1.9], [50.3, 1.4]]] }
-  - { key: breton, name: Breton, group: celtic, religion: catholic, color: "#d08cb4",
-      area: [[[48.95, -5.2], [48.7, -2.6], [47.6, -2.6], [47.2, -4.5]]] }
-  - { key: occitan, name: Occitan, group: frankish, religion: catholic, color: "#e0a050",
-      area: [[[46.3, -1.4], [46.3, 3.0], [45.9, 5.0], [45.0, 7.0], [43.7, 7.6], [43.0, 6.0], [43.3, 3.3], [42.6, 1.8], [42.8, -0.5], [43.4, -1.4]]] }
-  - { key: walloon, name: Walloon, group: frankish, religion: catholic, color: "#8a9ac8",
-      area: [[[50.8, 3.3], [50.8, 6.0], [49.8, 6.0], [50.0, 3.9]]] }
-  - { key: dutch, name: Dutch, group: german, religion: catholic, color: "#e08a4a",
-      area: [[[53.5, 3.3], [53.4, 7.1], [51.8, 6.8], [51.1, 6.1], [50.8, 5.8], [50.7, 3.0], [51.2, 2.5]]] }
-  - { key: frisian, name: Frisian, group: german, religion: catholic, color: "#c0a07a",
-      area: [[[53.5, 4.8], [53.7, 8.5], [53.1, 8.4], [52.9, 5.4]]] }
-  - { key: german, name: German, group: german, religion: catholic, color: "#7a8698",
-      area: [[[52.5, 6.9], [52.5, 13.5], [51.5, 15.0], [50.8, 15.0], [50.3, 12.2], [49.0, 13.8], [48.6, 16.9], [47.8, 16.9], [47.0, 16.1], [46.5, 15.0], [46.4, 13.6], [46.5, 10.4], [46.0, 8.3], [46.3, 6.9], [47.5, 6.9], [48.8, 6.4], [49.6, 6.4], [50.8, 6.0], [51.8, 6.8]]] }
-  - { key: low_german, name: Low German, group: german, religion: catholic, color: "#a0b4c8",
-      area: [[[54.9, 8.2], [54.6, 10.8], [54.2, 13.0], [54.6, 16.5], [54.2, 17.3], [53.2, 16.3], [52.5, 13.5], [52.5, 6.9], [53.4, 7.1], [53.6, 8.5]]] }
-  - { key: english, name: English, group: anglo, religion: catholic, color: "#e0857e",
-      area: [[[55.8, -2.1], [55.0, -3.0], [54.0, -3.5], [53.4, -3.1], [52.0, -2.9], [51.5, -3.0], [50.6, -4.0], [50.0, -5.8], [50.6, 1.6], [53.0, 2.0]]] }
-  - { key: welsh, name: Welsh, group: celtic, religion: catholic, color: "#b0c060",
-      area: [[[53.5, -4.8], [53.3, -3.1], [52.0, -2.9], [51.55, -3.1], [51.5, -5.4], [52.3, -4.6]]] }
-  - { key: scots, name: Scots, group: anglo, religion: catholic, color: "#6f9ed4",
-      area: [[[57.7, -2.9], [57.7, -1.7], [55.8, -1.9], [55.0, -3.0], [54.6, -5.1], [55.6, -4.9], [56.3, -3.6]]] }
-  - { key: gaelic, name: Gaelic, group: celtic, religion: catholic, color: "#5d9b6e",
-      area: [[[61, -8.5], [61, -2.0], [57.7, -1.7], [57.7, -2.9], [56.3, -3.6], [55.6, -4.9], [55.0, -7.0]],
-             [[55.5, -10.8], [55.5, -5.4], [51.2, -5.8], [51.2, -10.8]]] }
-  - { key: anglo_irish, name: Anglo-Irish, group: anglo, religion: catholic, color: "#e0a0a0",
-      area: [[[53.9, -6.9], [53.9, -5.9], [52.1, -6.2], [52.0, -7.8], [52.9, -7.6]]] }
-  - { key: danish, name: Danish, group: norse, religion: catholic, color: "#f0b070",
-      area: [[[57.9, 7.9], [57.8, 10.8], [56.6, 11.3], [57.3, 12.05], [56.4, 14.4], [56.1, 16.3], [55.0, 15.7], [54.5, 12.5], [54.6, 10.8], [54.9, 8.2]]] }
-  - { key: swedish, name: Swedish, group: norse, religion: catholic, color: "#6ab0e0",
-      area: [[[64.0, 13.0], [64.5, 21.5], [61.0, 18.0], [59.5, 19.5], [56.0, 17.5], [56.4, 14.4], [57.3, 12.05], [58.9, 11.6], [60.2, 12.6], [62.5, 12.2]],
-             [[60.6, 21.2], [60.6, 23.3], [59.8, 23.3], [59.8, 21.2]]] }
-  - { key: norwegian, name: Norwegian, group: norse, religion: catholic, color: "#c06a90",
-      area: [[[71.5, 24], [69, 18], [66.2, 15.2], [64.6, 14.2], [62.2, 14.2], [61.8, 12.4], [59.4, 11.9], [58.9, 11.6], [57.7, 11.0], [58.0, 6.5], [62, 4], [66, 11], [69, 15]],
-             [[60.9, -2.0], [60.9, -0.6], [58.6, -0.6], [58.6, -3.5]], [[62.4, -7.8], [62.4, -6.2], [61.3, -6.2], [61.3, -7.8]]] }
-  - { key: icelandic, name: Icelandic, group: norse, religion: catholic, color: "#a0c0e0",
-      area: [[[66.7, -24.7], [66.7, -13.2], [63.2, -13.2], [63.2, -24.7]], [[61.5, -48.5], [61.5, -44.5], [59.8, -44.5], [59.8, -48.5]], [[65.0, -53.5], [65.0, -49.5], [63.6, -49.5], [63.6, -53.5]]] }
-  - { key: sami, name: Sami, group: finno_ugric, religion: uralic_pagan, color: "#9ab0a0",
-      area: [[[71.5, 15], [71.5, 40], [66.5, 40], [65.5, 25], [66.2, 15]]] }
-  - { key: finnish, name: Finnish, group: finno_ugric, religion: catholic, color: "#80b0d0",
-      area: [[[66.0, 21.0], [66.5, 30.0], [62.0, 31.5], [60.5, 28.5], [59.8, 23.0], [61.5, 21.0], [63.5, 21.5]]] }
-  - { key: karelian, name: Karelian, group: finno_ugric, religion: orthodox, color: "#5a9080",
-      area: [[[66.5, 30.0], [66.5, 36.0], [61.0, 36.0], [60.4, 30.5], [61.8, 29.8], [63.5, 30.6]]] }
-  - { key: estonian, name: Estonian, group: finno_ugric, religion: catholic, color: "#7a90b0",
-      area: [[[59.7, 21.8], [59.6, 28.2], [57.9, 27.7], [57.9, 26.5], [58.2, 24.0], [58.0, 21.8]]] }
-  - { key: latvian, name: Latvian, group: baltic, religion: catholic, color: "#a07a80",
-      area: [[[58.0, 21.0], [57.9, 26.5], [57.5, 27.9], [56.0, 28.2], [56.3, 21.0]]] }
-  - { key: lithuanian, name: Lithuanian, group: baltic, religion: baltic_pagan, color: "#e0a848",
-      area: [[[56.3, 21.0], [56.3, 26.5], [55.0, 26.8], [54.0, 25.5], [54.0, 23.0], [55.1, 22.4], [55.4, 21.2]]] }
-  - { key: prussian, name: Old Prussian, group: baltic, religion: catholic, color: "#9a9a7a",
-      area: [[[55.0, 19.5], [55.1, 22.4], [54.0, 23.0], [53.6, 21.0], [54.0, 19.6]]] }
-  - { key: polish, name: Polish, group: west_slavic, religion: catholic, color: "#d84a4a",
-      area: [[[54.8, 17.3], [54.5, 18.8], [54.0, 19.6], [53.6, 21.0], [54.0, 23.0], [53.0, 23.6], [51.5, 23.7], [50.4, 23.5], [49.4, 22.8], [49.3, 19.5], [50.0, 18.3], [50.4, 16.9], [51.0, 15.0], [52.5, 14.8], [53.2, 16.3]]] }
-  - { key: silesian, name: Silesian, group: west_slavic, religion: catholic, color: "#e0a0a0",
-      area: [[[51.6, 15.0], [51.3, 17.8], [50.2, 18.9], [50.0, 18.3], [50.5, 16.4], [51.0, 15.0]]] }
-  - { key: czech, name: Czech, group: west_slavic, religion: catholic, color: "#d68ab0",
-      area: [[[50.8, 14.4], [50.4, 16.4], [50.0, 18.3], [49.3, 18.6], [48.7, 17.2], [48.7, 15.0], [49.2, 13.2], [50.0, 12.5], [50.5, 13.2]]] }
-  - { key: slovak, name: Slovak, group: west_slavic, religion: catholic, color: "#c0a0d0",
-      area: [[[49.5, 18.6], [49.4, 22.5], [48.4, 22.3], [48.0, 18.8], [48.1, 17.1], [48.8, 17.2]]] }
-  - { key: hungarian, name: Hungarian, group: finno_ugric, religion: catholic, color: "#f0c0a0",
-      area: [[[48.4, 17.1], [48.4, 22.3], [47.9, 23.0], [46.8, 22.0], [46.2, 21.0], [45.6, 19.3], [45.9, 17.3], [46.8, 16.1], [47.8, 16.6]],
-             [[47.0, 25.5], [46.9, 26.4], [45.8, 26.3], [45.9, 25.4]]] }
-  - { key: vlach, name: Vlach, group: balkan, religion: orthodox, color: "#c8d890",
-      area: [[[48.5, 26.0], [48.2, 28.0], [46.5, 30.0], [45.2, 29.6], [44.0, 28.6], [43.7, 25.0], [44.3, 22.6], [45.4, 21.3], [46.2, 22.0], [47.5, 22.3], [47.9, 23.2], [48.3, 24.5]]] }
-  - { key: slovene, name: Slovene, group: south_slavic, religion: catholic, color: "#a0d0c0",
-      area: [[[46.8, 13.6], [46.8, 16.0], [46.3, 16.6], [45.5, 15.3], [45.5, 13.9], [46.1, 13.4]]] }
-  - { key: croatian, name: Croatian, group: south_slavic, religion: catholic, color: "#c09060",
-      area: [[[46.4, 15.6], [46.3, 17.3], [45.6, 19.0], [45.0, 19.2], [45.0, 17.0], [44.3, 17.3], [43.0, 17.8], [42.6, 18.3], [43.5, 16.0], [45.3, 13.6], [45.5, 15.3]]] }
-  - { key: bosnian, name: Bosnian, group: south_slavic, religion: catholic, color: "#9a7ac0",
-      area: [[[45.1, 16.3], [45.0, 19.0], [44.2, 19.4], [43.3, 18.9], [43.2, 17.8], [44.0, 16.4]]] }
-  - { key: serbian, name: Serbian, group: south_slavic, religion: orthodox, color: "#6a6aa0",
-      area: [[[45.4, 19.0], [45.2, 21.2], [44.3, 22.6], [43.5, 22.6], [42.5, 22.5], [42.0, 22.0], [41.3, 21.5], [41.8, 20.5], [42.3, 19.3], [42.6, 18.5], [43.3, 18.9], [44.2, 19.4]]] }
-  - { key: albanian, name: Albanian, group: balkan, religion: orthodox, color: "#c05a5a",
-      area: [[[42.6, 19.2], [42.2, 20.6], [41.2, 20.8], [40.4, 20.9], [39.6, 20.1], [40.4, 19.3], [41.8, 19.4]]] }
-  - { key: bulgarian, name: Bulgarian, group: south_slavic, religion: orthodox, color: "#8ab860",
-      area: [[[44.2, 22.6], [43.7, 25.0], [44.0, 28.6], [43.0, 28.0], [42.2, 27.8], [41.6, 26.2], [41.4, 24.5], [41.2, 22.9], [42.0, 22.0], [42.5, 22.5], [43.5, 22.6]]] }
-  - { key: greek, name: Greek, group: balkan, religion: orthodox, color: "#c46ab0",
-      area: [[[41.6, 22.9], [41.4, 24.5], [41.6, 26.2], [41.9, 28.0], [41.3, 29.3], [40.3, 26.2], [39.6, 21.2], [38.2, 20.4], [36.3, 21.5], [36.2, 23.3], [37.6, 24.2], [38.9, 24.4], [40.0, 23.0], [40.8, 22.0]],
-             [[41.5, 29.2], [41.5, 31.7], [40.9, 31.7], [40.4, 28.5], [40.7, 29.0]],
-             [[41.3, 37.6], [41.6, 41.4], [40.9, 41.0], [40.8, 37.8]],
-             [[40.2, 24.8], [40.2, 29.0], [34.8, 29.0], [34.8, 23.0], [36.8, 23.0], [37.7, 24.3], [38.9, 25.6]],
-             [[35.8, 32.1], [35.8, 34.7], [34.5, 34.7], [34.5, 32.1]],
-             [[44.8, 33.3], [44.8, 35.4], [44.3, 35.4], [44.3, 33.3]]] }
-  - { key: italian_north, name: Lombard, group: italian, religion: catholic, color: "#5a9a5a",
-      area: [[[46.5, 6.9], [46.5, 10.4], [46.0, 11.2], [45.0, 12.2], [44.4, 12.2], [44.1, 9.8], [43.8, 7.5], [44.5, 6.9]]] }
+
+  # ======================================================== Germany, the Alps and Italy
+  - { key: saxon, name: Saxon, group: low_german, religion: catholic, color: "#a0b4c8",
+      area: [[[54.9, 8.2], [54.6, 10.8], [54.2, 13.0], [54.6, 16.5], [54.2, 17.3], [53.2, 16.3], [52.5, 14.8], [51.9, 14.7], [51.6, 13.0], [51.4, 11.4], [51.4, 10.0], [51.6, 8.6], [52.3, 7.8], [52.6, 7.0], [53.4, 7.1], [53.6, 8.5]]] }
+  - { key: westphalian, name: Westphalian, group: low_german, religion: catholic, color: "#8aa0b0",
+      area: [[[52.6, 7.0], [52.3, 8.9], [51.6, 8.9], [51.3, 8.3], [51.3, 7.0], [51.8, 6.7]]] }
+  - { key: thuringian, name: Thuringian, group: german, religion: catholic, color: "#9a9ab8",
+      area: [[[51.6, 10.0], [51.6, 13.0], [51.9, 14.7], [51.2, 15.0], [50.8, 14.4], [50.3, 12.2], [50.4, 10.0]]] }
+  - { key: sorbian, name: Sorbian, group: west_slavic, religion: catholic, color: "#c09ab0",
+      area: [[[51.8, 13.6], [51.8, 14.8], [51.0, 14.9], [51.1, 13.8]]] }
+  - { key: moselle_franconian, name: Moselle Franconian, group: german, religion: catholic, color: "#7a8698",
+      area: [[[51.3, 6.0], [51.3, 7.6], [50.6, 8.0], [50.0, 7.6], [49.4, 7.0], [49.2, 6.4], [49.6, 6.0], [50.4, 6.0]]] }
+  - { key: rhine_franconian, name: Rhine Franconian, group: german, religion: catholic, color: "#8a7a98",
+      area: [[[51.6, 8.6], [51.4, 10.0], [50.4, 10.0], [49.6, 9.4], [49.0, 8.4], [49.0, 7.5], [49.4, 7.0], [50.0, 7.6], [50.6, 8.0], [51.3, 8.3]]] }
+  - { key: east_franconian, name: East Franconian, group: german, religion: catholic, color: "#6a7a88",
+      area: [[[50.4, 10.0], [50.3, 12.2], [49.5, 12.0], [49.0, 11.5], [48.9, 10.0], [49.0, 9.3], [49.6, 9.4]]] }
+  - { key: swabian, name: Swabian, group: german, religion: catholic, color: "#b0a080",
+      area: [[[49.0, 8.4], [48.9, 10.0], [49.0, 11.0], [48.3, 11.0], [47.6, 10.4], [47.6, 9.4], [48.0, 8.6], [48.5, 8.0], [49.0, 8.2]]] }
+  - { key: alemannic, name: High Alemannic, group: german, religion: catholic, color: "#c0806a",
+      area: [[[49.0, 7.5], [48.5, 8.0], [48.0, 8.6], [47.6, 9.4], [47.6, 10.0], [47.0, 10.1], [46.4, 9.3], [46.1, 8.1], [46.5, 7.3], [46.9, 7.4], [47.3, 7.0], [47.6, 7.2], [48.3, 7.1], [48.9, 7.0]]] }
+  - { key: bavarian, name: Danube Bavarian, group: german, religion: catholic, color: "#6a90b0",
+      area: [[[49.5, 12.0], [49.0, 13.8], [48.6, 16.9], [47.8, 16.9], [47.0, 16.1], [46.5, 15.0], [46.4, 13.6], [46.6, 12.0], [46.5, 10.4], [47.0, 10.1], [47.6, 10.4], [48.3, 11.0], [49.0, 11.0], [49.0, 11.5]]] }
+  - { key: piedmontese, name: Piedmontese, group: italian, religion: catholic, color: "#a0c070",
+      area: [[[46.5, 6.9], [46.4, 8.4], [45.2, 8.7], [44.4, 8.6], [44.2, 7.6], [45.1, 7.0]]] }
+  - { key: ligurian, name: Ligurian, group: italian, religion: catholic, color: "#d07070",
+      area: [[[44.6, 7.6], [44.6, 9.9], [44.0, 10.0], [43.75, 7.6]]] }
+  - { key: lombard, name: Lombard, group: italian, religion: catholic, color: "#5a9a5a",
+      area: [[[46.5, 8.4], [46.5, 10.4], [45.8, 10.8], [45.0, 11.2], [44.9, 10.0], [45.0, 8.6]]] }
   - { key: venetian, name: Venetian, group: italian, religion: catholic, color: "#c84a6a",
-      area: [[[46.6, 11.2], [46.6, 13.8], [45.6, 13.9], [44.9, 12.4], [45.2, 11.2]], [[45.6, 13.5], [45.2, 13.9], [44.8, 13.95], [44.85, 13.55]]] }
+      area: [[[46.6, 10.8], [46.6, 13.8], [45.6, 13.9], [44.9, 12.4], [45.0, 11.2]], [[45.6, 13.5], [45.2, 13.9], [44.8, 13.95], [44.85, 13.55]]] }
+  - { key: emilian, name: Emilian, group: italian, religion: catholic, color: "#d0a070",
+      area: [[[45.0, 9.0], [45.0, 12.2], [44.4, 12.4], [43.9, 12.6], [44.1, 11.0], [44.6, 9.4]]] }
   - { key: tuscan, name: Tuscan, group: italian, religion: catholic, color: "#d86060",
-      area: [[[44.4, 9.8], [44.2, 12.6], [43.0, 13.9], [42.0, 12.6], [42.3, 11.0], [43.4, 10.2]]] }
+      area: [[[44.4, 9.9], [44.1, 11.0], [43.7, 12.3], [42.8, 12.0], [42.3, 11.2], [43.0, 10.4], [43.9, 10.1]]] }
   - { key: roman, name: Roman, group: italian, religion: catholic, color: "#f0e6a0",
-      area: [[[43.0, 11.5], [43.8, 13.6], [42.6, 14.2], [41.3, 13.6], [41.2, 12.2], [42.3, 11.3]]] }
+      area: [[[43.9, 12.6], [43.5, 13.6], [42.7, 13.9], [41.9, 13.6], [41.2, 13.6], [41.3, 12.3], [42.3, 11.3], [42.8, 12.0], [43.7, 12.3]]] }
   - { key: neapolitan, name: Neapolitan, group: italian, religion: catholic, color: "#7aa0c8",
-      area: [[[42.6, 13.6], [42.0, 15.5], [40.6, 18.7], [39.8, 18.6], [37.8, 15.8], [40.0, 15.0], [41.2, 13.0], [41.8, 13.7]]] }
+      area: [[[42.7, 13.9], [42.0, 15.5], [40.6, 18.7], [39.8, 18.6], [37.9, 15.7], [40.0, 15.0], [41.2, 13.0], [41.9, 13.6]]] }
   - { key: sicilian, name: Sicilian, group: italian, religion: catholic, color: "#e8c04a",
       area: [[[38.4, 12.2], [38.33, 15.7], [36.6, 15.3], [37.0, 12.2]]] }
   - { key: sardinian, name: Sardinian, group: italian, religion: catholic, color: "#70b0a0",
@@ -195,23 +197,144 @@ cultures:
   - { key: corsican, name: Corsican, group: italian, religion: catholic, color: "#a0c890",
       area: [[[43.1, 8.4], [43.1, 9.7], [41.3, 9.7], [41.3, 8.4]]] }
 
-  # ======================================================== Rus and the steppe
+  # ======================================================== British Isles and Scandinavia
+  - { key: english, name: English, group: anglo, religion: catholic, color: "#e0857e",
+      area: [[[55.8, -2.1], [55.0, -3.0], [54.0, -3.5], [53.4, -3.1], [52.0, -2.9], [51.5, -3.0], [50.6, -4.0], [50.0, -5.8], [50.6, 1.6], [53.0, 2.0]]] }
+  - { key: welsh, name: Welsh, group: celtic, religion: catholic, color: "#b0c060",
+      area: [[[53.5, -4.8], [53.3, -3.1], [52.0, -2.9], [51.55, -3.1], [51.5, -5.4], [52.3, -4.6]]] }
+  - { key: scots, name: Scottish, group: anglo, religion: catholic, color: "#6f9ed4",
+      area: [[[58.8, -7.8], [58.8, -2.8], [57.7, -1.7], [55.8, -1.9], [55.0, -3.0], [54.6, -5.1], [55.3, -6.6], [56.5, -7.8]]] }
+  - { key: irish, name: Irish, group: celtic, religion: catholic, color: "#5d9b6e",
+      area: [[[55.5, -10.8], [55.5, -5.4], [51.2, -5.8], [51.2, -10.8]]] }
+  - { key: danish, name: Danish, group: norse, religion: catholic, color: "#f0b070",
+      area: [[[57.9, 7.9], [57.8, 10.8], [56.6, 11.3], [57.3, 12.05], [56.4, 14.4], [56.1, 16.3], [55.0, 15.7], [54.5, 12.5], [54.6, 10.8], [54.9, 8.2]]] }
+  - { key: swedish, name: Swedish, group: norse, religion: catholic, color: "#6ab0e0",
+      area: [[[64.0, 13.0], [64.5, 21.5], [61.0, 18.0], [59.5, 19.5], [56.0, 17.5], [56.4, 14.4], [57.3, 12.05], [58.9, 11.6], [60.2, 12.6], [62.5, 12.2]],
+             [[60.6, 19.2], [60.6, 21.0], [59.8, 21.0], [59.8, 19.2]]] }
+  - { key: norwegian, name: Norwegian, group: norse, religion: catholic, color: "#c06a90",
+      area: [[[71.5, 24], [69, 18], [66.2, 15.2], [64.6, 14.2], [62.2, 14.2], [61.8, 12.4], [59.4, 11.9], [58.9, 11.6], [57.7, 11.0], [58.0, 6.5], [62, 4], [66, 11], [69, 15]],
+             [[60.9, -2.0], [60.9, -0.6], [58.75, -0.6], [58.75, -3.5]], [[62.4, -7.8], [62.4, -6.2], [61.3, -6.2], [61.3, -7.8]]] }
+  - { key: icelandic, name: Icelandic, group: norse, religion: catholic, color: "#a0c0e0",
+      area: [[[66.7, -24.7], [66.7, -13.2], [63.2, -13.2], [63.2, -24.7]], [[61.5, -48.5], [61.5, -44.5], [59.8, -44.5], [59.8, -48.5]], [[65.0, -53.5], [65.0, -49.5], [63.6, -49.5], [63.6, -53.5]]] }
+  - { key: sami, name: Sami, group: finno_ugric, religion: uralic_pagan, color: "#9ab0a0",
+      area: [[[71.5, 15], [71.5, 40], [66.5, 40], [65.5, 25], [66.2, 15]]] }
+  - { key: tavastian, name: Tavastian, group: finno_ugric, religion: catholic, color: "#80b0d0",
+      area: [[[66.0, 21.0], [66.5, 30.0], [62.0, 31.5], [60.5, 28.5], [59.8, 23.0], [61.5, 21.0], [63.5, 21.5]]] }
+  - { key: finnish, name: Finnish, group: finno_ugric, religion: catholic, color: "#a0c8e0",
+      area: [[[61.6, 21.0], [61.0, 23.6], [60.3, 24.0], [59.8, 22.8], [60.2, 21.3]]] }
+  - { key: karelian, name: Karelian, group: finno_ugric, religion: orthodox, color: "#5a9080",
+      area: [[[66.5, 30.0], [66.5, 36.0], [61.6, 36.0], [61.0, 33.5], [60.4, 30.5], [61.8, 29.8], [63.5, 30.6]]] }
+
+  # ======================================================== The Baltic, Poland, Bohemia and Hungary
+  - { key: estonian, name: Estonian, group: finno_ugric, religion: catholic, color: "#7a90b0",
+      area: [[[59.7, 21.8], [59.6, 28.2], [57.9, 27.7], [57.9, 26.5], [58.2, 24.0], [58.0, 21.8]]] }
+  - { key: latvian, name: Latvian, group: baltic, religion: catholic, color: "#a07a80",
+      area: [[[58.0, 21.0], [57.9, 26.5], [57.5, 27.9], [56.0, 28.2], [56.3, 21.0]]] }
+  - { key: livonian, name: Livonian, group: finno_ugric, religion: catholic, color: "#6a8aa0",
+      area: [[[57.8, 21.9], [57.8, 23.0], [57.2, 22.8], [57.2, 22.0]], [[57.9, 24.2], [57.9, 24.8], [57.1, 24.8], [57.1, 24.2]]] }
+  - { key: samogitian, name: Samogitian, group: baltic, religion: baltic_pagan, color: "#c09040",
+      area: [[[56.4, 21.0], [56.3, 23.5], [55.3, 23.5], [55.1, 22.4], [55.4, 21.2]]] }
+  - { key: aukstaitian, name: Aukštaitian, group: baltic, religion: baltic_pagan, color: "#e0a848",
+      area: [[[56.3, 23.5], [56.3, 26.5], [55.0, 26.8], [54.0, 25.5], [54.0, 23.0], [55.1, 22.4], [55.3, 23.5]]] }
+  - { key: prussian, name: Old Prussian, group: baltic, religion: catholic, color: "#9a9a7a",
+      area: [[[55.0, 19.5], [55.1, 22.4], [54.0, 23.0], [53.6, 21.0], [54.0, 19.6]]] }
+  - { key: kashubian, name: Kashubian, group: west_slavic, religion: catholic, color: "#d07a7a",
+      area: [[[54.8, 17.0], [54.8, 18.8], [54.0, 19.0], [53.5, 18.0], [53.6, 17.0]]] }
+  - { key: greater_polish, name: Greater Polish, group: west_slavic, religion: catholic, color: "#d84a4a",
+      area: [[[53.4, 15.8], [53.5, 18.0], [52.6, 19.2], [51.7, 18.8], [51.3, 17.8], [51.6, 16.0], [52.4, 15.3]]] }
+  - { key: mazovian, name: Mazovian, group: west_slavic, religion: catholic, color: "#b84a5a",
+      area: [[[53.6, 19.3], [53.6, 21.8], [53.0, 23.0], [52.0, 23.2], [51.6, 21.5], [51.7, 19.5], [52.6, 19.2], [53.5, 18.0]]] }
+  - { key: lesser_polish, name: Lesser Polish, group: west_slavic, religion: catholic, color: "#e06a5a",
+      area: [[[51.7, 18.8], [51.6, 21.5], [52.0, 23.2], [51.5, 23.7], [50.4, 23.5], [49.4, 22.8], [49.3, 19.5], [50.0, 18.9], [51.3, 17.8]]] }
+  - { key: silesian, name: Silesian, group: west_slavic, religion: catholic, color: "#e0a0a0",
+      area: [[[51.6, 15.0], [51.3, 17.8], [50.2, 18.9], [50.0, 18.3], [50.5, 16.4], [51.0, 15.0]]] }
+  - { key: czech, name: Czech, group: west_slavic, religion: catholic, color: "#d68ab0",
+      area: [[[50.8, 14.4], [50.4, 16.4], [50.0, 16.5], [49.5, 15.6], [48.8, 15.8], [48.7, 15.0], [49.2, 13.2], [50.0, 12.5], [50.5, 13.2]]] }
+  - { key: moravian, name: Moravian, group: west_slavic, religion: catholic, color: "#b07ab0",
+      area: [[[50.2, 16.2], [50.0, 18.3], [49.3, 18.6], [48.7, 17.2], [48.8, 15.8], [49.5, 15.6]]] }
+  - { key: slovak, name: Slovak, group: west_slavic, religion: catholic, color: "#c0a0d0",
+      area: [[[49.5, 18.6], [49.4, 22.5], [48.4, 22.3], [48.0, 18.8], [48.1, 17.1], [48.8, 17.2]]] }
+  - { key: hungarian, name: Hungarian, group: finno_ugric, religion: catholic, color: "#f0c0a0",
+      area: [[[48.4, 17.1], [48.4, 22.3], [48.2, 23.0], [47.8, 24.3], [47.0, 25.0], [46.7, 26.0], [45.8, 26.3], [45.6, 24.5], [45.8, 22.8], [45.6, 21.5], [45.3, 20.5], [45.6, 19.0], [45.9, 17.3], [46.8, 16.1], [47.8, 16.6]]] }
+
+  # ======================================================== The Balkans and Greece
+  - { key: wallachian, name: Wallachian, group: balkan, religion: orthodox, color: "#c8d890",
+      area: [[[45.8, 22.5], [45.6, 24.5], [45.8, 26.3], [45.5, 27.5], [45.2, 28.3], [44.2, 27.5], [43.7, 25.0], [44.3, 22.6], [44.8, 21.4]]] }
+  - { key: moldovan, name: Moldovan, group: balkan, religion: orthodox, color: "#a8c870",
+      area: [[[48.5, 26.0], [48.2, 28.0], [46.5, 30.0], [45.5, 28.2], [45.8, 26.3], [46.7, 26.0], [47.8, 24.3], [48.2, 25.0]]] }
+  - { key: slovene, name: Slovene, group: south_slavic, religion: catholic, color: "#a0d0c0",
+      area: [[[46.8, 13.6], [46.8, 16.0], [46.3, 16.6], [45.5, 15.3], [45.5, 13.9], [46.1, 13.4]]] }
+  - { key: croatian, name: Croatian, group: south_slavic, religion: catholic, color: "#c09060",
+      area: [[[46.4, 15.6], [46.3, 17.3], [45.6, 19.0], [45.0, 19.2], [45.0, 17.0], [44.3, 17.3], [43.0, 17.8], [42.6, 18.3], [43.5, 16.0], [45.3, 13.6], [45.5, 15.3]]] }
+  - { key: bosnian, name: Bosnian, group: south_slavic, religion: bosnian_church, color: "#9a7ac0",
+      area: [[[45.1, 16.3], [45.0, 19.0], [44.2, 19.4], [43.3, 18.9], [43.2, 17.8], [44.0, 16.4]]] }
+  - { key: serbian, name: Serbian, group: south_slavic, religion: orthodox, color: "#6a6aa0",
+      area: [[[45.4, 19.0], [45.2, 21.2], [44.3, 22.6], [43.5, 22.6], [42.5, 22.5], [42.0, 22.0], [41.3, 21.5], [41.8, 20.5], [42.3, 19.3], [42.6, 18.5], [43.3, 18.9], [44.2, 19.4]]] }
+  - { key: albanian, name: Albanian, group: balkan, religion: orthodox, color: "#c05a5a",
+      area: [[[42.6, 19.2], [42.2, 20.6], [41.2, 20.8], [40.4, 20.9], [39.6, 20.1], [40.4, 19.3], [41.8, 19.4]]] }
+  - { key: bulgarian, name: Bulgarian, group: south_slavic, religion: orthodox, color: "#8ab860",
+      area: [[[44.2, 22.6], [43.7, 25.0], [44.2, 27.5], [45.2, 28.3], [45.2, 29.6], [44.0, 28.6], [43.0, 28.0], [42.2, 27.8], [41.6, 26.2], [41.4, 24.5], [41.2, 22.9], [42.0, 22.0], [42.5, 22.5], [43.5, 22.6]]] }
+  - { key: greek, name: Greek, group: greek, religion: orthodox, color: "#c46ab0",
+      area: [[[41.6, 22.9], [41.4, 24.5], [41.6, 26.2], [41.9, 28.0], [41.3, 29.3], [40.3, 26.2], [39.6, 21.2], [38.2, 20.4], [36.3, 21.5], [36.2, 23.3], [37.6, 24.2], [38.9, 24.4], [40.0, 23.0], [40.8, 22.0]],
+             [[40.2, 24.8], [40.2, 26.2], [34.8, 29.0], [34.8, 23.0], [36.8, 23.0], [37.7, 24.3], [38.9, 25.6]],
+             [[35.8, 32.1], [35.8, 34.7], [34.5, 34.7], [34.5, 32.1]],
+             [[44.8, 33.3], [44.8, 35.4], [44.3, 35.4], [44.3, 33.3]],
+             # western and northern Anatolia: still largely Greek-speaking in 1314
+             [[41.3, 26.5], [41.2, 32.0], [42.0, 35.0], [41.3, 37.6], [41.5, 41.4], [40.9, 41.0], [40.5, 39.5], [40.2, 37.0], [40.8, 34.5], [40.5, 31.0], [39.5, 29.8], [38.5, 30.0], [37.3, 31.0], [36.5, 30.5], [36.5, 29.5], [37.0, 27.2], [38.5, 26.3], [40.0, 26.0]]] }
+
+  # ======================================================== The Rus lands
+  - { key: novgorodian, name: Novgorodian, group: east_slavic, religion: orthodox, color: "#5f9a50",
+      area: [[[61.5, 28.5], [62.0, 36.0], [64.5, 40.0], [66.5, 44.0], [64.0, 47.0], [61.5, 50.0], [59.5, 47.0], [58.5, 41.0], [57.5, 38.5], [57.0, 35.0], [56.5, 31.0], [57.5, 27.9], [59.0, 27.8]]] }
+  - { key: vepsian, name: Vepsian, group: finno_ugric, religion: orthodox, color: "#80a090",
+      area: [[[61.0, 33.5], [61.0, 37.5], [59.6, 37.5], [59.6, 33.5]]] }
+  - { key: muscovite, name: Muscovite, group: east_slavic, religion: orthodox, color: "#4a8a40",
+      area: [[[57.5, 35.0], [58.5, 41.0], [58.0, 44.0], [56.3, 44.5], [55.5, 42.5], [55.0, 38.5], [54.5, 36.0], [55.6, 34.5], [56.8, 34.5]]] }
+  - { key: ryazanian, name: Ryazanian, group: east_slavic, religion: orthodox, color: "#7ab060",
+      area: [[[55.0, 38.5], [55.5, 40.0], [55.3, 42.0], [53.5, 42.0], [53.0, 37.5], [54.5, 36.0]]] }
+  - { key: smolenskian, name: Smolenskian, group: east_slavic, religion: orthodox, color: "#6aa070",
+      area: [[[56.5, 31.0], [56.8, 34.5], [55.6, 34.5], [54.5, 36.0], [53.6, 35.0], [54.0, 31.5], [55.3, 30.5]]] }
+  - { key: polatskian, name: Polatskian, group: east_slavic, religion: orthodox, color: "#8ab880",
+      area: [[[56.5, 26.5], [56.5, 31.0], [55.3, 30.5], [54.0, 30.5], [54.0, 27.0], [55.0, 26.8]]] }
+  - { key: polesian, name: Polesian, group: east_slavic, religion: orthodox, color: "#a0c090",
+      area: [[[54.0, 23.6], [54.0, 30.5], [53.0, 31.5], [51.8, 30.5], [51.5, 26.0], [51.6, 23.6], [53.0, 23.6]]] }
+  - { key: severian, name: Severian, group: east_slavic, religion: orthodox, color: "#5a9a70",
+      area: [[[53.6, 31.5], [54.5, 36.0], [53.0, 37.5], [51.5, 36.5], [50.8, 34.0], [51.5, 31.5], [52.5, 31.2]]] }
   - { key: ruthenian, name: Ruthenian, group: east_slavic, religion: orthodox, color: "#6fae6a",
-      area: [[[55.5, 23.5], [55.8, 29.0], [54.0, 31.5], [52.6, 33.5], [50.5, 33.5], [49.0, 32.5], [48.3, 28.5], [48.2, 25.0], [49.0, 22.6], [50.4, 23.5], [51.5, 23.7], [53.0, 23.6], [54.0, 25.5], [55.0, 26.8]]] }
-  - { key: russian, name: Russian, group: east_slavic, religion: orthodox, color: "#5f9a50",
-      area: [[[61.0, 28.5], [61.0, 36.0], [62.0, 45.0], [61.0, 50.0], [57.5, 48.0], [56.0, 45.0], [55.0, 42.0], [53.5, 41.0], [52.6, 38.0], [52.6, 33.5], [54.0, 31.5], [55.8, 29.0], [57.5, 27.9], [59.0, 27.8]]] }
+      area: [[[51.8, 30.5], [51.5, 31.5], [50.8, 34.0], [49.5, 33.5], [48.8, 31.0], [49.5, 28.5], [50.5, 27.5], [51.5, 28.0]]] }
+  - { key: volhynian, name: Volhynian, group: east_slavic, religion: orthodox, color: "#80b050",
+      area: [[[51.6, 23.6], [51.5, 26.0], [51.5, 28.0], [50.5, 27.5], [49.8, 26.5], [50.3, 24.0], [50.8, 23.6]]] }
+  - { key: halychian, name: Halychian, group: east_slavic, religion: orthodox, color: "#609a40",
+      area: [[[50.3, 24.0], [49.8, 26.5], [49.5, 28.5], [48.5, 26.5], [48.0, 25.0], [48.5, 23.5], [49.2, 22.6], [50.0, 23.0]]] }
+
+  # ======================================================== Volga, Urals and the western steppe
   - { key: komi, name: Komi, group: finno_ugric, religion: uralic_pagan, color: "#8aa070",
-      area: [[[68.5, 45], [68.5, 60], [60.0, 60], [59.0, 50.0], [61.0, 50.0], [62.0, 45.0], [66.0, 40.0]]] }
-  - { key: volga_finnic, name: Mordvin and Mari, group: finno_ugric, religion: uralic_pagan, color: "#a0b080",
-      area: [[[58.0, 44.0], [57.5, 50.0], [55.5, 50.0], [53.5, 46.0], [53.5, 42.0], [55.0, 42.0], [56.0, 45.0]]] }
-  - { key: volga_tatar, name: Volga Tatar, group: turkic, religion: sunni, color: "#b8b070",
-      area: [[[57.5, 48.0], [57.0, 54.0], [54.5, 54.0], [53.5, 50.0], [55.5, 50.0]]] }
-  - { key: bashkir, name: Bashkir, group: turkic, religion: tengri, color: "#c8b880",
-      area: [[[57.0, 54.0], [56.5, 60.0], [52.0, 60.0], [51.5, 55.0], [53.5, 50.0], [54.5, 54.0]]] }
-  - { key: kipchak, name: Kipchak, group: turkic, religion: tengri, color: "#d9c56b",
-      area: [[[53.5, 33.5], [53.5, 45.0], [55.0, 60.0], [54.0, 75.0], [50.0, 82.0], [46.0, 80.0], [43.5, 70.0], [42.0, 60.0], [44.5, 54.0], [43.5, 47.5], [43.5, 40.0], [45.2, 36.6], [46.0, 30.6], [45.2, 29.6], [46.5, 30.0], [48.2, 28.0], [49.0, 32.5], [50.5, 33.5]]] }
-  - { key: crimean_tatar, name: Crimean Tatar, group: turkic, religion: sunni, color: "#c0b060",
-      area: [[[46.2, 32.6], [46.2, 36.6], [44.8, 36.6], [44.6, 33.0]]] }
+      area: [[[68.5, 45], [68.5, 60], [60.0, 60], [59.0, 50.0], [61.5, 50.0], [64.0, 47.0], [66.0, 44.0]]] }
+  - { key: udmurt, name: Udmurt, group: volga, religion: uralic_pagan, color: "#90a868",
+      area: [[[59.0, 50.0], [58.8, 54.5], [56.5, 54.0], [56.5, 51.0], [57.5, 50.0]]] }
+  - { key: mari, name: Mari, group: volga, religion: uralic_pagan, color: "#a0b080",
+      area: [[[58.0, 44.0], [57.5, 50.0], [56.5, 50.0], [56.2, 46.0], [56.3, 44.5]]] }
+  - { key: chuvash, name: Chuvash, group: volga, religion: uralic_pagan, color: "#b0b890",
+      area: [[[56.2, 46.0], [56.2, 47.8], [55.0, 48.2], [54.8, 46.5]]] }
+  - { key: erzya, name: Erzya, group: volga, religion: uralic_pagan, color: "#98a878",
+      area: [[[56.3, 43.0], [55.5, 46.5], [54.5, 46.5], [54.3, 44.2], [55.3, 42.0]]] }
+  - { key: moksha, name: Moksha, group: volga, religion: uralic_pagan, color: "#88a070",
+      area: [[[55.3, 42.0], [54.3, 44.2], [54.5, 46.5], [53.3, 46.0], [53.3, 42.0]]] }
+  - { key: mishar, name: Mishar, group: kipchak, religion: sunni, color: "#c0a870",
+      area: [[[54.3, 46.5], [53.3, 48.5], [52.5, 47.5], [53.3, 46.0]]] }
+  - { key: kazani, name: Kazani, group: kipchak, religion: sunni, color: "#b8b070",
+      area: [[[56.5, 47.8], [56.5, 51.0], [55.3, 51.5], [55.0, 48.2]]] }
+  - { key: bolghar, name: Bolghar, group: kipchak, religion: sunni, color: "#a8a060",
+      area: [[[55.3, 48.2], [55.3, 52.5], [54.0, 53.5], [53.5, 50.0], [54.2, 48.0]]] }
+  - { key: bashkir, name: Bashkir, group: kipchak, religion: tengri, color: "#c8b880",
+      area: [[[56.5, 54.0], [56.5, 60.0], [52.0, 60.0], [51.5, 55.0], [53.5, 50.5], [54.0, 53.5]]] }
+  - { key: crimean, name: Crimean, group: kipchak, religion: tengri, color: "#d9c56b",
+      area: [[[49.0, 30.0], [49.5, 33.5], [50.5, 36.5], [50.5, 40.0], [48.5, 43.5], [46.5, 44.0], [45.5, 41.0], [45.2, 36.6], [44.4, 33.5], [46.0, 30.6], [46.5, 30.0], [47.5, 29.5]]] }
+  - { key: astrakhani, name: Astrakhani, group: kipchak, religion: sunni, color: "#c0b060",
+      area: [[[48.5, 43.5], [48.5, 46.5], [47.0, 48.5], [46.5, 50.0], [44.5, 47.5], [44.5, 45.0], [46.5, 44.0]]] }
+  - { key: nogai, name: Nogai, group: kipchak, religion: sunni, color: "#b8a858",
+      area: [[[52.0, 46.5], [51.5, 56.0], [47.5, 57.0], [46.5, 52.0], [47.0, 48.5], [48.5, 46.5]]] }
+
+  # ======================================================== The Caucasus and Anatolia
   - { key: circassian, name: Circassian, group: caucasian, religion: orthodox, color: "#8ab0a0",
       area: [[[45.2, 36.6], [45.0, 41.0], [43.5, 42.5], [43.4, 40.0], [44.6, 37.5]]] }
   - { key: alan, name: Alan, group: iranian, religion: orthodox, color: "#a0a0c8",
@@ -220,59 +343,103 @@ cultures:
       area: [[[43.8, 45.0], [43.8, 47.8], [41.4, 48.8], [41.5, 46.0], [42.6, 45.0]]] }
   - { key: georgian, name: Georgian, group: caucasian, religion: orthodox, color: "#a8a040",
       area: [[[43.4, 40.0], [42.8, 43.0], [42.6, 45.0], [41.5, 46.8], [41.0, 45.8], [41.1, 43.5], [41.4, 41.6], [42.2, 41.5]]] }
+  - { key: adhari, name: Adhari, group: turkic, religion: sunni, color: "#70a888",
+      area: [[[41.5, 46.0], [41.5, 48.5], [40.0, 49.8], [38.0, 48.8], [37.5, 46.0], [38.6, 45.0], [40.5, 45.5]]] }
+  - { key: turkish, name: Turkish, group: turkic, religion: sunni, color: "#5a9a70",
+      area: [[[40.5, 31.0], [40.8, 34.5], [40.2, 37.0], [39.0, 38.5], [38.6, 37.6], [38.2, 36.5], [37.3, 35.0], [37.0, 33.0], [37.3, 31.0], [38.5, 30.0], [39.5, 29.8]]] }
   - { key: armenian, name: Armenian, group: caucasian, religion: miaphysite, color: "#e09050",
-      area: [[[41.1, 43.0], [41.0, 46.5], [39.2, 47.0], [38.6, 45.0], [38.4, 42.5], [39.5, 41.0], [40.6, 42.0]],
-             [[38.0, 34.6], [38.0, 36.4], [37.0, 37.0], [36.6, 36.6], [36.2, 34.8], [36.8, 34.3]]] }
-
-  # ======================================================== Anatolia, Middle East, Iran, Central Asia
-  - { key: turkmen, name: Turkmen, group: turkic, religion: sunni, color: "#5a9a70",
-      area: [[[41.3, 26.5], [41.2, 32.0], [42.0, 35.0], [41.0, 37.6], [40.5, 40.0], [39.5, 41.0], [38.4, 42.5], [37.3, 40.0], [37.0, 36.8], [36.2, 34.8], [36.1, 32.5], [36.5, 29.5], [37.0, 27.2], [38.5, 26.3], [40.0, 26.0]],
-             [[41.0, 54.0], [41.5, 59.5], [40.0, 62.5], [37.3, 62.0], [37.8, 56.0], [38.5, 53.8]],
-             [[40.5, 45.5], [39.8, 48.5], [38.0, 48.5], [37.6, 46.0], [38.6, 45.0]]] }
+      area: [[[41.3, 41.0], [41.1, 43.5], [41.0, 46.5], [39.2, 47.0], [38.6, 45.0], [38.0, 43.0], [37.6, 41.5], [37.8, 39.0], [38.6, 37.6], [39.0, 38.5], [40.2, 37.0], [40.5, 39.5], [40.9, 41.0]],
+             [[38.2, 34.6], [38.3, 36.6], [37.0, 37.0], [36.6, 36.4], [36.2, 34.8], [36.7, 34.0], [37.3, 35.0]]] }
   - { key: kurdish, name: Kurdish, group: iranian, religion: sunni, color: "#8a7aa0",
-      area: [[[39.0, 41.0], [38.6, 44.5], [36.8, 46.2], [35.0, 46.6], [34.3, 45.7], [36.2, 43.4], [37.2, 41.5], [38.0, 40.0]]] }
+      area: [[[38.6, 42.0], [38.6, 44.5], [36.8, 46.2], [35.0, 46.6], [34.3, 45.7], [36.2, 43.4], [37.2, 41.5], [37.6, 41.5], [38.0, 43.0]]] }
   - { key: syriac, name: Syriac, group: arabic, religion: miaphysite, color: "#b080a0",
-      area: [[[37.6, 40.4], [37.6, 42.2], [36.9, 42.4], [36.9, 40.4]]] }
-  - { key: levantine, name: Levantine Arab, group: arabic, religion: sunni, color: "#d6b05c",
-      area: [[[37.1, 36.2], [36.9, 38.5], [35.0, 40.6], [33.5, 39.5], [31.0, 37.3], [29.5, 35.0], [31.2, 34.2], [33.0, 35.0], [35.6, 35.7]]] }
-  - { key: iraqi, name: Iraqi Arab, group: arabic, religion: sunni, color: "#c89a50",
-      area: [[[36.3, 41.0], [36.0, 43.0], [34.3, 45.7], [33.0, 46.5], [30.0, 48.5], [29.5, 47.5], [31.0, 45.0], [33.0, 42.0], [34.5, 40.8]]] }
-  - { key: bedouin, name: Bedouin, group: arabic, religion: sunni, color: "#e0c890",
+      area: [[[37.8, 38.5], [37.6, 41.5], [37.2, 41.5], [36.9, 42.4], [36.6, 38.5]]] }
+
+  # ======================================================== Arabia, Iraq, the Levant and Egypt
+  - { key: levantine, name: Levantine, group: arabic, religion: sunni, color: "#d6b05c",
+      area: [[[37.1, 36.2], [36.6, 38.5], [35.0, 40.6], [33.5, 39.5], [31.0, 37.3], [29.5, 35.0], [31.2, 34.2], [33.0, 35.0], [35.6, 35.7]]] }
+  - { key: iraqi, name: Iraqi, group: arabic, religion: sunni, color: "#c89a50",
+      area: [[[36.6, 38.5], [36.3, 41.0], [36.0, 43.0], [34.3, 45.7], [33.0, 46.5], [30.0, 48.5], [29.5, 47.5], [31.0, 45.0], [33.0, 42.0], [34.5, 40.8], [35.0, 40.6]]] }
+  - { key: najdi, name: Najdi, group: arabic, religion: sunni, color: "#e0c890",
       area: [[[33.5, 39.5], [31.0, 37.3], [29.5, 35.0], [28.0, 35.0], [22.0, 39.0], [18.0, 42.5], [17.0, 52.0], [19.0, 55.5], [22.5, 55.5], [24.5, 51.0], [27.0, 49.0], [29.5, 47.5], [31.0, 45.0], [33.0, 42.0]]] }
-  - { key: hejazi, name: Hejazi Arab, group: arabic, religion: sunni, color: "#90b050",
+  - { key: khaliji, name: Khaliji, group: arabic, religion: sunni, color: "#c0b8a0",
+      area: [[[29.8, 47.6], [28.0, 48.8], [26.5, 50.3], [24.5, 51.3], [24.1, 54.5], [25.7, 56.2], [24.7, 56.4], [23.6, 54.0], [24.0, 51.0], [25.5, 49.4], [27.5, 48.0], [29.2, 47.0]]] }
+  - { key: hejazi, name: Hejazi, group: arabic, religion: sunni, color: "#90b050",
       area: [[[28.0, 34.8], [27.5, 37.0], [24.0, 39.8], [21.0, 41.0], [19.6, 42.0], [19.5, 41.0], [22.0, 38.8], [25.5, 36.5]]] }
   - { key: yemeni, name: Yemeni, group: arabic, religion: sunni, color: "#a07060",
       area: [[[18.0, 42.3], [17.0, 52.0], [16.0, 54.5], [12.6, 45.0], [12.6, 43.4], [15.0, 42.6]]] }
   - { key: omani, name: Omani, group: arabic, religion: ibadi, color: "#b8c060",
       area: [[[26.4, 56.0], [24.0, 58.5], [22.5, 59.9], [19.0, 57.5], [19.0, 55.5], [22.5, 55.5], [24.0, 55.8]]] }
-  - { key: egyptian, name: Egyptian Arab, group: arabic, religion: sunni, color: "#d7a64c",
+  - { key: egyptian, name: Egyptian, group: arabic, religion: sunni, color: "#d7a64c",
       area: [[[31.8, 25.0], [31.6, 32.5], [31.2, 34.3], [29.5, 35.0], [27.0, 34.0], [24.0, 35.5], [22.0, 36.8], [22.0, 31.0], [24.0, 30.0], [29.5, 27.0], [30.5, 25.0]]] }
-  - { key: maghrebi, name: Maghrebi Arab, group: arabic, religion: sunni, color: "#8fae5e",
-      area: [[[37.5, -2.0], [37.5, 11.5], [33.5, 11.5], [32.8, 13.5], [32.2, 15.6], [32.0, 20.0], [32.9, 22.5], [31.8, 25.0], [30.5, 25.0], [31.5, 15.6], [32.0, 10.0], [34.0, 3.0], [34.5, -1.0], [35.3, -2.2]]] }
+
+  # ======================================================== The Maghreb and the Sahara
   - { key: berber, name: Berber, group: berber, religion: sunni, color: "#c9b66a",
       area: [[[36.0, -10.5], [36.0, -5.5], [35.2, -2.2], [34.5, -1.0], [34.0, 3.0], [32.0, 10.0], [30.0, 10.0], [29.0, -1.0], [27.5, -13.5], [31.5, -10.5]]] }
+  - { key: algerian, name: Algerian, group: arabic, religion: sunni, color: "#8fae5e",
+      area: [[[37.3, -1.5], [37.3, 8.3], [35.5, 8.0], [34.0, 6.5], [34.0, 1.0], [35.0, -1.5]]] }
+  - { key: zenati, name: Zenati, group: berber, religion: sunni, color: "#a0c060",
+      area: [[[35.9, -6.0], [35.2, -2.2], [35.0, 1.0], [33.0, 1.0], [31.5, -2.0], [30.5, -8.0], [31.8, -9.9], [33.5, -8.0]]] }
+  - { key: masmuda, name: Masmuda, group: berber, religion: sunni, color: "#c0a050",
+      area: [[[31.8, -9.9], [31.6, -7.5], [31.0, -5.0], [29.0, -5.0], [28.0, -11.5], [29.5, -10.0]]] }
+  - { key: kabyle, name: Kabyle, group: berber, religion: sunni, color: "#d0c050",
+      area: [[[36.9, 3.6], [36.9, 5.8], [36.2, 5.8], [36.2, 3.6]]] }
+  - { key: mozabite, name: Mozabite, group: berber, religion: ibadi, color: "#b0b0a0",
+      area: [[[34.0, 1.0], [34.0, 6.5], [31.0, 6.5], [31.0, 1.0]]] }
+  - { key: tunisian, name: Tunisian, group: arabic, religion: sunni, color: "#70a060",
+      area: [[[37.5, 8.3], [37.5, 11.5], [33.5, 11.5], [33.0, 8.5], [34.5, 7.8], [36.5, 8.0]]] }
+  - { key: libyan, name: Libyan, group: arabic, religion: sunni, color: "#c0c070",
+      area: [[[33.5, 11.5], [32.8, 13.5], [32.2, 15.6], [32.0, 20.0], [32.9, 22.5], [31.8, 25.0], [29.0, 25.0], [29.0, 11.5]]] }
   - { key: tuareg, name: Tuareg, group: berber, religion: sunni, color: "#d0c090",
       area: [[[29.0, -6.0], [29.0, 15.0], [17.5, 15.0], [17.5, -6.0]]] }
-  - { key: persian, name: Persian, group: iranian, religion: sunni, color: "#b4545e",
+
+  # ======================================================== Iran and Central Asia
+  - { key: farsi, name: Farsi, group: iranian, religion: sunni, color: "#b4545e",
       area: [[[38.5, 48.5], [37.3, 50.0], [37.0, 54.0], [37.3, 56.0], [37.3, 61.2], [35.5, 61.0], [33.5, 60.6], [30.5, 60.8], [28.5, 61.8], [26.8, 62.6], [25.3, 57.3], [27.0, 52.0], [29.5, 50.0], [30.5, 48.5], [32.5, 47.5], [34.3, 45.7], [36.8, 46.2], [38.0, 46.0]]] }
+  - { key: achomi, name: Achomi, group: iranian, religion: sunni, color: "#a06070",
+      area: [[[28.6, 52.0], [28.4, 55.5], [27.0, 57.3], [26.4, 55.0], [27.2, 52.5]]] }
   - { key: gilaki, name: Gilaki and Mazandarani, group: iranian, religion: shia, color: "#40a0a0",
       area: [[[38.0, 48.6], [37.0, 54.0], [36.4, 54.0], [36.4, 50.5], [37.3, 48.8]]] }
   - { key: luri, name: Luri, group: iranian, religion: sunni, color: "#7aa070",
       area: [[[34.3, 46.5], [33.5, 49.5], [31.5, 51.0], [30.5, 50.0], [32.4, 47.6]]] }
+  - { key: khorasani, name: Khorasani, group: iranian, religion: sunni, color: "#c0705a",
+      area: [[[37.5, 56.0], [37.5, 61.2], [33.5, 60.6], [33.5, 57.0], [35.0, 56.0]]] }
   - { key: baloch, name: Baloch, group: iranian, religion: sunni, color: "#c0a080",
       area: [[[30.0, 61.0], [30.0, 66.5], [27.0, 67.5], [25.0, 66.5], [25.2, 61.5], [27.0, 62.6]]] }
-  - { key: pashtun, name: Pashtun, group: iranian, religion: sunni, color: "#a08a60",
+  - { key: afghan, name: Afghan, group: iranian, religion: sunni, color: "#a08a60",
       area: [[[34.5, 66.5], [35.0, 71.5], [33.0, 71.0], [31.0, 70.5], [30.0, 67.5], [31.5, 65.0], [33.0, 65.5]]] }
   - { key: tajik, name: Tajik, group: iranian, religion: sunni, color: "#e09848",
       area: [[[40.5, 64.0], [40.5, 70.5], [38.8, 71.5], [36.8, 71.5], [35.0, 70.0], [34.5, 66.5], [33.0, 65.5], [32.5, 62.0], [33.5, 60.6], [37.3, 61.2], [39.5, 62.0]]] }
-  - { key: sogdian, name: Sogdian, group: iranian, religion: sunni, color: "#d0a060",
-      area: [[[42.5, 58.5], [42.5, 61.5], [41.0, 62.0], [41.0, 59.5]]] }
-  - { key: chagatai_turk, name: Chagatai Turk, group: turkic, religion: sunni, color: "#7d9fa6",
-      area: [[[45.0, 65.0], [46.0, 80.0], [45.0, 87.0], [42.5, 88.5], [40.5, 85.0], [38.5, 80.0], [37.0, 77.0], [39.5, 72.0], [40.5, 70.5], [41.5, 66.0]]] }
-  - { key: uyghur, name: Uyghur, group: turkic, religion: mahayana, color: "#b07a60",
-      area: [[[45.0, 87.0], [44.5, 96.0], [41.5, 96.0], [40.0, 89.0], [42.5, 88.5]]] }
-  - { key: mongol, name: Mongol, group: mongolic, religion: tengri, color: "#6a9ad0",
+  - { key: turkmen, name: Turkmen, group: turkic, religion: sunni, color: "#6a9a60",
+      area: [[[41.0, 54.0], [41.5, 59.5], [40.0, 62.5], [37.6, 62.0], [37.8, 56.0], [38.5, 53.8]]] }
+  - { key: uzbek, name: Uzbek, group: kipchak, religion: tengri, color: "#5a70c0",
+      area: [[[56.5, 60.0], [55.0, 75.0], [50.0, 82.0], [46.0, 80.0], [44.0, 72.0], [45.5, 62.0], [46.0, 57.0], [47.5, 57.0], [51.5, 56.0], [52.0, 60.0]]] }
+  - { key: khorezmian, name: Khorezmian, group: kipchak, religion: sunni, color: "#7d9fa6",
+      area: [[[46.0, 57.0], [45.5, 62.0], [44.0, 72.0], [43.0, 76.5], [41.5, 71.5], [40.5, 70.5], [40.5, 64.0], [41.5, 62.0], [41.5, 59.5], [42.0, 56.0]]] }
+  - { key: moghul, name: Moghul, group: kipchak, religion: tengri, color: "#6a88a8",
+      area: [[[46.0, 76.5], [46.0, 82.0], [44.5, 87.0], [42.5, 86.5], [42.0, 80.0], [43.2, 76.5]]] }
+  - { key: kyrgyz, name: Kyrgyz, group: kipchak, religion: tengri, color: "#7a9ac0",
+      area: [[[43.2, 73.0], [43.0, 80.0], [41.5, 80.0], [40.0, 77.0], [39.5, 73.5], [41.0, 71.5]]] }
+  - { key: kashgari, name: Kashgari, group: kipchak, religion: sunni, color: "#b09a60",
+      area: [[[40.0, 73.5], [41.5, 80.0], [42.0, 84.0], [40.5, 88.0], [37.0, 84.0], [36.5, 77.0], [38.5, 74.5]]] }
+  - { key: uyghur, name: Uyghur, group: kipchak, religion: mahayana, color: "#b07a60",
+      area: [[[44.5, 86.5], [44.5, 96.0], [41.5, 96.0], [40.5, 88.0], [42.0, 84.0], [42.5, 86.5]]] }
+
+  # ======================================================== Mongolia and southern Siberia
+  - { key: mongol, name: Khalkha, group: mongolic, religion: tengri, color: "#6a9ad0",
       area: [[[53.0, 87.0], [53.0, 122.0], [45.0, 124.0], [41.5, 115.0], [41.5, 105.0], [42.5, 96.0], [46.0, 88.0]]] }
+  - { key: oirat, name: Oirat, group: mongolic, religion: tengri, color: "#8ab0d8",
+      area: [[[51.0, 87.0], [50.0, 98.0], [47.0, 98.0], [45.0, 93.0], [46.0, 88.0]]] }
+  - { key: tumed, name: Tumed, group: mongolic, religion: tengri, color: "#5a80b0",
+      area: [[[45.0, 105.0], [45.0, 118.0], [42.0, 119.0], [41.5, 110.0], [41.5, 105.0]]] }
+  - { key: siberian_tatar, name: Yerle-Qalqi, group: kipchak, religion: tengri, color: "#a0a080",
+      area: [[[58.5, 63.0], [58.5, 76.0], [55.0, 76.0], [55.0, 63.0]]] }
+  - { key: altaian, name: Telengit, group: kipchak, religion: tengri, color: "#90a0b0",
+      area: [[[53.5, 82.0], [53.5, 88.0], [49.5, 89.0], [49.5, 84.0]]] }
+  - { key: khakas, name: Khakas, group: kipchak, religion: tengri, color: "#8aa8a0",
+      area: [[[56.0, 88.0], [56.0, 93.0], [52.0, 93.0], [52.0, 88.0]]] }
+  - { key: tuvan, name: Tuvan, group: kipchak, religion: tengri, color: "#a0b8c8",
+      area: [[[52.0, 89.0], [52.0, 99.0], [50.0, 99.0], [50.0, 89.0]]] }
 
   # ======================================================== Africa south of the Sahara
   - { key: nubian, name: Nubian, group: east_african, religion: miaphysite, color: "#909080",
@@ -293,13 +460,15 @@ cultures:
       area: [[[-15.5, 27.5], [-15.5, 33.5], [-22.5, 33.5], [-22.5, 27.5]]] }
   - { key: nilotic, name: Nilotic, group: east_african, religion: african_traditional, color: "#9a8a6a",
       area: [[[12.5, 25.0], [12.5, 34.0], [4.0, 35.0], [3.5, 30.0], [5.0, 25.0]]] }
-  - { key: kanuri, name: Kanuri, group: west_african, religion: sunni, color: "#b07a50",
-      area: [[[17.5, 11.0], [17.5, 20.0], [12.0, 20.0], [11.0, 13.0], [12.0, 11.0]]] }
+  - { key: daju, name: Daju, group: east_african, religion: african_traditional, color: "#b09070",
+      area: [[[15.5, 21.5], [15.5, 27.5], [11.0, 27.5], [11.0, 21.5]]] }
+  - { key: kanembu, name: Kanembu, group: west_african, religion: sunni, color: "#b07a50",
+      area: [[[17.5, 11.0], [17.5, 21.5], [12.0, 21.5], [11.0, 13.0], [12.0, 11.0]]] }
   - { key: hausa, name: Hausa, group: west_african, religion: african_traditional, color: "#c0905a",
       area: [[[14.5, 4.0], [14.5, 11.0], [10.5, 11.0], [10.0, 6.0], [12.0, 4.0]]] }
   - { key: songhai, name: Songhai, group: west_african, religion: sunni, color: "#d0a050",
       area: [[[18.0, -3.0], [17.5, 4.0], [12.0, 4.0], [13.5, -1.0], [15.5, -3.5]]] }
-  - { key: mande, name: Mande, group: west_african, religion: sunni, color: "#c89840",
+  - { key: mande, name: Mandinka, group: west_african, religion: sunni, color: "#c89840",
       area: [[[16.0, -12.5], [15.5, -3.5], [13.5, -1.0], [10.5, -4.0], [9.0, -8.0], [10.0, -12.5], [12.5, -14.5]]] }
   - { key: soninke, name: Soninke, group: west_african, religion: sunni, color: "#d8b070",
       area: [[[17.5, -12.5], [17.0, -6.5], [15.0, -6.5], [14.5, -12.0]]] }
@@ -319,26 +488,36 @@ cultures:
   # ======================================================== Indian subcontinent and Himalaya
   - { key: hindustani, name: Hindustani, group: indo_aryan, religion: hindu, color: "#9dbb4c",
       area: [[[31.5, 75.5], [30.0, 79.0], [27.5, 84.0], [25.5, 85.0], [23.5, 84.0], [22.5, 80.0], [23.5, 76.5], [26.5, 76.0], [29.0, 76.0]]] }
+  - { key: braji, name: Braji, group: indo_aryan, religion: hindu, color: "#b0c850",
+      area: [[[30.5, 76.5], [29.5, 79.0], [27.0, 80.0], [26.0, 78.5], [26.5, 76.5], [28.5, 76.0]]] }
+  - { key: awadhi, name: Awadhi, group: indo_aryan, religion: hindu, color: "#8ab040",
+      area: [[[29.5, 79.0], [28.5, 82.5], [26.5, 84.0], [25.0, 82.5], [25.5, 80.0], [27.0, 80.0]]] }
+  - { key: maithili, name: Maithili, group: indo_aryan, religion: hindu, color: "#c0b850",
+      area: [[[27.5, 84.0], [26.8, 88.0], [25.3, 87.5], [24.8, 84.0], [26.5, 84.0]]] }
+  - { key: bundeli, name: Bundeli, group: indo_aryan, religion: hindu, color: "#a0a040",
+      area: [[[26.0, 78.0], [25.5, 80.0], [25.0, 82.5], [23.5, 81.0], [23.5, 78.5], [24.8, 77.5]]] }
   - { key: punjabi, name: Punjabi, group: indo_aryan, religion: hindu, color: "#7aa040",
       area: [[[34.0, 71.5], [33.0, 75.5], [31.5, 75.5], [29.0, 76.0], [28.5, 72.5], [29.5, 70.5], [31.5, 70.0]]] }
   - { key: sindhi, name: Sindhi, group: indo_aryan, religion: sunni, color: "#d890d0",
       area: [[[29.0, 67.5], [28.5, 70.5], [26.5, 71.0], [24.3, 71.0], [23.7, 68.3], [25.0, 66.8], [27.0, 67.2]]] }
-  - { key: rajput, name: Rajasthani, group: indo_aryan, religion: hindu, color: "#e8d040",
+  - { key: marwari, name: Marwari, group: indo_aryan, religion: hindu, color: "#e8d040",
       area: [[[28.5, 70.5], [28.5, 76.0], [26.5, 76.0], [24.5, 76.0], [24.0, 73.0], [24.5, 71.0], [26.5, 71.0]]] }
   - { key: gujarati, name: Gujarati, group: indo_aryan, religion: hindu, color: "#50a0a0",
       area: [[[24.5, 68.5], [24.5, 73.0], [23.5, 74.5], [21.0, 73.5], [20.5, 70.5], [22.0, 68.8]]] }
-  - { key: malwi, name: Malwi, group: indo_aryan, religion: hindu, color: "#b0c060",
-      area: [[[25.0, 74.5], [24.5, 79.0], [22.5, 80.0], [21.5, 77.5], [22.0, 74.0]]] }
+  - { key: bhil, name: Bhil, group: indo_aryan, religion: hindu, color: "#a07a50",
+      area: [[[24.0, 73.5], [23.5, 75.5], [21.5, 75.5], [21.5, 73.8], [23.0, 73.5]]] }
+  - { key: malvi, name: Malvi, group: indo_aryan, religion: hindu, color: "#b0c060",
+      area: [[[25.0, 74.5], [24.8, 77.5], [23.5, 78.5], [22.5, 78.0], [21.8, 75.5], [23.5, 75.5]]] }
   - { key: bengali, name: Bengali, group: indo_aryan, religion: hindu, color: "#7ab0a0",
       area: [[[26.6, 87.0], [26.5, 90.0], [24.5, 92.3], [22.0, 92.0], [21.5, 88.0], [22.8, 86.5], [24.5, 86.8]]] }
-  - { key: oriya, name: Oriya, group: indo_aryan, religion: hindu, color: "#d898c8",
+  - { key: odia, name: Odia, group: indo_aryan, religion: hindu, color: "#d898c8",
       area: [[[22.6, 84.0], [22.0, 87.3], [19.0, 85.0], [18.0, 83.4], [19.5, 82.5], [21.5, 82.5]]] }
   - { key: assamese, name: Assamese, group: indo_aryan, religion: hindu, color: "#a0c070",
       area: [[[28.0, 89.5], [28.0, 96.0], [26.0, 96.0], [25.5, 90.0]]] }
   - { key: marathi, name: Marathi, group: indo_aryan, religion: hindu, color: "#b08880",
       area: [[[21.8, 72.8], [21.5, 79.0], [20.0, 80.5], [18.0, 77.5], [16.0, 75.5], [15.5, 73.5], [18.5, 72.8]]] }
-  - { key: gond, name: Gond, group: dravidian, religion: hindu, color: "#9080c8",
-      area: [[[23.5, 79.5], [23.5, 84.0], [20.0, 83.5], [19.0, 81.0], [21.5, 79.0]]] }
+  - { key: chhattisgarhi, name: Chhattisgarhi, group: indo_aryan, religion: hindu, color: "#9080c8",
+      area: [[[23.5, 81.0], [23.0, 84.0], [20.0, 83.5], [19.5, 81.5], [21.5, 80.5]]] }
   - { key: telugu, name: Telugu, group: dravidian, religion: hindu, color: "#70a8a0",
       area: [[[19.5, 77.5], [19.5, 82.5], [17.5, 83.0], [15.5, 81.0], [13.5, 80.2], [14.0, 78.0], [16.0, 77.0], [18.0, 77.0]]] }
   - { key: kannada, name: Kannada, group: dravidian, religion: hindu, color: "#8a78c0",
@@ -356,13 +535,53 @@ cultures:
       area: [[[33.0, 75.8], [31.0, 79.5], [29.0, 82.0], [27.7, 88.2], [27.0, 88.0], [28.5, 81.0], [30.0, 78.0], [32.0, 75.8]]] }
   - { key: newar, name: Newar, group: tibeto_burman, religion: hindu, color: "#e07ab0",
       area: [[[28.0, 84.8], [28.0, 86.0], [27.4, 86.0], [27.4, 84.8]]] }
-  - { key: tibetan, name: Tibetan, group: tibeto_burman, religion: vajrayana, color: "#9a8060",
+  - { key: tsang, name: Tsang, group: tibetan, religion: vajrayana, color: "#9a8060",
       area: [[[36.5, 77.0], [36.5, 84.0], [37.0, 90.0], [36.0, 97.0], [33.0, 100.0], [29.0, 99.0], [28.0, 92.0], [28.0, 88.5], [29.5, 82.0], [31.5, 78.5], [33.0, 77.5]]] }
+  - { key: khampa, name: Khampa, group: tibetan, religion: vajrayana, color: "#b09070",
+      area: [[[33.0, 92.5], [33.0, 100.0], [28.0, 99.5], [28.5, 94.0], [30.5, 92.5]]] }
+  - { key: amdowa, name: Amdowa, group: tibetan, religion: vajrayana, color: "#8a7050",
+      area: [[[37.5, 96.0], [37.0, 101.5], [35.0, 103.0], [33.0, 103.0], [33.0, 97.0], [35.0, 94.0]]] }
 
-  # ======================================================== East and Southeast Asia
-  - { key: han, name: Han Chinese, group: east_asian, religion: chinese_folk, color: "#c84a4a",
+  # ======================================================== China
+  - { key: zhongyuan, name: Zhongyuan, group: chinese, religion: chinese_folk, color: "#c84a4a",
       area: [[[41.5, 104.0], [42.0, 119.0], [40.0, 124.0], [35.0, 120.5], [30.5, 123.0], [25.0, 120.5], [21.5, 112.0], [21.5, 108.5], [23.0, 105.5], [26.0, 103.0], [29.0, 102.5], [32.0, 103.5], [35.0, 103.0], [38.0, 102.0]]] }
-  - { key: jurchen, name: Jurchen, group: east_asian, religion: tengri, color: "#a06a50",
+  - { key: yan, name: Yan, group: chinese, religion: chinese_folk, color: "#d06a5a",
+      area: [[[41.5, 114.0], [42.0, 119.0], [40.5, 124.0], [39.5, 121.5], [39.0, 119.0], [38.0, 117.5], [37.5, 115.5], [39.5, 114.0]]] }
+  - { key: jin, name: Jin, group: chinese, religion: chinese_folk, color: "#b85a40",
+      area: [[[40.8, 111.0], [40.5, 114.0], [37.5, 114.0], [35.5, 112.5], [35.0, 111.0], [36.5, 110.5], [38.5, 111.0]]] }
+  - { key: qin, name: Qin, group: chinese, religion: chinese_folk, color: "#a04a3a",
+      area: [[[38.0, 107.0], [38.5, 111.0], [36.5, 110.5], [35.0, 111.0], [33.0, 111.0], [32.5, 106.5], [34.5, 106.0], [36.0, 106.5]]] }
+  - { key: liang, name: Liang, group: chinese, religion: chinese_folk, color: "#c08060",
+      area: [[[41.5, 96.0], [41.0, 100.0], [38.0, 104.0], [38.0, 107.0], [36.0, 106.5], [34.5, 106.0], [34.5, 103.0], [37.0, 101.0], [39.5, 97.0]]] }
+  - { key: qilu, name: Qilu, group: chinese, religion: chinese_folk, color: "#d87a6a",
+      area: [[[38.0, 115.5], [38.0, 118.5], [37.5, 122.7], [36.0, 120.5], [34.8, 119.0], [35.0, 116.0]]] }
+  - { key: shu, name: Shu, group: chinese, religion: chinese_folk, color: "#c06050",
+      area: [[[32.5, 103.5], [32.5, 106.5], [32.0, 108.5], [29.5, 108.5], [28.0, 106.0], [28.5, 103.5], [30.5, 103.0]]] }
+  - { key: chu, name: Chu, group: chinese, religion: chinese_folk, color: "#b06a5a",
+      area: [[[33.0, 108.5], [32.5, 113.0], [31.5, 115.5], [30.0, 116.0], [30.0, 114.0], [27.0, 113.8], [25.5, 113.0], [25.5, 110.5], [27.5, 109.5], [29.5, 108.5]]] }
+  - { key: wu, name: Wu, group: chinese, religion: chinese_folk, color: "#e06a6a",
+      area: [[[34.0, 118.5], [32.0, 121.5], [30.5, 122.5], [28.5, 121.0], [29.5, 118.5], [31.0, 118.0], [32.5, 117.0]]] }
+  - { key: gan, name: Gan, group: chinese, religion: chinese_folk, color: "#c87050",
+      area: [[[30.0, 114.0], [29.8, 117.5], [28.0, 118.0], [26.0, 116.5], [25.0, 114.5], [27.0, 113.8]]] }
+  - { key: hakka, name: Hakka, group: chinese, religion: chinese_folk, color: "#d89070",
+      area: [[[26.0, 115.5], [25.0, 116.8], [23.8, 116.5], [24.0, 114.8], [25.0, 114.5]]] }
+  - { key: min, name: Min, group: chinese, religion: chinese_folk, color: "#d05a70",
+      area: [[[28.3, 117.5], [28.0, 120.5], [25.0, 119.8], [23.5, 117.5], [24.5, 116.8], [26.0, 116.5]]] }
+  - { key: yue, name: Yue, group: chinese, religion: chinese_folk, color: "#e08060",
+      area: [[[25.0, 111.0], [24.0, 114.8], [23.8, 116.5], [23.5, 117.5], [22.5, 116.0], [21.5, 112.0], [21.0, 110.0], [22.0, 109.5], [23.5, 110.5]]] }
+  - { key: miao, name: Miao, group: southeast_asian, religion: animist, color: "#a08070",
+      area: [[[28.5, 104.5], [28.5, 109.0], [25.5, 109.0], [25.5, 104.5]]] }
+  - { key: zhuang, name: Zhuang, group: southeast_asian, religion: animist, color: "#90a070",
+      area: [[[25.5, 104.5], [25.5, 109.0], [23.5, 110.5], [22.0, 109.5], [21.5, 108.5], [22.5, 106.5], [23.0, 105.5]]] }
+  - { key: tujia, name: Tujia, group: tibeto_burman, religion: animist, color: "#9a7a6a",
+      area: [[[30.5, 108.5], [30.0, 110.5], [28.0, 110.0], [28.0, 108.5]]] }
+  - { key: yao, name: Yao, group: southeast_asian, religion: animist, color: "#8a9a7a",
+      area: [[[25.8, 110.5], [25.8, 112.8], [24.5, 112.8], [24.5, 110.5]]] }
+  - { key: yi, name: Yi and Bai, group: tibeto_burman, religion: mahayana, color: "#c0805a",
+      area: [[[29.0, 98.5], [29.0, 104.0], [23.0, 105.5], [22.5, 101.0], [24.0, 98.5]]] }
+
+  # ======================================================== Manchuria, Korea, Japan and Southeast Asia
+  - { key: jurchen, name: Jurchen, group: tungusic, religion: tungusic, color: "#a06a50",
       area: [[[53.5, 120.0], [53.0, 140.0], [43.0, 135.0], [42.0, 128.0], [41.0, 124.0], [42.0, 119.0], [45.0, 124.0]]] }
   - { key: korean, name: Korean, group: east_asian, religion: mahayana, color: "#7aaab0",
       area: [[[42.5, 124.0], [42.5, 130.5], [38.5, 129.0], [34.5, 129.6], [34.0, 125.5], [38.0, 124.0]]] }
@@ -370,8 +589,6 @@ cultures:
       area: [[[41.6, 139.5], [41.5, 142.0], [35.0, 141.8], [31.0, 131.6], [30.9, 129.4], [33.5, 129.2], [34.5, 131.0], [37.0, 136.5], [38.5, 139.0], [40.5, 139.6]]] }
   - { key: ainu, name: Ainu, group: siberian, religion: animist, color: "#b0c0c0",
       area: [[[46.0, 139.0], [46.0, 146.5], [41.6, 146.5], [41.6, 139.0]]] }
-  - { key: yi, name: Yi and Bai, group: tibeto_burman, religion: mahayana, color: "#c0805a",
-      area: [[[29.0, 98.5], [29.0, 104.0], [23.0, 105.5], [22.5, 101.0], [24.0, 98.5]]] }
   - { key: vietnamese, name: Vietnamese, group: southeast_asian, religion: mahayana, color: "#d0605a",
       area: [[[23.3, 105.3], [22.5, 107.0], [21.5, 108.1], [20.0, 107.0], [17.5, 107.2], [16.2, 108.3], [16.0, 107.6], [17.5, 106.0], [19.0, 104.3], [20.6, 103.5], [22.4, 102.6]]] }
   - { key: cham, name: Cham, group: austronesian, religion: hindu, color: "#c0a060",
@@ -385,6 +602,8 @@ cultures:
   - { key: burmese, name: Burmese, group: tibeto_burman, religion: theravada, color: "#c0c0a0",
       area: [[[26.5, 94.0], [26.5, 98.0], [22.0, 98.0], [19.0, 97.0], [18.0, 95.0], [21.0, 94.0]],
              [[21.5, 92.2], [21.5, 94.0], [18.0, 94.6], [18.0, 93.8], [20.0, 92.5]]] }
+  - { key: karen, name: Karen, group: tibeto_burman, religion: animist, color: "#a0a080",
+      area: [[[19.8, 96.4], [19.8, 97.9], [17.0, 98.4], [17.2, 96.8]]] }
   - { key: malay, name: Malay, group: austronesian, religion: hindu, color: "#60a070",
       area: [[[7.0, 99.5], [7.0, 104.5], [1.2, 104.5], [1.2, 101.0]], [[5.8, 95.0], [5.8, 98.5], [-6.0, 106.0], [-6.0, 101.0], [2.0, 98.0]]] }
   - { key: javanese, name: Javanese, group: austronesian, religion: hindu, color: "#c05a50",
@@ -436,14 +655,24 @@ religion_areas:
   # Painted over the cultures' default faith where another was the local majority in 1314.
   - religion: catholic
     add: [[45.03, 35.38], [44.84, 34.97]]  # Genoese Caffa and Soldaia
+  - religion: sunni
+    area: [[[46.0, 33.5], [46.0, 35.2], [45.0, 35.2], [44.7, 33.5]]]  # Solkhat and the Crimean khanate's seat
   - religion: catholic
     area: [[[34.6, 35.6], [34.6, 36.2], [33.8, 36.1], [33.8, 35.5]]]  # Maronites of Mount Lebanon
+  - religion: miaphysite
+    area: [[[27.5, 30.5], [27.5, 33.0], [24.0, 33.5], [24.0, 32.2]]]  # Coptic Upper Egypt
   - religion: shia
     area: [[[33.5, 43.5], [33.0, 46.0], [30.0, 48.0], [31.0, 44.0]]]  # Kufa, Hilla and the shrine cities
   - religion: shia
     area: [[[35.5, 49.5], [35.5, 52.5], [33.5, 52.0], [33.8, 49.8]]]  # Qom, Kashan and Rey
+  - religion: shia
+    area: [[[26.4, 50.3], [26.4, 50.8], [25.7, 50.8], [25.7, 50.3]]]  # Bahrain
   - religion: nestorian
     area: [[[37.4, 43.2], [37.4, 44.6], [36.6, 44.6], [36.6, 43.2]]]  # Hakkari and the Assyrian hills
+  - religion: sunni
+    area: [[[34.0, 70.5], [32.5, 74.5], [30.5, 74.0], [29.0, 71.5], [30.5, 70.0]]]  # Lahore, Multan and the Sultanate's west
+  - religion: sunni
+    add: [[28.61, 77.21]]  # Delhi
   - religion: sunni
     area: [[[11.2, 39.6], [11.2, 41.0], [9.3, 41.0], [9.3, 39.6]]]  # the Ifat sultanate
   - religion: sunni
