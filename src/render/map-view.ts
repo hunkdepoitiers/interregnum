@@ -463,6 +463,38 @@ export class MapView {
       painting = false;
     });
     canvas.addEventListener('pointerleave', () => this.onHover(0, 0, 0));
+    // WASD and the arrow keys pan, ~900 screen px per second (twice that with Shift).
+    const held = new Set<string>();
+    let fast = false;
+    const PAN_KEYS: Record<string, [number, number]> = {
+      w: [0, 1], arrowup: [0, 1], s: [0, -1], arrowdown: [0, -1], a: [1, 0], arrowleft: [1, 0], d: [-1, 0], arrowright: [-1, 0],
+    };
+    window.addEventListener('keydown', (e) => {
+      const t = e.target;
+      if (t instanceof HTMLInputElement || t instanceof HTMLSelectElement || t instanceof HTMLTextAreaElement) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      fast = e.shiftKey;
+      const k = e.key.toLowerCase();
+      if (!PAN_KEYS[k]) return;
+      e.preventDefault();
+      // A tap nudges the map; holding the key keeps it moving every frame.
+      if (!e.repeat && !held.has(k)) {
+        this.world.position.set(this.world.x + PAN_KEYS[k]![0] * 40, this.world.y + PAN_KEYS[k]![1] * 40);
+        this.clampCamera();
+      }
+      held.add(k);
+    });
+    window.addEventListener('keyup', (e) => { fast = e.shiftKey; held.delete(e.key.toLowerCase()); });
+    window.addEventListener('blur', () => held.clear());
+    this.app.ticker.add((ticker) => {
+      if (!held.size) return;
+      let dx = 0, dy = 0;
+      for (const k of held) { dx += PAN_KEYS[k]![0]; dy += PAN_KEYS[k]![1]; }
+      const speed = 0.9 * ticker.deltaMS * (fast ? 2 : 1);
+      if (!dx && !dy) return;
+      this.world.position.set(this.world.x + dx * speed, this.world.y + dy * speed);
+      this.clampCamera();
+    });
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();

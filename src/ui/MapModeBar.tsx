@@ -3,8 +3,8 @@ import { hasRealms, mapMode } from './App';
 import { editing } from './editor';
 
 const MODES: { mode: MapMode; label: string; key: string }[] = [
-  { mode: 'political', label: 'Political', key: 'q' },
-  { mode: 'terrain', label: 'Terrain', key: 'w' },
+  { mode: 'political', label: 'Political', key: 'p' },
+  { mode: 'terrain', label: 'Terrain', key: 't' },
 ];
 
 export function MapModeBar() {
