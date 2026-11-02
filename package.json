@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "seed-map": "node --max-old-space-size=16000 --import tsx tools/seed-map.ts",
     "opengs-map": "py -3.12 -I tools/opengs_map.py .",
+    "name-provinces": "py -3.12 -I tools/name_provinces.py .",
     "fetch-boundaries": "tsx tools/fetch-boundaries.ts",
     "build-rivers": "tsx tools/build-rivers.ts",
     "world-seeds": "tsx tools/world-seeds.ts"
