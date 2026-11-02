@@ -16,6 +16,7 @@
     "seed-map": "node --max-old-space-size=16000 --import tsx tools/seed-map.ts",
     "opengs-map": "py -3.12 -I tools/opengs_map.py .",
     "name-provinces": "py -3.12 -I tools/name_provinces.py .",
+    "open-valleys": "py -3.12 -I tools/open_valleys.py .",
     "carve-passes": "py -3.12 -I tools/carve_passes.py .",
     "check-passes": "tsx tools/check-passes.ts",
     "find-pockets": "tsx tools/find-pockets.ts",

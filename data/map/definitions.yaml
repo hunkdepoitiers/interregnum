@@ -4341,7 +4341,7 @@
 - { id: 4339, key: north_west_british_columbia, name: "North-West British Columbia", kind: land, color: "#7c35cc" }
 - { id: 4340, key: south_el_beni, name: "South El Beni", kind: land, color: "#04a517" }
 - { id: 4341, key: south_la_libertad, name: "South La Libertad", kind: land, color: "#abf011" }
-- { id: 4342, key: north_conamara_north_lea_4, name: "North Conamara North Lea-4", kind: land, color: "#192347" }
+- { id: 4342, key: conamara_north_lea_4, name: "Conamara North Lea-4", kind: land, color: "#192347" }
 - { id: 4343, key: north_gobi_desert, name: "North Gobi Desert", kind: land, color: "#ba9ca4" }
 - { id: 4344, key: east_devon, name: "East Devon", kind: land, color: "#142533" }
 - { id: 4345, key: jiajuedibu, name: "Jiajuedibu", kind: land, color: "#64020c" }
@@ -5728,7 +5728,7 @@
 - { id: 5726, key: east_new_brunswick, name: "East New Brunswick", kind: land, color: "#86bee1" }
 - { id: 5727, key: taza, name: "Taza", kind: land, color: "#e3510a" }
 - { id: 5728, key: urach, name: "Urach", kind: land, color: "#38d972" }
-- { id: 5729, key: north_killaloe_lea_5, name: "North Killaloe Lea-5", kind: land, color: "#ed2b19" }
+- { id: 5729, key: killaloe_lea_5, name: "Killaloe Lea-5", kind: land, color: "#ed2b19" }
 - { id: 5730, key: omo_valley, name: "Omo Valley", kind: land, color: "#be4120" }
 - { id: 5731, key: northland, name: "Northland", kind: land, color: "#b4d824" }
 - { id: 5732, key: klarjeti, name: "Klarjeti", kind: land, color: "#9b582d" }
@@ -5926,7 +5926,7 @@
 - { id: 5924, key: swidnica, name: "Świdnica", kind: land, color: "#92213a" }
 - { id: 5925, key: south_west_benue, name: "South-West Benue", kind: land, color: "#7566a9" }
 - { id: 5926, key: araxa, name: "Araxá", kind: land, color: "#4b003c" }
-- { id: 5927, key: north_ballina_lea_6, name: "North Ballina Lea-6", kind: land, color: "#ad4950" }
+- { id: 5927, key: ballina_lea_6, name: "Ballina Lea-6", kind: land, color: "#ad4950" }
 - { id: 5928, key: yongan, name: "Yong’an", kind: land, color: "#62d732" }
 - { id: 5929, key: maremma, name: "Maremma", kind: land, color: "#7c3be9" }
 - { id: 5930, key: xixia, name: "Xixia", kind: land, color: "#b712cf" }
@@ -6309,7 +6309,7 @@
 - { id: 6307, key: north_east_ohio, name: "North-East Ohio", kind: land, color: "#1a518d" }
 - { id: 6308, key: sherbaktinskiy, name: "Sherbaktinskiy", kind: land, color: "#1cbf92" }
 - { id: 6309, key: karungu, name: "Karungu", kind: land, color: "#82b668" }
-- { id: 6310, key: north_portlaw_kilmacthomas_lea_5, name: "North Portlaw-kilmacthomas Lea-5", kind: land, color: "#3ddd24" }
+- { id: 6310, key: portlaw_kilmacthomas_lea_5, name: "Portlaw-kilmacthomas Lea-5", kind: land, color: "#3ddd24" }
 - { id: 6311, key: north_sverdlovsk, name: "North Sverdlovsk", kind: land, color: "#ff6eec" }
 - { id: 6312, key: zanzan, name: "Zanzan", kind: land, color: "#d4f179" }
 - { id: 6313, key: north_west_sinaloa, name: "North-West Sinaloa", kind: land, color: "#2d1754" }
@@ -9460,7 +9460,7 @@
 - { id: 9458, key: sirohi, name: "Sirohi", kind: land, color: "#956318" }
 - { id: 9459, key: nu_valley, name: "Nu Valley", kind: land, color: "#f4bed9" }
 - { id: 9460, key: garzon, name: "Garzón", kind: land, color: "#c9f779" }
-- { id: 9461, key: north_newcastle_west_lea_6, name: "North Newcastle West Lea-6", kind: land, color: "#2d9433" }
+- { id: 9461, key: newcastle_west_lea_6, name: "Newcastle West Lea-6", kind: land, color: "#2d9433" }
 - { id: 9462, key: konigsberg, name: "Königsberg", kind: land, color: "#58248c" }
 - { id: 9463, key: norrkoping, name: "Norrköping", kind: land, color: "#2e8174" }
 - { id: 9464, key: north_west_santa_ana, name: "North-West Santa Ana", kind: land, color: "#10c0cb" }
@@ -9942,7 +9942,7 @@
 - { id: 9940, key: south_dakota, name: "South Dakota", kind: land, color: "#b40fbb" }
 - { id: 9941, key: port_burwell_3, name: "Port Burwell 3", kind: land, color: "#32a087" }
 - { id: 9942, key: east_shizuoka, name: "East Shizuoka", kind: land, color: "#293c91" }
-- { id: 9943, key: north_canton_10, name: "North Canton 10", kind: land, color: "#26796b" }
+- { id: 9943, key: canton_10, name: "Canton 10", kind: land, color: "#26796b" }
 - { id: 9944, key: north_east_meghalaya, name: "North-East Meghalaya", kind: land, color: "#5d2a98" }
 - { id: 9945, key: south_east_ucayali, name: "South-East Ucayali", kind: land, color: "#877087" }
 - { id: 9946, key: bauchi, name: "Bauchi", kind: land, color: "#82d28d" }
@@ -10989,7 +10989,7 @@
 - { id: 10987, key: arak, name: "Arak", kind: land, color: "#81cc87" }
 - { id: 10988, key: amherst, name: "Amherst", kind: land, color: "#a82c8f" }
 - { id: 10989, key: lower_loreto, name: "Lower Loreto", kind: land, color: "#b85853" }
-- { id: 10990, key: north_killarney_lea_7, name: "North Killarney Lea-7", kind: land, color: "#9a0dd8" }
+- { id: 10990, key: killarney_lea_7, name: "Killarney Lea-7", kind: land, color: "#9a0dd8" }
 - { id: 10991, key: south_nagano, name: "South Nagano", kind: land, color: "#ea0c28" }
 - { id: 10992, key: pavlohrad, name: "Pavlohrad", kind: land, color: "#5d9c10" }
 - { id: 10993, key: coronel_oviedo, name: "Coronel Oviedo", kind: land, color: "#157c25" }
@@ -11744,7 +11744,7 @@
 - { id: 11742, key: florence_w, name: "Florence", kind: land, color: "#bc0cc6" }
 - { id: 11743, key: navoi, name: "Navoi", kind: land, color: "#08726a" }
 - { id: 11744, key: north_west_taranto, name: "North-West Taranto", kind: land, color: "#e4261f" }
-- { id: 11745, key: north_belmullet_lea_3, name: "North Belmullet-lea-3", kind: land, color: "#bde0ad" }
+- { id: 11745, key: belmullet_lea_3, name: "Belmullet-lea-3", kind: land, color: "#bde0ad" }
 - { id: 11746, key: shimukappu, name: "Shimukappu", kind: land, color: "#f2730b" }
 - { id: 11747, key: north_al_najaf, name: "North Al-Najaf", kind: land, color: "#c6536d" }
 - { id: 11748, key: west_rajshahi, name: "West Rajshahi", kind: land, color: "#91bad8" }
@@ -17018,7 +17018,7 @@
 - { id: 17016, key: qarmunah, name: "Qarmunah", kind: land, color: "#91c198" }
 - { id: 17017, key: north_east_province_de_taza, name: "North-East Province de Taza اقليم تازة", kind: land, color: "#9b6600" }
 - { id: 17018, key: mirninsky_ulus, name: "Mirninsky Ulus", kind: land, color: "#3adfa8" }
-- { id: 17019, key: north_ballinamore_lea_6, name: "North Ballinamore-lea-6", kind: land, color: "#fe4324" }
+- { id: 17019, key: ballinamore_lea_6, name: "Ballinamore-lea-6", kind: land, color: "#fe4324" }
 - { id: 17020, key: chishtian, name: "Chishtian", kind: land, color: "#7d1149" }
 - { id: 17021, key: wilds_evenkiysky_rayon_6, name: "Evenkiysky Rayon Wilds 6", kind: land, color: "#3e6153" }
 - { id: 17022, key: mudug, name: "Mudug", kind: land, color: "#a75faf" }
@@ -20520,7 +20520,7 @@
 - { id: 20518, key: sarawak, name: "Sarawak", kind: land, color: "#d59deb" }
 - { id: 20519, key: copiapo, name: "Copiapó", kind: land, color: "#179672" }
 - { id: 20520, key: south_east_marlborough, name: "South-East Marlborough", kind: land, color: "#f186b7" }
-- { id: 20521, key: north_ennistimon_lea_4, name: "North Ennistimon Lea-4", kind: land, color: "#e7887c" }
+- { id: 20521, key: ennistimon_lea_4, name: "Ennistimon Lea-4", kind: land, color: "#e7887c" }
 - { id: 20522, key: north_west_usumacinta_valley, name: "North-West Usumacinta Valley", kind: land, color: "#4c5110" }
 - { id: 20523, key: senhor_do_bonfim, name: "Senhor do Bonfim", kind: land, color: "#1271c1" }
 - { id: 20524, key: kecskemet, name: "Kecskemét", kind: land, color: "#87e466" }
@@ -23195,7 +23195,6 @@
 - { id: 23193, key: tarbagatay_ra, name: "Tarbagatay Ra.", kind: mountain, color: "#5c5d53" }
 - { id: 23194, key: west_tarbagatay_ra, name: "West Tarbagatay Ra.", kind: mountain, color: "#989e94" }
 - { id: 23195, key: columbia_plat, name: "Columbia Plat.", kind: mountain, color: "#9a959f" }
-- { id: 23196, key: alps, name: "Alps", kind: mountain, color: "#465248" }
 - { id: 23197, key: south_east_altay_mountains, name: "South-East Altay Mountains", kind: mountain, color: "#6f726f" }
 - { id: 23198, key: south_cascade_range, name: "South Cascade Range", kind: mountain, color: "#7c6e72" }
 - { id: 23199, key: idaho_mountains, name: "Idaho Mountains", kind: mountain, color: "#867d76" }
@@ -23223,7 +23222,6 @@
 - { id: 23221, key: south_montana_mountains, name: "South Montana Mountains", kind: mountain, color: "#989b93" }
 - { id: 23222, key: south_east_columbia_plat, name: "South-East Columbia Plat.", kind: mountain, color: "#83797c" }
 - { id: 23223, key: south_idaho_mountains, name: "South Idaho Mountains", kind: mountain, color: "#493e49" }
-- { id: 23224, key: mtn_apennines, name: "Apennines", kind: mountain, color: "#4d4947" }
 - { id: 23225, key: south_east_cascade_range, name: "South-East Cascade Range", kind: mountain, color: "#555e54" }
 - { id: 23226, key: dinaric_alps, name: "Dinaric Alps", kind: mountain, color: "#7f7e7d" }
 - { id: 23227, key: south_wyoming_mountains, name: "South Wyoming Mountains", kind: mountain, color: "#8e9396" }
@@ -24867,3 +24865,146 @@
 - { id: 24865, key: lake_lago_buenos_aires, name: "Lago Buenos Aires", kind: lake, color: "#0891a9" }
 - { id: 24866, key: lake_lago_viedma, name: "Lago Viedma", kind: lake, color: "#278266" }
 - { id: 24867, key: lake_lago_argentino, name: "Lago Argentino", kind: lake, color: "#2b62b5" }
+- { id: 24868, key: vordernberg, name: "Vordernberg", kind: land, color: "#68273c" }
+- { id: 24869, key: grobming, name: "Gröbming", kind: land, color: "#679c8f" }
+- { id: 24870, key: radenthein, name: "Radenthein", kind: land, color: "#cf8c37" }
+- { id: 24871, key: tamsweg, name: "Tamsweg", kind: land, color: "#f5976a" }
+- { id: 24872, key: trieben, name: "Trieben", kind: land, color: "#422f14" }
+- { id: 24873, key: sankt_veit_an_der_glan, name: "Sankt Veit an der Glan", kind: land, color: "#a1a126" }
+- { id: 24874, key: mariapfarr, name: "Mariapfarr", kind: land, color: "#2fa6e5" }
+- { id: 24875, key: oberosterreich, name: "Oberösterreich", kind: land, color: "#a30c0c" }
+- { id: 24876, key: murau, name: "Murau", kind: land, color: "#2c0a2a" }
+- { id: 24877, key: eisenerz, name: "Eisenerz", kind: land, color: "#1ebe5e" }
+- { id: 24878, key: gosau, name: "Gosau", kind: land, color: "#4747ae" }
+- { id: 24879, key: tauplitz, name: "Tauplitz", kind: land, color: "#cd8fca" }
+- { id: 24880, key: schladming, name: "Schladming", kind: land, color: "#a84aad" }
+- { id: 24881, key: sankt_nikolai_im_solktal, name: "Sankt Nikolai im Sölktal", kind: land, color: "#df0625" }
+- { id: 24882, key: mautern_in_steiermark, name: "Mautern in Steiermark", kind: land, color: "#6d810b" }
+- { id: 24883, key: donnersbach, name: "Donnersbach", kind: land, color: "#e49f6f" }
+- { id: 24884, key: maurach, name: "Maurach", kind: land, color: "#5d9f74" }
+- { id: 24885, key: samedan, name: "Samedan", kind: land, color: "#29a2c0" }
+- { id: 24886, key: grainau, name: "Grainau", kind: land, color: "#bc5c64" }
+- { id: 24887, key: langenfeld, name: "Längenfeld", kind: land, color: "#cdbfc9" }
+- { id: 24888, key: klaus, name: "Klaus", kind: land, color: "#010858" }
+- { id: 24889, key: schruns, name: "Schruns", kind: land, color: "#d0d53f" }
+- { id: 24890, key: tannheim, name: "Tannheim", kind: land, color: "#1dd4f9" }
+- { id: 24891, key: telfs, name: "Telfs", kind: land, color: "#a583dd" }
+- { id: 24892, key: oberstdorf, name: "Oberstdorf", kind: land, color: "#8c7782" }
+- { id: 24893, key: nenzing, name: "Nenzing", kind: land, color: "#77b6f6" }
+- { id: 24894, key: bayrischzell, name: "Bayrischzell", kind: land, color: "#eab415" }
+- { id: 24895, key: vipiteno, name: "Vipiteno", kind: land, color: "#30333c" }
+- { id: 24896, key: reutte, name: "Reutte", kind: land, color: "#cfa6c8" }
+- { id: 24897, key: mittenwald, name: "Mittenwald", kind: land, color: "#316b14" }
+- { id: 24898, key: kappl, name: "Kappl", kind: land, color: "#2bbaf6" }
+- { id: 24899, key: davos, name: "Davos", kind: land, color: "#56a538" }
+- { id: 24900, key: schiers, name: "Schiers", kind: land, color: "#535269" }
+- { id: 24901, key: imst, name: "Imst", kind: land, color: "#bad8b6" }
+- { id: 24902, key: bramberg_am_wildkogel, name: "Bramberg am Wildkogel", kind: land, color: "#ceb110" }
+- { id: 24903, key: bischofshofen, name: "Bischofshofen", kind: land, color: "#0a155d" }
+- { id: 24904, key: sankt_johann_im_pongau, name: "Sankt Johann im Pongau", kind: land, color: "#633edd" }
+- { id: 24905, key: waidring, name: "Waidring", kind: land, color: "#1c7228" }
+- { id: 24906, key: saalfelden_am_steinernen_meer, name: "Saalfelden am Steinernen Meer", kind: land, color: "#7c081c" }
+- { id: 24907, key: alpbach, name: "Alpbach", kind: land, color: "#6d666c" }
+- { id: 24908, key: mayrhofen, name: "Mayrhofen", kind: land, color: "#1f794d" }
+- { id: 24909, key: ramsau, name: "Ramsau", kind: land, color: "#a5d015" }
+- { id: 24910, key: zell_am_see, name: "Zell am See", kind: land, color: "#0107e7" }
+- { id: 24911, key: kirchberg_in_tirol, name: "Kirchberg in Tirol", kind: land, color: "#c1c2e3" }
+- { id: 24912, key: bad_gastein, name: "Bad Gastein", kind: land, color: "#f802fd" }
+- { id: 24913, key: gallmannsegg, name: "Gallmannsegg", kind: land, color: "#7a3635" }
+- { id: 24914, key: oberweg, name: "Oberweg", kind: land, color: "#c2a5f8" }
+- { id: 24915, key: osterwitz, name: "Osterwitz", kind: land, color: "#0f1530" }
+- { id: 24916, key: reichenfels, name: "Reichenfels", kind: land, color: "#1ab86f" }
+- { id: 24917, key: luchsingen, name: "Luchsingen", kind: land, color: "#339007" }
+- { id: 24918, key: sarganserland, name: "Sarganserland", kind: land, color: "#bd02e0" }
+- { id: 24919, key: flims, name: "Flims", kind: land, color: "#b7d911" }
+- { id: 24920, key: disentis, name: "Disentis", kind: land, color: "#d3cc8d" }
+- { id: 24921, key: muotathal, name: "Muotathal", kind: land, color: "#6e315d" }
+- { id: 24922, key: amden, name: "Amden", kind: land, color: "#31dab1" }
+- { id: 24923, key: kotschach, name: "Kötschach", kind: land, color: "#c2ae17" }
+- { id: 24924, key: livinallongo_del_col_di_lana, name: "Livinallongo del Col di Lana", kind: land, color: "#6cf018" }
+- { id: 24925, key: rasun_anterselva_rasen_antholz, name: "Rasun Anterselva - Rasen-Antholz", kind: land, color: "#bc3d9b" }
+- { id: 24926, key: ospedaletto, name: "Ospedaletto", kind: land, color: "#4b248e" }
+- { id: 24927, key: lozzo_di_cadore, name: "Lozzo di Cadore", kind: land, color: "#e5170b" }
+- { id: 24928, key: tambre, name: "Tambre", kind: land, color: "#25dbc7" }
+- { id: 24929, key: agordo, name: "Agordo", kind: land, color: "#4a518b" }
+- { id: 24930, key: asiago, name: "Asiago", kind: land, color: "#4b4eff" }
+- { id: 24931, key: transacqua, name: "Transacqua", kind: land, color: "#10c4f2" }
+- { id: 24932, key: borgo_valsugana, name: "Borgo Valsugana", kind: land, color: "#e02fad" }
+- { id: 24933, key: heiligenblut, name: "Heiligenblut", kind: land, color: "#73a207" }
+- { id: 24934, key: karnten, name: "Kärnten", kind: land, color: "#bb907b" }
+- { id: 24935, key: pedemonte, name: "Pedemonte", kind: land, color: "#fe4cd4" }
+- { id: 24936, key: lienz, name: "Lienz", kind: land, color: "#d4400b" }
+- { id: 24937, key: matrei_in_osttirol, name: "Matrei in Osttirol", kind: land, color: "#be35a1" }
+- { id: 24938, key: auronzo, name: "Auronzo", kind: land, color: "#ef5094" }
+- { id: 24939, key: selva, name: "Selva", kind: land, color: "#3550f0" }
+- { id: 24940, key: predazzo, name: "Predazzo", kind: land, color: "#b0710e" }
+- { id: 24941, key: valle_aurina_ahrntal, name: "Valle Aurina - Ahrntal", kind: land, color: "#a5a5ff" }
+- { id: 24942, key: ortisei, name: "Ortisei", kind: land, color: "#c4dffc" }
+- { id: 24943, key: brunico, name: "Brunico", kind: land, color: "#ced180" }
+- { id: 24944, key: cortina_d_ampezzo, name: "Cortina d'Ampezzo", kind: land, color: "#0ea9b7" }
+- { id: 24945, key: sappada, name: "Sappada", kind: land, color: "#10a283" }
+- { id: 24946, key: steinfeld, name: "Steinfeld", kind: land, color: "#976211" }
+- { id: 24947, key: sallanches, name: "Sallanches", kind: land, color: "#be5959" }
+- { id: 24948, key: les_houches, name: "Les Houches", kind: land, color: "#c8c12e" }
+- { id: 24949, key: fluhli, name: "Flühli", kind: land, color: "#db71dc" }
+- { id: 24950, key: villeneuve, name: "Villeneuve", kind: land, color: "#c2e8d7" }
+- { id: 24951, key: le_grand_bornand, name: "Le Grand-Bornand", kind: land, color: "#6360ce" }
+- { id: 24952, key: frutigen, name: "Frutigen", kind: land, color: "#ae56d8" }
+- { id: 24953, key: gstaad, name: "Gstaad", kind: land, color: "#8f41af" }
+- { id: 24954, key: chamonix_mont_blanc, name: "Chamonix-Mont-Blanc", kind: land, color: "#45a9a8" }
+- { id: 24955, key: interlaken, name: "Interlaken", kind: land, color: "#b47324" }
+- { id: 24956, key: engelberg, name: "Engelberg", kind: land, color: "#a3aa22" }
+- { id: 24957, key: megeve, name: "Megève", kind: land, color: "#282762" }
+- { id: 24958, key: wolfenschiessen, name: "Wolfenschiessen", kind: land, color: "#60e2ad" }
+- { id: 24959, key: meiringen, name: "Meiringen", kind: land, color: "#b69526" }
+- { id: 24960, key: morzine, name: "Morzine", kind: land, color: "#81fd86" }
+- { id: 24961, key: charmey, name: "Charmey", kind: land, color: "#f99de0" }
+- { id: 24962, key: sondrio, name: "Sondrio", kind: land, color: "#359721" }
+- { id: 24963, key: tione_di_trento, name: "Tione di Trento", kind: land, color: "#b24841" }
+- { id: 24964, key: storo, name: "Storo", kind: land, color: "#3852bf" }
+- { id: 24965, key: edolo, name: "Edolo", kind: land, color: "#ee92af" }
+- { id: 24966, key: bormio, name: "Bormio", kind: land, color: "#5ad8d0" }
+- { id: 24967, key: ultimo_ulten, name: "Ultimo - Ulten", kind: land, color: "#431fec" }
+- { id: 24968, key: rabbi_fonti, name: "Rabbi Fonti", kind: land, color: "#129534" }
+- { id: 24969, key: premana, name: "Premana", kind: land, color: "#3bf08d" }
+- { id: 24970, key: castione_della_presolana, name: "Castione della Presolana", kind: land, color: "#ad9a9e" }
+- { id: 24971, key: vermiglio, name: "Vermiglio", kind: land, color: "#32b430" }
+- { id: 24972, key: tirano, name: "Tirano", kind: land, color: "#538e18" }
+- { id: 24973, key: ardesio, name: "Ardesio", kind: land, color: "#81b1a6" }
+- { id: 24974, key: silandro, name: "Silandro", kind: land, color: "#a724eb" }
+- { id: 24975, key: acquarossa, name: "Acquarossa", kind: land, color: "#ea426b" }
+- { id: 24976, key: carlazzo, name: "Carlazzo", kind: land, color: "#acce4a" }
+- { id: 24977, key: zgornje_jezersko, name: "Zgornje Jezersko", kind: land, color: "#69005e" }
+- { id: 24978, key: hrusica, name: "Hrušica", kind: land, color: "#be1acf" }
+- { id: 24979, key: koroska_bela, name: "Koroška Bela", kind: land, color: "#23f507" }
+- { id: 24980, key: bovec, name: "Bovec", kind: land, color: "#b05e38" }
+- { id: 24981, key: cevio, name: "Cevio", kind: land, color: "#92141f" }
+- { id: 24982, key: malesco, name: "Malesco", kind: land, color: "#0a26c1" }
+- { id: 24983, key: sitten, name: "Sitten", kind: land, color: "#455335" }
+- { id: 24984, key: sierre, name: "Sierre", kind: land, color: "#1a5d32" }
+- { id: 24985, key: calasca_castiglione, name: "Calasca-Castiglione", kind: land, color: "#57739f" }
+- { id: 24986, key: gaby, name: "Gaby", kind: land, color: "#65e512" }
+- { id: 24987, key: chatillon, name: "Chatillon", kind: land, color: "#f254cf" }
+- { id: 24988, key: saint_martin_de_belleville, name: "Saint-Martin-de-Belleville", kind: land, color: "#c9eec4" }
+- { id: 24989, key: sparone, name: "Sparone", kind: land, color: "#e59197" }
+- { id: 24990, key: le_bourg_d_oisans, name: "Le Bourg-d'Oisans", kind: land, color: "#0808b8" }
+- { id: 24991, key: saint_bonnet_en_champsaur, name: "Saint-Bonnet-en-Champsaur", kind: land, color: "#e8926d" }
+- { id: 24992, key: east_alpes_de_haute_provence, name: "East Alpes-de-Haute-Provence", kind: land, color: "#241209" }
+- { id: 24993, key: saint_martin_vesubie, name: "Saint-Martin-Vésubie", kind: land, color: "#914eb3" }
+- { id: 24994, key: villard_de_lans, name: "Villard-de-Lans", kind: land, color: "#3e9e4b" }
+- { id: 24995, key: north_alpes_de_haute_provence, name: "North Alpes-de-Haute-Provence", kind: land, color: "#684c85" }
+- { id: 24996, key: north_drome, name: "North Drôme", kind: land, color: "#082053" }
+- { id: 24997, key: saint_etienne_de_tinee, name: "Saint-Étienne-de-Tinée", kind: land, color: "#de7b33" }
+- { id: 24998, key: hautes_alpes, name: "Hautes-Alpes", kind: land, color: "#639faa" }
+- { id: 24999, key: guillestre, name: "Guillestre", kind: land, color: "#6cb60d" }
+- { id: 25000, key: la_motte_d_aveillans, name: "La Motte-d'Aveillans", kind: land, color: "#f409d5" }
+- { id: 25001, key: embrun, name: "Embrun", kind: land, color: "#9101f5" }
+- { id: 25002, key: north_west_alpes_maritimes, name: "North-West Alpes-Maritimes", kind: land, color: "#a24e0d" }
+- { id: 25003, key: seyne_les_alpes, name: "Seyne-les-Alpes", kind: land, color: "#764598" }
+- { id: 25004, key: annot, name: "Annot", kind: land, color: "#96a608" }
+- { id: 25005, key: perosa_argentina, name: "Perosa Argentina", kind: land, color: "#d01f2e" }
+- { id: 25006, key: demonte, name: "Demonte", kind: land, color: "#067214" }
+- { id: 25007, key: sampeyre, name: "Sampeyre", kind: land, color: "#8301d4" }
+- { id: 25008, key: collagna, name: "Collagna", kind: land, color: "#d483aa" }
+- { id: 25009, key: fiumalbo_dogana, name: "Fiumalbo-Dogana", kind: land, color: "#a7734c" }
+- { id: 25010, key: ormea, name: "Ormea", kind: land, color: "#b00eac" }
