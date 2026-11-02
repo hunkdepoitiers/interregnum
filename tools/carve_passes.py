@@ -1,7 +1,8 @@
 """
 Carves the mountain passes of data/map/passes.yaml into the current province map: impassable mountain or wasteland
-pixels within HALF_WIDTH of a pass route become land of the nearest land province. Nothing else changes, so it can
-run on a finished map (and again after tools/opengs_map.py):  py -3.12 -I tools/carve_passes.py .
+pixels within HALF_WIDTH of a pass route become land of the nearest land province. Then any land still walled in by
+terrain gets an automatic pass to the nearest other land of its landmass (up to MAX_GAP). Nothing else changes, so it
+can run on a finished map (and again after tools/opengs_map.py):  py -3.12 -I tools/carve_passes.py .
 """
 import math
 import re
@@ -11,6 +12,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 from scipy import ndimage as ndi
+from skimage.graph import MCP_Geometric
 
 Image.MAX_IMAGE_PIXELS = None
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else '.')
@@ -18,6 +20,8 @@ MAP = ROOT / 'data' / 'map'
 ROWS = 512
 HALF_WIDTH = 6   # px either side of the route (~17 km wide in all)
 REACH = 400      # px around a route searched for the land a carved pixel joins
+MAX_GAP = 300    # px (~420 km): longest automatic pass for land walled in by terrain
+MIN_POCKET = 30  # px: smaller walled-in specks are left alone
 
 DEF_RE = re.compile(r'^- \{ id: (\d+), key: ([\w-]+), name: "((?:[^"\\]|\\.)*)", kind: (\w+), color: "#([0-9a-fA-F]{6})" \}$')
 defs = {}
@@ -88,6 +92,74 @@ for name, pts in passes.items():
     win[carve] = win[iy[carve], ix[carve]]
     total += int(carve.sum())
     print(f'{name}: {int(carve.sum())} px carved')
+
+
+
+DISK = np.hypot(*np.mgrid[-HALF_WIDTH:HALF_WIDTH + 1, -HALF_WIDTH:HALF_WIDTH + 1]) <= HALF_WIDTH
+
+
+def carve_path(win, path):
+    """Turns mountain or wasteland within HALF_WIDTH of the path pixels (window coords) into the nearest land."""
+    mask = np.zeros(win.shape, bool)
+    mask[tuple(np.asarray(path).T)] = True
+    carve = ndi.binary_dilation(mask, DISK) & (kind[win] == 2)
+    if carve.any():
+        _, (iy, ix) = ndi.distance_transform_edt(kind[win] != 1, return_indices=True)
+        win[carve] = win[iy[carve], ix[carve]]
+    return int(carve.sum())
+
+
+# Land still cut off by terrain (a valley walled in by mountains, a coast behind a desert) gets a pass to the
+# nearest other land of the same landmass: the shortest route over land, mountain or wasteland (never water), if it
+# is at most MAX_GAP long. Repeated until nothing changes.
+skipped = {}
+for round_ in range(4):
+    k = kind[pmap]
+    land_lab, _ = ndi.label(k == 1)
+    terr_lab, _ = ndi.label(k > 0)
+    del k
+    sizes = np.bincount(land_lab.ravel())
+    sizes[0] = 0
+    objs = ndi.find_objects(land_lab)
+    terr_of = np.zeros(len(sizes), np.int64)
+    for c, sl in enumerate(objs, 1):
+        if sl is not None:
+            sub = land_lab[sl] == c
+            terr_of[c] = terr_lab[sl][sub][0]
+    main = {}
+    for c in np.argsort(-sizes):
+        if sizes[c] == 0:
+            break
+        main.setdefault(int(terr_of[c]), int(c))
+    pockets = [c for c in np.argsort(-sizes) if sizes[c] >= MIN_POCKET and main.get(int(terr_of[c])) != c]
+    carved = 0
+    for c in pockets:
+        sl = objs[c - 1]
+        y0, y1 = max(sl[0].start - MAX_GAP, 0), min(sl[0].stop + MAX_GAP, H)
+        x0, x1 = max(sl[1].start - MAX_GAP, 0), min(sl[1].stop + MAX_GAP, W)
+        lab = land_lab[y0:y1, x0:x1]
+        mine = lab == c
+        other = (lab > 0) & ~mine & (terr_lab[y0:y1, x0:x1] == terr_of[c])
+        if not other.any():
+            skipped[c] = 'no other land within reach'
+            continue
+        win = pmap[y0:y1, x0:x1]
+        mcp = MCP_Geometric(np.where(kind[win] == 0, np.inf, 1.0))
+        edge = mine & ~ndi.binary_erosion(mine)  # start from the pocket's rim, not all its pixels
+        cum, _ = mcp.find_costs(list(zip(*np.nonzero(edge))))
+        reach = np.where(other, cum, np.inf)
+        target = np.unravel_index(np.argmin(reach), reach.shape)
+        if not np.isfinite(reach[target]) or reach[target] > MAX_GAP:
+            skipped[c] = f'route of {reach[target]:.0f} px'
+            continue
+        carved += carve_path(win, mcp.traceback(target))
+    del land_lab, terr_lab
+    print(f'round {round_ + 1}: {len(pockets)} pockets, {carved} px carved')
+    total += carved
+    if not carved:
+        break
+if skipped:
+    print(f'{len(skipped)} pockets left unconnected (too far from other land through terrain)')
 
 after = np.bincount(pmap.ravel(), minlength=n)
 gone = [defs[i]['key'] for i in defs if before[i] and not after[i]]
