@@ -4,6 +4,10 @@ import { scenarioSourceSchema } from '../src/content/scenario';
 import { peoplesSourceSchema } from '../src/content/peoples';
 import { compileScenario, paintRegions, type MapContext } from '../tools/data-lib';
 import { compilePeoples } from '../tools/peoples-lib';
+import { compileTitles } from '../tools/titles-lib';
+import { compileGoods } from '../tools/goods-lib';
+import { goodsSourceSchema } from '../src/content/goods';
+import { generatedTitlesSchema, upperTitlesSchema } from '../src/content/titles';
 import { content } from './fixtures/content';
 
 // One pixel per degree: x = lon + 180, y = 90 - lat.
@@ -23,7 +27,7 @@ const provinces = [prov(1, 'a', 'land', 10, [2]), prov(2, 'b', 'land', 30, [1, 3
   prov(4, 's', 'sea', 70, [3]), prov(5, 'w', 'wasteland', 90, [])];
 
 /** Box around the given longitudes on lat 75–85. */
-const box = (w: number, e: number) => [[85, w], [85, e], [75, e], [75, w]];
+const box = (w: number, e: number): [number, number][] => [[85, w], [85, e], [75, e], [75, w]];
 function realm(key: string, extra: object = {}) {
   return { key, name: key, rank: 'kingdom', government: 'feudal_monarchy', color: '#ff0000', capital: 'acity', ...extra };
 }
@@ -138,5 +142,56 @@ describe('paintRegions and compilePeoples', () => {
     expect(r.religion).toEqual([0, 2, 1, 0, 0, 0]);
     expect(r.cultures[0]).toMatchObject({ key: 'one', groupName: 'Group', religion: 1 });
     expect(r.errors).toEqual(['Culture bad: unknown group nope', 'Culture bad: unknown religion gone']);
+  });
+});
+
+describe('compileTitles', () => {
+  const gen = generatedTitlesSchema.parse({
+    countries: { AAA: 'Alpha', BBB: 'Beta' },
+    counties: [['c_a', 'County of A', 'a', ['a', 'b']], ['c_c', 'County of C', 'c', ['c']]],
+    duchies: [['d_ab', 'Duchy of AB', 'AAA', ['c_a']], ['d_c', 'Duchy of C', 'BBB', ['c_c']]],
+  });
+
+  it('links counties to duchies, duchies to the drawn kingdom or their country, and up to hegemonies', () => {
+    const upper = upperTitlesSchema.parse({
+      country_kingdoms: { BBB: 'the Betas' },
+      kingdoms: [{ key: 'k_west', name: 'Kingdom of the West', area: [box(-180, -140)] }],
+      empires: [{ key: 'e_all', name: 'Empire of All', kingdoms: ['k_west', 'k_auto_BBB'] }],
+      hegemonies: [{ key: 'h_top', name: 'Top', de_jure: true, empires: ['e_all'] }, { key: 'h_dream', name: 'Dream', empires: ['e_all'] }],
+    });
+    const { titles, county, errors } = compileTitles(gen, upper, provinces, ctx);
+    expect(errors).toEqual([]);
+    expect(county).toEqual([0, 1, 1, 2, 0, 0]);
+    expect(titles.counties.map((c) => [c.parent, c.capital])).toEqual([[1, 1], [2, 3]]);
+    expect(titles.duchies.map((d) => d.parent)).toEqual([1, 2]);
+    expect(titles.kingdoms.map((k) => [k.key, k.name, k.parent])).toEqual([['k_west', 'Kingdom of the West', 1], ['k_auto_BBB', 'Kingdom of the Betas', 1]]);
+    expect(titles.empires[0]!.parent).toBe(1); // the de jure hegemony, not the formable one
+    expect(titles.hegemonies.map((h) => [h.key, h.deJure, h.empires])).toEqual([['h_top', true, [1]], ['h_dream', false, [1]]]);
+  });
+
+  it('reports stale province keys, unknown members and a kingdom in two empires', () => {
+    const stale = generatedTitlesSchema.parse({ ...gen, counties: [...gen.counties, ['c_x', 'County of X', 'gone', ['gone']]] });
+    const upper = upperTitlesSchema.parse({
+      kingdoms: [{ key: 'k_west', name: 'W', area: [box(-180, -140)] }],
+      empires: [{ key: 'e_1', name: 'E1', kingdoms: ['k_west'] }, { key: 'e_2', name: 'E2', kingdoms: ['k_west', 'k_nowhere'] }],
+    });
+    expect(compileTitles(stale, upper, provinces, ctx).errors).toEqual([
+      'data/map/titles.yaml names 1 provinces the map does not have; run tools/build_titles.py',
+      'Kingdom k_west is in two empires',
+      'Empire e_2: unknown kingdom k_nowhere',
+    ]);
+  });
+});
+
+describe('compileGoods', () => {
+  it('takes the first matching rule, then famous places on top', () => {
+    const src = goodsSourceSchema.parse({
+      goods: [{ key: 'grain', name: 'Grain', color: '#ffff00' }, { key: 'fur', name: 'Fur', color: '#000000' }, { key: 'wine', name: 'Wine', color: '#880000' }],
+      rules: [{ good: 'fur', region: [[70, -175, 90, -165]] }, { good: 'grain' }],
+      places: [['wine', 'ccity']],
+    });
+    const { good, errors } = compileGoods(src, provinces, ctx);
+    expect(errors).toEqual([]);
+    expect(good).toEqual([0, 2, 1, 3, 0, 0]); // a in the fur box, b grain, c the wine place; sea and wasteland none
   });
 });

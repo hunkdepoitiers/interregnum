@@ -11,13 +11,36 @@ export const LOOKUP_WIDTH = 4096;
 export const LOOKUP_ROWS = 16;
 export const LOOKUP_HEIGHT = LOOKUP_ROWS * 2;
 
-export type MapMode = 'political' | 'terrain' | 'culture' | 'religion';
+export type MapMode = 'political' | 'terrain' | 'culture' | 'religion' | 'dejure' | 'goods';
 
 /** Static per-province data the culture and religion map modes colour by. */
 export interface Peoples {
   culture: number[];
   religion: number[];
+  /** De jure county of each province (Content.titles). */
+  county: number[];
+  /** Trade good of each province (Content.goods). */
+  good: number[];
   content: Content;
+}
+
+/** The de jure kingdom of a province (0 = none). */
+export function kingdomOf(peoples: Peoples, provinceId: number): number {
+  const t = peoples.content.titles;
+  const c = peoples.county[provinceId] ?? 0;
+  const d = c ? t.counties[c - 1]!.parent : 0;
+  return d ? t.duchies[d - 1]!.parent : 0;
+}
+
+/** A stable, distinct colour per title key for the de jure map mode. */
+function keyColor(key: string): Rgb {
+  let h = 2166136261;
+  for (let i = 0; i < key.length; i++) h = Math.imul(h ^ key.charCodeAt(i), 16777619);
+  const hue = ((h >>> 0) % 360) / 60;
+  const x = 1 - Math.abs((hue % 2) - 1);
+  const [r, g, b] = hue < 1 ? [1, x, 0] : hue < 2 ? [x, 1, 0] : hue < 3 ? [0, 1, x] : hue < 4 ? [0, x, 1] : hue < 5 ? [x, 0, 1] : [1, 0, x];
+  const light = 0.45 + (((h >>> 9) % 25) / 100);
+  return [r, g, b].map((v) => Math.round(70 + v * 150 * light + 40)) as Rgb;
 }
 
 type Rgb = [number, number, number];
@@ -74,6 +97,14 @@ export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null
     if (mode === 'political') {
       base = realmColor(world?.owner[p.id] ?? 0) ?? UNCLAIMED;
       held = realmColor(world?.controller[p.id] ?? 0) ?? base;
+    } else if (mode === 'dejure') {
+      const k = peoples ? kingdomOf(peoples, p.id) : 0;
+      base = k ? keyColor(peoples!.content.titles.kingdoms[k - 1]!.key) : UNCLAIMED;
+      held = base;
+    } else if (mode === 'goods') {
+      const g = peoples?.good[p.id] ?? 0;
+      base = g ? hexToRgb(peoples!.content.goods[g - 1]!.color) : UNCLAIMED;
+      held = base;
     } else if (mode === 'culture' || mode === 'religion') {
       const id = (mode === 'culture' ? peoples?.culture : peoples?.religion)?.[p.id] ?? 0;
       const def = id ? (mode === 'culture' ? peoples!.content.cultures : peoples!.content.religions)[id - 1] : undefined;

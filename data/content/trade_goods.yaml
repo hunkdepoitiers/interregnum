@@ -1,0 +1,137 @@
+# Trade goods: what each land province produces. Read by tools/build-data.ts (tools/goods-lib.ts).
+# rules: the first rule that matches a province decides. A rule matches on any of: terrain (list), region (list of
+# boxes [south, west, north, east]), lat_above / lat_below, coastal; `share` makes it match only that fraction of
+# the provinces it would otherwise take (chosen by province key, so it is stable between builds).
+# places: [good, place] overrides for famous producers; place = [lat, lon] or a town key from seeds.yaml.
+# Prices arrive with the economy (M4). Distribution is rough: GUESS.
+
+goods:
+  - { key: grain, name: Grain, color: "#d8c060" }
+  - { key: rice, name: Rice, color: "#c8d890" }
+  - { key: livestock, name: Livestock, color: "#b08a5a" }
+  - { key: horses, name: Horses, color: "#8a6a4a" }
+  - { key: wool, name: Wool, color: "#e8e0c8" }
+  - { key: fish, name: Fish, color: "#6a9ab0" }
+  - { key: salt, name: Salt, color: "#f0f0f0" }
+  - { key: wine, name: Wine, color: "#8a2c4a" }
+  - { key: olives, name: Olives, color: "#8a9a4a" }
+  - { key: fur, name: Fur, color: "#6a4a3a" }
+  - { key: wood, name: Timber, color: "#5a7a3a" }
+  - { key: naval_supplies, name: Naval supplies, color: "#4a6a5a" }
+  - { key: iron, name: Iron, color: "#7a7a8a" }
+  - { key: copper, name: Copper, color: "#c07a4a" }
+  - { key: silver, name: Silver, color: "#c0c8d0" }
+  - { key: gold, name: Gold, color: "#e0b020" }
+  - { key: tin, name: Tin, color: "#9aa0a8" }
+  - { key: amber, name: Amber, color: "#e09030" }
+  - { key: cloth, name: Cloth, color: "#a05a8a" }
+  - { key: silk, name: Silk, color: "#d070a0" }
+  - { key: cotton, name: Cotton, color: "#f0e8e0" }
+  - { key: dyes, name: Dyes, color: "#5a4ab0" }
+  - { key: spices, name: Spices, color: "#c05a2a" }
+  - { key: pepper, name: Pepper, color: "#3a3a3a" }
+  - { key: incense, name: Incense, color: "#c0a080" }
+  - { key: ivory, name: Ivory, color: "#f0e8d0" }
+  - { key: slaves, name: Slaves, color: "#5a3a3a" }
+  - { key: sugar, name: Sugar, color: "#e8d0d8" }
+  - { key: tea, name: Tea, color: "#5a8a4a" }
+  - { key: porcelain, name: Porcelain, color: "#a0c0e0" }
+  - { key: glass, name: Glass, color: "#80c0c0" }
+  - { key: gems, name: Gems, color: "#4ac0a0" }
+  - { key: maize, name: Maize, color: "#e0c040" }
+  - { key: cocoa, name: Cocoa, color: "#6a3a2a" }
+
+rules:
+  # Cold north
+  - { good: fur, terrain: [tundra] }
+  - { good: fur, terrain: [forest], lat_above: 57 }
+  - { good: fish, coastal: true, lat_above: 58 }
+  - { good: naval_supplies, terrain: [forest], region: [[53, 15, 60, 40]], share: 0.5 }
+  - { good: wood, terrain: [forest] }
+  # Steppes and deserts
+  - { good: horses, terrain: [steppe], region: [[40, 25, 56, 125]] }
+  - { good: horses, terrain: [steppe], region: [[33, 48, 38, 62]], share: 0.5 }
+  - { good: livestock, terrain: [steppe] }
+  - { good: incense, terrain: [desert, hills, highlands], region: [[12, 43, 19, 57]] }
+  - { good: salt, terrain: [desert], share: 0.5 }
+  - { good: livestock, terrain: [desert] }
+  # The tropics
+  - { good: pepper, region: [[7.5, 74, 16, 78]] }
+  - { good: spices, terrain: [jungle], region: [[-11, 95, 10, 135]] }
+  - { good: ivory, terrain: [jungle, plains, hills], region: [[-15, -18, 12, 45]], share: 0.3 }
+  - { good: gold, region: [[8, -12, 14, -2]], share: 0.25 }
+  - { good: cocoa, terrain: [jungle], region: [[8, -95, 20, -85]] }
+  - { good: maize, region: [[10, -110, 25, -85]] }
+  - { good: maize, region: [[-25, -82, 5, -60]], share: 0.6 }
+  # Mediterranean
+  - { good: wine, terrain: [hills, plains], region: [[36, -9, 46, 30]], share: 0.25 }
+  - { good: olives, terrain: [hills, plains], region: [[30, -9, 42, 37]], share: 0.25 }
+  # Asia
+  - { good: silk, terrain: [farmlands, plains, hills], region: [[27, 112, 33, 122], [36.4, 49, 38.5, 54]], share: 0.5 }
+  - { good: tea, terrain: [hills, highlands], region: [[22, 104, 31, 121]], share: 0.4 }
+  - { good: porcelain, region: [[28.5, 116.5, 30, 118]] }
+  - { good: rice, region: [[-10, 90, 35, 123], [8, 75, 27, 92]] }
+  - { good: cotton, region: [[18, 68, 30, 85]], share: 0.35 }
+  - { good: dyes, region: [[20, 68, 26, 75]], share: 0.3 }
+  # Mines and herds in the hills
+  - { good: iron, terrain: [hills, highlands], share: 0.18 }
+  - { good: copper, terrain: [hills, highlands], share: 0.08 }
+  - { good: wool, terrain: [hills, highlands], share: 0.5 }
+  - { good: livestock, terrain: [hills, highlands] }
+  # Coasts and the rest
+  - { good: fish, coastal: true, share: 0.25 }
+  - { good: livestock, terrain: [marsh], share: 0.5 }
+  - { good: fish, terrain: [marsh] }
+  - { good: livestock, region: [[-35, 10, 5, 52], [5, -18, 18, 52]] }
+  - { good: grain }
+
+places:
+  - [wine, [44.84, -0.58]]   # Bordeaux
+  - [wine, [47.32, 5.04]]    # Burgundy
+  - [wine, [49.26, 4.03]]    # Champagne
+  - [wine, [50.36, 7.6]]     # Rhine and Moselle
+  - [wine, [41.15, -8.61]]   # Porto
+  - [wine, [37.98, 23.73]]   # Attica
+  - [wine, [35.17, 33.36]]   # Cyprus
+  - [sugar, [34.7, 33.0]]    # Cypriot cane at Kolossi
+  - [sugar, [30.04, 31.24]]  # Egypt
+  - [cloth, [51.05, 3.72]]   # Ghent
+  - [cloth, [51.21, 3.22]]   # Bruges
+  - [cloth, [50.84, 4.36]]   # Brussels
+  - [cloth, [43.77, 11.25]]  # Florence
+  - [cloth, [45.46, 9.19]]   # Milan
+  - [cloth, [51.75, -1.26]]  # Cotswold wool towns
+  - [glass, [45.44, 12.33]]  # Venice
+  - [glass, [33.51, 36.29]]  # Damascus
+  - [silk, [38.6, 26.5]]     # Chios is mastic, but Bursa and the Aegean silks
+  - [silk, [40.18, 29.06]]   # Bursa
+  - [dyes, [36.2, 37.15]]    # Aleppo
+  - [silver, [49.95, 15.27]] # Kutná Hora
+  - [silver, [51.9, 10.43]]  # Goslar and the Harz
+  - [silver, [50.92, 13.34]] # Freiberg
+  - [silver, [48.74, 19.15]] # Banská Bystrica
+  - [gold, [48.6, 18.86]]    # Kremnica
+  - [gold, [46.07, 23.58]]   # Transylvanian gold
+  - [silver, [43.97, 21.0]]  # Novo Brdo and the Serbian mines
+  - [silver, [43.55, 19.65]] # Rudnik
+  - [copper, [60.6, 15.6]]   # Falun
+  - [iron, [59.6, 15.0]]     # Bergslagen
+  - [tin, [50.26, -5.05]]    # Cornwall
+  - [amber, [54.71, 20.51]]  # Samland
+  - [salt, [49.98, 20.06]]   # Wieliczka
+  - [salt, [47.73, 13.64]]   # Salzkammergut
+  - [salt, [47.27, 11.5]]    # Hall in Tirol
+  - [salt, [46.9, 2.0]]      # Bay of Bourgneuf
+  - [fish, [56.0, 12.7]]     # Scania herring
+  - [fish, [58.0, 7.0]]      # Norwegian stockfish
+  - [slaves, [45.03, 35.38]] # Caffa
+  - [slaves, [41.0, 29.0]]   # Constantinople's markets
+  - [spices, [12.8, 45.0]]   # Aden's entrepôt
+  - [gems, [7.0, 80.5]]      # Ceylon
+  - [gems, [17.0, 78.5]]     # Golconda
+  - [gold, [13.5, -10.0]]    # Bambuk
+  - [gold, [11.5, -8.0]]     # Buré
+  - [gold, [-20.3, 30.9]]    # Great Zimbabwe
+  - [ivory, [-8.96, 39.51]]  # Kilwa
+  - [horses, [34.5, 46.5]]   # Kurdish and Iranian horses
+  - [porcelain, [29.3, 117.2]] # Jingdezhen

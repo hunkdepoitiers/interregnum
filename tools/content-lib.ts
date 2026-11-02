@@ -7,7 +7,10 @@ const fixed = (v: number) => Math.round(v * SCALE);
 /** Checks stats and modifiers against each other and converts their numbers to fixed-point hundredths. */
 export function compileContent(stats: StatsSource, modifiers: ModifiersSource): { content: Content; errors: string[] } {
   const errors: string[] = [];
-  const content: Content = { stats: {}, modifiers: {}, cultures: [], religions: [] };
+  const content: Content = {
+    stats: {}, modifiers: {}, cultures: [], religions: [],
+    titles: { counties: [], duchies: [], kingdoms: [], empires: [], hegemonies: [] }, goods: [],
+  };
   for (const scope of ['province', 'realm'] as const) {
     for (const s of stats[scope]) {
       if (content.stats[s.key]) errors.push(`Stat ${s.key}: duplicate key`);

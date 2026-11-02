@@ -9,10 +9,14 @@ import { parse } from 'yaml';
 import { seedsSchema, type MapData } from '../src/content/map';
 import { modifiersSourceSchema, statsSourceSchema } from '../src/content/content';
 import { peoplesSourceSchema } from '../src/content/peoples';
+import { generatedTitlesSchema, upperTitlesSchema } from '../src/content/titles';
+import { goodsSourceSchema } from '../src/content/goods';
 import { editsSourceSchema, scenarioSourceSchema } from '../src/content/scenario';
 import { compileContent } from './content-lib';
 import { compileScenario } from './data-lib';
 import { compilePeoples } from './peoples-lib';
+import { compileTitles } from './titles-lib';
+import { compileGoods } from './goods-lib';
 
 function load<T>(file: string, schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: { issues: { path: PropertyKey[]; message: string }[] } } }): T {
   const r = schema.safeParse(parse(readFileSync(file, 'utf8')));
@@ -77,6 +81,15 @@ content.cultures = peoples.cultures;
 content.religions = peoples.religions;
 scenario.culture = peoples.culture;
 scenario.religion = peoples.religion;
+const titles = compileTitles(load('data/map/titles.yaml', generatedTitlesSchema), load('data/content/titles.yaml', upperTitlesSchema), map.provinces, { projection: map.projection, towns, idAt });
+errors.push(...titles.errors);
+warnings.push(...titles.warnings);
+content.titles = titles.titles;
+scenario.county = titles.county;
+const goods = compileGoods(load('data/content/trade_goods.yaml', goodsSourceSchema), map.provinces, { projection: map.projection, towns, idAt });
+errors.push(...goods.errors);
+content.goods = goods.goods;
+scenario.good = goods.good;
 for (const w of warnings) console.warn(`warning: ${w}`);
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
@@ -86,4 +99,4 @@ writeFileSync('public/generated/scenario.json', JSON.stringify(scenario));
 writeFileSync('public/generated/scenario-edits.json', JSON.stringify(edits));
 writeFileSync('public/generated/content.json', JSON.stringify(content));
 const owned = scenario.owner.filter(Boolean).length;
-console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${warnings.length} warnings`);
+console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${titles.titles.counties.length}/${titles.titles.duchies.length}/${titles.titles.kingdoms.length}/${titles.titles.empires.length}/${titles.titles.hegemonies.length} counties/duchies/kingdoms/empires/hegemonies, ${goods.goods.length} trade goods, ${warnings.length} warnings`);

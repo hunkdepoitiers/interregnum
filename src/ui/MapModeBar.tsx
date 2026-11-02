@@ -7,6 +7,8 @@ const MODES: { mode: MapMode; label: string; key: string }[] = [
   { mode: 'terrain', label: 'Terrain', key: 't' },
   { mode: 'culture', label: 'Culture', key: 'k' },
   { mode: 'religion', label: 'Religion', key: 'r' },
+  { mode: 'dejure', label: 'De jure', key: 'j' },
+  { mode: 'goods', label: 'Goods', key: 'g' },
 ];
 
 export function MapModeBar() {

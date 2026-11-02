@@ -112,7 +112,7 @@ export function App() {
         fetch(`${base}generated/content.json`).then((r) => r.json() as Promise<Content>),
       ]);
       content.value = gameContent;
-      peoples.value = { culture: scenario.culture ?? [], religion: scenario.religion ?? [], content: gameContent };
+      peoples.value = { culture: scenario.culture ?? [], religion: scenario.religion ?? [], county: scenario.county ?? [], good: scenario.good ?? [], content: gameContent };
       if (edits) setBaseEdits(edits);
       // Labels are drawn to canvas, so the font must be ready first; without it they fall back to a system serif.
       const [tiles] = await Promise.all([loadIdTiles(base, map), document.fonts.load(`32px ${LABEL_FONT}`).catch(() => [])]);

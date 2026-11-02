@@ -16,4 +16,6 @@ export const content: Content = {
   },
   cultures: [],
   religions: [],
+  titles: { counties: [], duchies: [], kingdoms: [], empires: [], hegemonies: [] },
+  goods: [],
 };

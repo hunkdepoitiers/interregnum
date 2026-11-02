@@ -38,4 +38,8 @@ export interface Scenario {
   /** Per province id: culture and religion ids (Content.cultures / religions, 1-based; 0 = none). */
   culture?: number[];
   religion?: number[];
+  /** Per province id: its de jure county (Content.titles.counties, 1-based; 0 = none). */
+  county?: number[];
+  /** Per province id: its trade good (Content.goods, 1-based; 0 = none). */
+  good?: number[];
 }

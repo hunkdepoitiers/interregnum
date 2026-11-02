@@ -54,10 +54,49 @@ export interface CultureDef {
   color: string;
 }
 
+export interface GoodDef {
+  key: string;
+  name: string;
+  color: string;
+}
+
+export type TitleTier = 'county' | 'duchy' | 'kingdom' | 'empire' | 'hegemony';
+
+/** A de jure title. Ids are 1-based per tier (Content.titles[tier][id - 1]); 0 means none. */
+export interface TitleDef {
+  key: string;
+  name: string;
+  /** Id of the title one tier up; 0 = none (an empire outside any de jure hegemony, say). */
+  parent: number;
+  /** Counties: their capital province id. */
+  capital?: number;
+}
+
+/** A hegemony: a de jure top title (de_jure) or one formed later by decision; lists the empires it unites. */
+export interface HegemonyDef {
+  key: string;
+  name: string;
+  hinduName?: string;
+  description: string;
+  deJure: boolean;
+  empires: number[];
+}
+
+export interface Titles {
+  counties: TitleDef[];
+  duchies: TitleDef[];
+  kingdoms: TitleDef[];
+  empires: TitleDef[];
+  hegemonies: HegemonyDef[];
+}
+
 export interface Content {
   stats: Record<string, StatDef>;
   modifiers: Record<string, ModifierDef>;
   /** Culture id i is cultures[i - 1]; 0 means none. Same for religions. */
   cultures: CultureDef[];
   religions: ReligionDef[];
+  titles: Titles;
+  /** Trade good id i is goods[i - 1]; 0 = none. */
+  goods: GoodDef[];
 }

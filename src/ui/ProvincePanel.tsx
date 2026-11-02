@@ -57,6 +57,17 @@ export function ProvincePanel() {
             <>
               {cu && (<><dt>Culture</dt><dd>{cu.name} <span class="muted">({cu.groupName})</span></dd></>)}
               {re && (<><dt>Religion</dt><dd>{re.name}</dd></>)}
+              {peoples.value.good[p.id] ? (<><dt>Produces</dt><dd>{c.goods[peoples.value.good[p.id]! - 1]!.name}</dd></>) : null}
+              {(() => {
+                const t = c.titles;
+                const county = peoples.value.county[p.id] ? t.counties[peoples.value.county[p.id]! - 1] : undefined;
+                const duchy = county?.parent ? t.duchies[county.parent - 1] : undefined;
+                const kingdom = duchy?.parent ? t.kingdoms[duchy.parent - 1] : undefined;
+                const empire = kingdom?.parent ? t.empires[kingdom.parent - 1] : undefined;
+                const hegemony = empire?.parent ? t.hegemonies[empire.parent - 1] : undefined;
+                const chain = [county, duchy, kingdom, empire, hegemony].filter((x) => x).map((x) => x!.name);
+                return chain.length ? (<><dt>De jure</dt><dd class="dejure">{chain.join(' › ')}</dd></>) : null;
+              })()}
             </>
           );
         })()}
