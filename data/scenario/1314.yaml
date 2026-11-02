@@ -573,7 +573,7 @@ realms:
     name: Duchy of Carinthia and Tyrol
     rank: duchy
     government: feudal_monarchy
-    color: "#5a8a6a"
+    color: "#6a8aa8"
     capital: [46.62, 14.31]  # Klagenfurt; Henry of Carinthia, Count of Tyrol
     area:
       - [[47.75, 10.45], [47.6, 12.5], [46.75, 12.6], [46.4, 11.6], [45.85, 11.0], [46.5, 10.4], [47.0, 10.1]]
