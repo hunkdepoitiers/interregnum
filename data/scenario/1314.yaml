@@ -30,6 +30,17 @@ fill:
   # China, Korea and Japan (the Lao and hill country of Southeast Asia stays outside)
   - [[54, 96], [54, 142], [46, 147], [30, 132], [22, 122], [21, 108], [22.5, 101], [24, 97], [30, 97], [40, 95]]
 
+# Modifiers in force on 1 November 1314: [realm, modifier] (data/content/modifiers.yaml). Capitals get `capital`.
+modifiers:
+  - [castile, regency]          # Alfonso XI is three
+  - [lower_bavaria, regency]    # the young dukes are under Louis of Bavaria's guardianship
+  - [papal_states, papal_vacancy]
+  - [bavaria, disputed_election]
+  - [habsburg, disputed_election]
+  - [scotland, bannockburn_victory]
+  - [england, bannockburn_defeat]
+  - [france, strong_crown]      # Philip IV's officials
+
 realms:
   # ======================================================== Large realms first (smaller ones paint over them)
   - key: golden_horde

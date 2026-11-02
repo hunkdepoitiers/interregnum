@@ -3,14 +3,17 @@ import { useEffect, useRef } from 'preact/hooks';
 import { command, startGame, world } from '../bridge/client';
 import type { MapData, RiverData } from '../content/map';
 import type { EditsSource, Scenario } from '../content/scenario';
+import type { Content } from '../sim/content';
 import { buildLookup, hexToRgb, type MapMode } from '../render/map-modes';
 import { computeLabels } from '../render/labels';
 import { LABEL_FONT, loadIdTiles, MapView } from '../render/map-view';
 import { editing, paint, restoreEdits, setBaseEdits } from './editor';
 import { EditorPanel } from './EditorPanel';
+import { DebugConsole } from './DebugConsole';
 import { MapModeBar } from './MapModeBar';
 import { ProvincePanel } from './ProvincePanel';
 import { RealmPanel } from './RealmPanel';
+import { content } from './StatList';
 import { SaveMenu } from './SaveMenu';
 import { TopBar } from './TopBar';
 
@@ -100,11 +103,13 @@ export function App() {
     let cancelled = false;
     (async () => {
       const base = import.meta.env.BASE_URL;
-      const [map, scenario, edits] = await Promise.all([
+      const [map, scenario, edits, gameContent] = await Promise.all([
         fetch(`${base}generated/map.json`).then((r) => r.json() as Promise<MapData>),
         fetch(`${base}generated/scenario.json`).then((r) => r.json() as Promise<Scenario>),
         fetch(`${base}generated/scenario-edits.json`).then((r) => r.json() as Promise<EditsSource>).catch(() => null),
+        fetch(`${base}generated/content.json`).then((r) => r.json() as Promise<Content>),
       ]);
+      content.value = gameContent;
       if (edits) setBaseEdits(edits);
       // Labels are drawn to canvas, so the font must be ready first; without it they fall back to a system serif.
       const [tiles] = await Promise.all([loadIdTiles(base, map), document.fonts.load(`32px ${LABEL_FONT}`).catch(() => [])]);
@@ -119,7 +124,7 @@ export function App() {
       view.onPaint = paint;
       await view.mount(host.current);
       view.setRivers(await riversReady);
-      startGame(START_SEED, scenario);
+      startGame(START_SEED, scenario, gameContent);
       // Replay this browser's unsaved map edits once the game exists.
       let restored = false;
       const stop = effect(() => {
@@ -145,6 +150,7 @@ export function App() {
       <RealmPanel />
       <MapModeBar />
       <EditorPanel />
+      <DebugConsole />
       <SaveMenu />
       <a
         class="credits"

@@ -22,9 +22,17 @@ export interface ScenarioRealm {
   scripted: boolean;
 }
 
+/** A modifier in force at the start: def key, what it sits on, and the day it ends (null = never). */
+export interface ScenarioModifier {
+  def: string;
+  target: { kind: 'province' | 'realm'; id: number };
+  end: number | null;
+}
+
 /** owner/controller are indexed by province id (index 0 unused); 0 = unowned. */
 export interface Scenario {
   realms: ScenarioRealm[];
   owner: number[];
   controller: number[];
+  modifiers?: ScenarioModifier[];
 }

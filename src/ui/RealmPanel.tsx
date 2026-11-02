@@ -1,6 +1,7 @@
 import { world } from '../bridge/client';
 import type { Realm } from '../sim/state';
 import { mapData, selectedRealm, selectProvince, selectRealm } from './App';
+import { ModifierList, StatList } from './StatList';
 
 export const RANK_LABEL: Record<Realm['rank'], string> = {
   empire: 'Empire', kingdom: 'Kingdom', duchy: 'Duchy', county: 'County',
@@ -73,6 +74,9 @@ export function RealmPanel() {
           </>
         )}
       </dl>
+      <h3>Stats</h3>
+      <StatList scope="realm" id={realm.id} />
+      <ModifierList scope="realm" id={realm.id} />
       {vassals.length > 0 && (
         <>
           <h3>Vassals and tributaries</h3>

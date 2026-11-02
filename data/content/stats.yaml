@@ -1,0 +1,58 @@
+# Stats: every number the game computes from modifiers (src/sim/modifiers.ts). Values are in the stat's own unit
+# (percent stats in percent); the build turns them into fixed-point hundredths.
+# scope: province | realm. format: number | integer | percent | gold. A realm's modifiers also reach the province
+# stats of every province it owns.
+# The base values are placeholders until the economy (M4) gives them meaning: GUESS.
+
+province:
+  - key: development
+    label: Development
+    description: How built-up and populous the province is. Drives taxes, levies and supply.
+    base: 5
+    min: 0
+    max: 100
+    format: number
+  - key: tax_efficiency
+    label: Tax efficiency
+    description: Share of the province's taxable wealth that reaches the treasury.
+    base: 50
+    min: 0
+    max: 100
+    format: percent
+  - key: supply_limit
+    label: Supply limit
+    description: Thousands of soldiers the province can feed before armies start to starve.
+    base: 5
+    min: 1
+    max: 50
+    format: integer
+  - key: unrest
+    label: Unrest
+    description: How close the people are to revolt. Above 10, rebels may rise.
+    base: 0
+    min: 0
+    max: 100
+    format: number
+
+realm:
+  - key: legitimacy
+    label: Legitimacy
+    description: How rightful the ruler's claim to the throne is held to be. Affects vassal opinion and levies.
+    base: 60
+    min: 0
+    max: 100
+    format: number
+  - key: levy_size
+    label: Levy size
+    description: Share of able-bodied men the realm can call up in war.
+    base: 10
+    min: 0
+    max: 50
+    format: percent
+  - key: war_exhaustion
+    label: War exhaustion
+    description: How tired of war the realm's people are. Raises unrest and lowers taxes.
+    base: 0
+    min: 0
+    max: 20
+    format: number

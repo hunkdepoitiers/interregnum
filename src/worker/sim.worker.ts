@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 import { applyCommand } from '../sim/commands';
+import type { Content } from '../sim/content';
 import { deserialize, serialize } from '../sim/save';
 import type { Scenario } from '../sim/scenario';
 import { newGame, type GameState, type Speed } from '../sim/state';
@@ -10,6 +11,7 @@ import type { FromWorker, ToWorker } from './protocol';
 const DAY_MS: Record<Speed, number> = { 1: 1000, 2: 400, 3: 150, 4: 50, 5: 10 };
 
 let scenario: Scenario | null = null;
+let content: Content | null = null;
 let state: GameState | null = null;
 let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -22,7 +24,7 @@ function postStatus(s: GameState) {
 function postWorld(s: GameState) {
   const owner = Uint16Array.from(s.provinces, (p) => p.owner);
   const controller = Uint16Array.from(s.provinces, (p) => p.controller);
-  post({ type: 'world', realms: s.realms, owner, controller }, [owner.buffer, controller.buffer]);
+  post({ type: 'world', realms: s.realms, owner, controller, modifiers: s.modifiers }, [owner.buffer, controller.buffer]);
 }
 
 function schedule() {
@@ -32,7 +34,7 @@ function schedule() {
 
 function step() {
   if (!state) return;
-  tick(state);
+  if (tick(state).modifiersChanged) postWorld(state);
   postStatus(state);
   schedule();
 }
@@ -41,12 +43,13 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
   const msg = e.data;
   if (msg.type === 'init') {
     scenario = msg.scenario;
+    content = msg.content;
     state = newGame(msg.seed, scenario);
     postWorld(state);
   } else if (!state || !scenario) {
     return; // nothing to act on before init
   } else if (msg.type === 'command') {
-    if (applyCommand(state, msg.cmd)) postWorld(state);
+    if (applyCommand(state, msg.cmd, content ?? undefined)) postWorld(state);
   } else if (msg.type === 'requestSave') {
     post({ type: 'saveData', requestId: msg.requestId, text: serialize(state) });
     return;

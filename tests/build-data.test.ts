@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { MapProvince } from '../src/content/map';
 import { scenarioSourceSchema } from '../src/content/scenario';
 import { compileScenario, type MapContext } from '../tools/data-lib';
+import { content } from './fixtures/content';
 
 // One pixel per degree: x = lon + 180, y = 90 - lat.
 const ctx: MapContext = {
@@ -64,6 +65,19 @@ describe('compileScenario', () => {
     expect(warnings).toEqual(['Realm y lost all its land to edits and is left out']);
     expect(scenario.owner).toEqual([0, 0, 1, 2, 0, 0]);
     expect(scenario.realms.map((r) => [r.id, r.key, r.overlord])).toEqual([[1, 'x', 0], [2, 'z', 0]]);
+  });
+
+  it('puts capital on every capital and the listed realm modifiers in force', () => {
+    const { scenario, errors } = compileScenario(scenarioSourceSchema.parse({
+      realms: [realm('x', { area: [box(-180, -120)] })],
+      modifiers: [['x', 'crown'], ['x', 'famine'], ['nobody', 'crown'], ['x', 'missing']],
+    }), provinces, { ...ctx, content });
+    expect(scenario.modifiers).toEqual([
+      { def: 'capital', target: { kind: 'province', id: 1 }, end: null },
+      { def: 'crown', target: { kind: 'realm', id: 1 }, end: null },
+      { def: 'famine', target: { kind: 'realm', id: 1 }, end: 10 },
+    ]);
+    expect(errors).toEqual(['modifiers: unknown realm nobody', 'modifiers: x: unknown modifier missing']);
   });
 
   it('rejects unknown towns, places off the land, double naming and empty realms', () => {

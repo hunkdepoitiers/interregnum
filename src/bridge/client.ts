@@ -1,5 +1,6 @@
 import { signal } from '@preact/signals';
 import type { Command } from '../sim/commands';
+import type { Content } from '../sim/content';
 import type { Scenario } from '../sim/scenario';
 import type { Speed } from '../sim/state';
 import type { FromWorker, ToWorker, WorldView } from '../worker/protocol';
@@ -24,7 +25,7 @@ worker.onmessage = (e: MessageEvent<FromWorker>) => {
     return;
   }
   if (msg.type === 'world') {
-    world.value = { realms: msg.realms, owner: msg.owner, controller: msg.controller };
+    world.value = { realms: msg.realms, owner: msg.owner, controller: msg.controller, modifiers: msg.modifiers };
     return;
   }
   pending.get(msg.requestId)?.(msg);
@@ -45,8 +46,8 @@ export function command(cmd: Command) {
   send({ type: 'command', cmd });
 }
 
-export function startGame(seed: number, scenario: Scenario) {
-  send({ type: 'init', seed, scenario });
+export function startGame(seed: number, scenario: Scenario, content: Content) {
+  send({ type: 'init', seed, scenario, content });
 }
 
 export async function getSaveText(): Promise<string> {

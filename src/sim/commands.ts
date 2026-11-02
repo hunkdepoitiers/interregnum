@@ -1,3 +1,5 @@
+import type { Content } from './content';
+import { addModifier, removeModifiers, type ModifierTarget } from './modifiers';
 import type { GameState, Realm, Speed } from './state';
 
 export type Command =
@@ -8,11 +10,14 @@ export type Command =
   | { type: 'setOwner'; province: number; realm: number }
   /** Map editor: a new realm, given the next free id. */
   | { type: 'addRealm'; realm: Omit<Realm, 'id'> }
+  /** Debug console: add a modifier by key, or remove every copy of it from the target. */
+  | { type: 'addModifier'; def: string; target: ModifierTarget }
+  | { type: 'removeModifier'; def: string; target: ModifierTarget }
   /** Debug: occupy a province (realm = its owner ends the occupation). */
   | { type: 'setController'; province: number; realm: number };
 
-/** Returns true if the map's ownership or control changed. Invalid commands are ignored. */
-export function applyCommand(state: GameState, cmd: Command): boolean {
+/** Returns true if ownership, control or modifiers changed. Invalid commands are ignored. */
+export function applyCommand(state: GameState, cmd: Command, content?: Content): boolean {
   switch (cmd.type) {
     case 'setSpeed':
       state.speed = cmd.speed;
@@ -30,6 +35,12 @@ export function applyCommand(state: GameState, cmd: Command): boolean {
       p.controller = cmd.realm;
       return true;
     }
+    case 'addModifier': {
+      if (!content || !validTarget(state, cmd.target)) return false;
+      return addModifier(state, content, cmd.def, cmd.target) !== null;
+    }
+    case 'removeModifier':
+      return removeModifiers(state, cmd.def, cmd.target) > 0;
     case 'addRealm':
       state.realms.push({ ...cmd.realm, id: state.realms.length });
       return true;
@@ -40,4 +51,8 @@ export function applyCommand(state: GameState, cmd: Command): boolean {
       return true;
     }
   }
+}
+
+function validTarget(state: GameState, t: ModifierTarget): boolean {
+  return t.kind === 'realm' ? t.id > 0 && !!state.realms[t.id] : t.id > 0 && !!state.provinces[t.id];
 }

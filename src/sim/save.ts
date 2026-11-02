@@ -1,5 +1,5 @@
 import type { Scenario } from './scenario';
-import { provincesFromScenario, realmsFromScenario, SAVE_VERSION, type GameState } from './state';
+import { modifiersFromScenario, provincesFromScenario, realmsFromScenario, SAVE_VERSION, type GameState } from './state';
 
 /** Plain-text save envelope. Compression and storage live in src/platform. */
 export interface SaveFile {
@@ -19,6 +19,11 @@ type Migration = (state: Record<string, unknown>, ctx: MigrationContext) => Reco
 export const migrations: Record<number, Migration> = {
   // v2 added realms and province ownership; v1 saves only had the date, so take the start map.
   1: (s, { scenario }) => ({ ...s, realms: realmsFromScenario(scenario), provinces: provincesFromScenario(scenario) }),
+  // v3 added modifiers; older saves start with the scenario's.
+  2: (s, { scenario }) => {
+    const modifiers = modifiersFromScenario(scenario);
+    return { ...s, modifiers, nextModifierId: modifiers.length + 1 };
+  },
 };
 
 export class SaveError extends Error {}
@@ -75,6 +80,11 @@ function validate(s: GameState): void {
     typeof s.paused === 'boolean' &&
     Array.isArray(s.realms) && s.realms[0] === null &&
     Array.isArray(s.provinces) &&
-    s.provinces.every((p, i) => p?.id === i && realmRef(p.owner) && realmRef(p.controller));
+    s.provinces.every((p, i) => p?.id === i && realmRef(p.owner) && realmRef(p.controller)) &&
+    Array.isArray(s.modifiers) && Number.isInteger(s.nextModifierId) &&
+    s.modifiers.every((m) =>
+      Number.isInteger(m?.id) && m.id < s.nextModifierId && typeof m.def === 'string' && Number.isInteger(m.start) &&
+      (m.end === null || Number.isInteger(m.end)) &&
+      (m.target?.kind === 'realm' ? realmRef(m.target.id) && m.target.id > 0 : m.target?.kind === 'province' && s.provinces[m.target.id] !== undefined));
   if (!ok) throw new SaveError('Save file is corrupt');
 }

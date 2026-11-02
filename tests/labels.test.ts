@@ -23,6 +23,7 @@ describe('computeLabels', () => {
     realms: [null, { id: 1, key: 'x', name: 'Kingdom of Testland', rank: 'kingdom', government: 'feudal_monarchy', color: '#ff0000', capital: 1, overlord: 0, scripted: false }],
     owner: new Uint16Array([0, 1, 1, 1, 1]),
     controller: new Uint16Array([0, 1, 1, 1, 1]),
+    modifiers: [],
   };
 
   it('labels the largest connected piece along its long axis', () => {

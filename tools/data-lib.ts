@@ -1,5 +1,7 @@
 import { lonLatToPixel, type MapProvince, type Projection } from '../src/content/map';
 import type { Place, Scenario, ScenarioRealm, ScenarioSource } from '../src/content/scenario';
+import type { Content } from '../src/sim/content';
+import type { ScenarioModifier } from '../src/sim/scenario';
 
 export interface CompiledScenario {
   scenario: Scenario;
@@ -17,6 +19,8 @@ export interface MapContext {
   idAt?: (x: number, y: number) => number;
   /** Realms from this index on come from the map editor; like its overrides, they win over earlier realms. */
   editedFrom?: number;
+  /** Stats and modifiers, for the starting modifiers; without it they are left out. */
+  content?: Content;
 }
 
 /** Below this RGB distance two bordering realms are hard to tell apart on the political map. */
@@ -206,5 +210,26 @@ export function compileScenario(src: ScenarioSource, provinces: MapProvince[], c
     }
   }
 
-  return { scenario: { realms, owner, controller }, errors, warnings, unowned: counts[0]! };
+  // Starting modifiers: those the scenario lists, and `capital` on every realm's capital.
+  const modifiers: ScenarioModifier[] = [];
+  if (ctx.content) {
+    const content = ctx.content;
+    const put = (def: string, target: ScenarioModifier['target'], where: string) => {
+      const d = content.modifiers[def];
+      if (!d) { errors.push(`${where}: unknown modifier ${def}`); return; }
+      if (target.kind === 'province' && d.effects.some((e) => content.stats[e.stat]?.scope !== 'province')) {
+        errors.push(`${where}: ${def} has realm effects and cannot sit on a province`);
+        return;
+      }
+      modifiers.push({ def, target, end: d.days });
+    };
+    if (content.modifiers.capital) for (const r of realms) if (r.capital) put('capital', { kind: 'province', id: r.capital }, `Realm ${r.key} capital`);
+    for (const [realmKey, def] of src.modifiers) {
+      const id = realmId.get(realmKey);
+      if (!id) errors.push(`modifiers: unknown realm ${realmKey}`);
+      else put(def, { kind: 'realm', id }, `modifiers: ${realmKey}`);
+    }
+  }
+
+  return { scenario: { realms, owner, controller, modifiers }, errors, warnings, unowned: counts[0]! };
 }

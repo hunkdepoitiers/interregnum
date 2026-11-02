@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyCommand } from '../src/sim/commands';
+import { content } from './fixtures/content';
 import { hashState } from '../src/sim/hash';
 import { nextU32 } from '../src/sim/rng';
 import { deserialize, migrate, SaveError, serialize } from '../src/sim/save';
@@ -95,6 +96,19 @@ describe('commands', () => {
   });
 });
 
+describe('modifier commands', () => {
+  it('add needs content and a real target; remove takes every copy off', () => {
+    const s = newGame(1, scenario);
+    const P = { kind: 'province', id: 2 } as const;
+    expect(applyCommand(s, { type: 'addModifier', def: 'famine', target: P })).toBe(false); // no content
+    expect(applyCommand(s, { type: 'addModifier', def: 'famine', target: { kind: 'realm', id: 9 } }, content)).toBe(false);
+    expect(applyCommand(s, { type: 'addModifier', def: 'nothing', target: P }, content)).toBe(false);
+    expect(applyCommand(s, { type: 'addModifier', def: 'famine', target: P }, content)).toBe(true);
+    expect(applyCommand(s, { type: 'removeModifier', def: 'famine', target: P })).toBe(true);
+    expect(applyCommand(s, { type: 'removeModifier', def: 'famine', target: P })).toBe(false);
+  });
+});
+
 describe('save', () => {
   it('round-trips and the game continues identically', () => {
     const a = run(77, 400);
@@ -131,12 +145,30 @@ describe('save', () => {
     expect(s.realms[1]!.key).toBe('a');
   });
 
+  it('upgrades a version 2 save by adding the scenario modifiers', () => {
+    const withMods: Scenario = { ...scenario, modifiers: [{ def: 'capital', target: { kind: 'province', id: 1 }, end: null }] };
+    const v2 = { format: 'interregnum-save', saveVersion: 2, state: { ...newGame(5, scenario), saveVersion: 2, modifiers: undefined, nextModifierId: undefined } };
+    const s = deserialize(JSON.stringify(v2), { scenario: withMods });
+    expect(s.modifiers).toEqual([{ id: 1, def: 'capital', target: { kind: 'province', id: 1 }, start: 0, end: null }]);
+    expect(s.nextModifierId).toBe(2);
+  });
+
+  it('round-trips modifiers and rejects one pointing at a missing realm', () => {
+    const a = newGame(1, scenario);
+    applyCommand(a, { type: 'addModifier', def: 'famine', target: { kind: 'province', id: 2 } }, content);
+    expect(deserialize(serialize(a), ctx).modifiers).toEqual(a.modifiers);
+    const bad = JSON.parse(serialize(a));
+    bad.state.modifiers[0].target = { kind: 'realm', id: 9 };
+    expect(() => deserialize(JSON.stringify(bad), ctx)).toThrow(/corrupt/);
+  });
+
   it('migrate applies each step in order', () => {
     const table = {
       0: (s: Record<string, unknown>) => ({ ...s, a: true }),
       1: (s: Record<string, unknown>) => ({ ...s, b: true }),
+      2: (s: Record<string, unknown>) => ({ ...s, c: true }),
     };
-    expect(migrate({ saveVersion: 0 }, 0, ctx, table)).toEqual({ saveVersion: SAVE_VERSION, a: true, b: true });
+    expect(migrate({ saveVersion: 0 }, 0, ctx, table)).toEqual({ saveVersion: SAVE_VERSION, a: true, b: true, c: true });
     expect(() => migrate({}, -1, ctx, table)).toThrow(/No migration from save version -1/);
   });
 });

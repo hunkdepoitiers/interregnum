@@ -1,6 +1,7 @@
 import { world } from '../bridge/client';
 import { hasRealms, mapData, selected, selectProvince } from './App';
 import { RealmLink } from './RealmPanel';
+import { ModifierList, StatList } from './StatList';
 
 const KIND_LABEL = {
   land: 'Land province', sea: 'Sea zone', wasteland: 'Wasteland (impassable)', mountain: 'Mountains (impassable)', lake: 'Lake',
@@ -47,6 +48,13 @@ export function ProvincePanel() {
         <dt>Key</dt>
         <dd><code>{p.key}</code></dd>
       </dl>
+      {p.kind === 'land' && (
+        <>
+          <h3>Stats</h3>
+          <StatList scope="province" id={p.id} />
+          <ModifierList scope="province" id={p.id} />
+        </>
+      )}
       <h3>Neighbours</h3>
       <ul class="neighbours">
         {p.adjacency.map((a) => {

@@ -1,13 +1,31 @@
 /**
  * Validates data/scenario/1314.yaml (plus the map editor's 1314-edits.yaml, if present) against the built map and writes
- * public/generated/scenario.json, and the edits as scenario-edits.json for the editor to build on. Runs after build-map.
+ * public/generated/scenario.json, and the edits as scenario-edits.json for the editor to build on; compiles
+ * data/content/*.yaml (stats, modifiers) into public/generated/content.json. Runs after build-map.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import { parse } from 'yaml';
 import { seedsSchema, type MapData } from '../src/content/map';
+import { modifiersSourceSchema, statsSourceSchema } from '../src/content/content';
 import { editsSourceSchema, scenarioSourceSchema } from '../src/content/scenario';
+import { compileContent } from './content-lib';
 import { compileScenario } from './data-lib';
+
+function load<T>(file: string, schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: { issues: { path: PropertyKey[]; message: string }[] } } }): T {
+  const r = schema.safeParse(parse(readFileSync(file, 'utf8')));
+  if (!r.success) {
+    for (const issue of r.error.issues) console.error(`error: ${file} ${issue.path.join('.')}: ${issue.message}`);
+    process.exit(1);
+  }
+  return r.data;
+}
+const compiled = compileContent(load('data/content/stats.yaml', statsSourceSchema), load('data/content/modifiers.yaml', modifiersSourceSchema));
+if (compiled.errors.length) {
+  for (const e of compiled.errors) console.error(`error: ${e}`);
+  process.exit(1);
+}
+const content = compiled.content;
 
 const SCENARIO = 'data/scenario/1314.yaml';
 const map = JSON.parse(readFileSync('public/generated/map.json', 'utf8')) as MapData;
@@ -49,7 +67,7 @@ function idAt(x: number, y: number): number {
 }
 
 const { scenario, errors, warnings, unowned } = compileScenario(source, map.provinces, {
-  projection: map.projection, towns, idAt, editedFrom: parsed.data.realms.length,
+  projection: map.projection, towns, idAt, editedFrom: parsed.data.realms.length, content,
 });
 for (const w of warnings) console.warn(`warning: ${w}`);
 if (errors.length) {
@@ -58,5 +76,6 @@ if (errors.length) {
 }
 writeFileSync('public/generated/scenario.json', JSON.stringify(scenario));
 writeFileSync('public/generated/scenario-edits.json', JSON.stringify(edits));
+writeFileSync('public/generated/content.json', JSON.stringify(content));
 const owned = scenario.owner.filter(Boolean).length;
-console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${warnings.length} warnings`);
+console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${warnings.length} warnings`);

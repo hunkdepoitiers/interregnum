@@ -1,0 +1,82 @@
+# Modifiers: named bundles of effects on stats (data/content/stats.yaml). Put on a province or a realm by the
+# scenario, events, laws, buildings or the debug console. effects: { stat, add } adds in the stat's unit;
+# { stat, pct } multiplies by (1 + pct/100). stacking: replace (default; adding it again refreshes it) | stack.
+# days: lasts that long, else until removed. A realm modifier with province-stat effects reaches all its provinces.
+# Values are placeholders until the economy (M4): GUESS.
+
+- key: capital
+  label: Capital
+  description: The seat of the realm's government.
+  effects:
+    - { stat: development, add: 5 }
+    - { stat: tax_efficiency, add: 10 }
+    - { stat: supply_limit, add: 2 }
+
+- key: regency
+  label: Regency
+  description: The ruler is a child; a regent governs in his name.
+  effects:
+    - { stat: legitimacy, add: -15 }
+    - { stat: levy_size, add: -2 }
+
+- key: papal_vacancy
+  label: Vacant See
+  description: No pope has been elected since Clement V died in April 1314.
+  effects:
+    - { stat: legitimacy, add: -20 }
+
+- key: disputed_election
+  label: Disputed Election
+  description: Louis of Bavaria and Frederick of Austria were both elected King of the Romans in October 1314.
+  effects:
+    - { stat: legitimacy, add: -10 }
+
+- key: bannockburn_victory
+  label: Victor of Bannockburn
+  description: Robert Bruce routed the English army in June 1314.
+  days: 1825
+  effects:
+    - { stat: legitimacy, add: 10 }
+    - { stat: levy_size, add: 2 }
+
+- key: bannockburn_defeat
+  label: Defeat at Bannockburn
+  description: Edward II's army was routed by the Scots in June 1314.
+  days: 1825
+  effects:
+    - { stat: legitimacy, add: -10 }
+    - { stat: war_exhaustion, add: 3 }
+
+- key: strong_crown
+  label: Strong Crown
+  description: Royal officials reach into every province of the realm.
+  effects:
+    - { stat: tax_efficiency, add: 5 }
+    - { stat: legitimacy, add: 5 }
+
+- key: famine
+  label: Famine
+  description: The harvest has failed.
+  days: 365
+  effects:
+    - { stat: tax_efficiency, add: -20 }
+    - { stat: unrest, add: 10 }
+    - { stat: supply_limit, pct: -40 }
+
+- key: devastation
+  label: Devastated
+  description: Armies have burned and plundered the land.
+  days: 730
+  effects:
+    - { stat: development, add: -2 }
+    - { stat: supply_limit, add: -2 }
+    - { stat: unrest, add: 5 }
+
+- key: prosperity
+  label: Prosperity
+  description: Years of peace and good harvests.
+  stacking: stack
+  days: 1825
+  effects:
+    - { stat: development, pct: 10 }
+    - { stat: tax_efficiency, add: 5 }

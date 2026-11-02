@@ -1,0 +1,106 @@
+import type { Content, Effect, StatScope } from './content';
+import type { GameState } from './state';
+
+/**
+ * Modifiers are the only way stats change. Every stat value is
+ *   clamp((base + Σadd) × (10000 + Σpct) / 10000, min, max)
+ * in fixed-point hundredths, and explain() returns the lines behind it, so every number in the UI can show where it
+ * comes from. A province stat also sees the modifiers on the realm that owns the province.
+ */
+export interface ModifierTarget {
+  kind: StatScope;
+  id: number;
+}
+
+export interface Modifier {
+  id: number;
+  /** Key into Content.modifiers. */
+  def: string;
+  target: ModifierTarget;
+  start: number;
+  /** Day it expires on; null = until removed. */
+  end: number | null;
+}
+
+export interface ExplainLine {
+  label: string;
+  op: Effect['op'];
+  value: number;
+  /** Comes from the realm that owns the province, not the province itself. */
+  inherited: boolean;
+  modifierId: number;
+}
+
+export interface Explained {
+  stat: string;
+  value: number;
+  base: number;
+  /** Before clamping to [min, max]. */
+  raw: number;
+  min: number;
+  max: number;
+  lines: ExplainLine[];
+}
+
+const sameTarget = (a: ModifierTarget, b: ModifierTarget) => a.kind === b.kind && a.id === b.id;
+
+/** Adds a modifier from its definition; returns null for an unknown key. */
+export function addModifier(state: GameState, content: Content, def: string, target: ModifierTarget): Modifier | null {
+  const d = content.modifiers[def];
+  if (!d) return null;
+  if (d.stacking === 'replace') removeModifiers(state, def, target);
+  const m: Modifier = { id: state.nextModifierId++, def, target, start: state.day, end: d.days === null ? null : state.day + d.days };
+  state.modifiers.push(m);
+  return m;
+}
+
+/** Removes every copy of a modifier from a target; returns how many there were. */
+export function removeModifiers(state: GameState, def: string, target: ModifierTarget): number {
+  const before = state.modifiers.length;
+  state.modifiers = state.modifiers.filter((m) => !(m.def === def && sameTarget(m.target, target)));
+  return before - state.modifiers.length;
+}
+
+/** Drops modifiers whose time is up; returns true if any went. */
+export function expireModifiers(state: GameState): boolean {
+  const before = state.modifiers.length;
+  state.modifiers = state.modifiers.filter((m) => m.end === null || m.end > state.day);
+  return state.modifiers.length !== before;
+}
+
+export function hasModifier(state: Pick<GameState, 'modifiers'>, def: string, target: ModifierTarget): boolean {
+  return state.modifiers.some((m) => m.def === def && sameTarget(m.target, target));
+}
+
+/** The value of a stat on a target, with every line that makes it up. */
+export function explain(
+  state: Pick<GameState, 'modifiers' | 'provinces'>, content: Content, stat: string, target: ModifierTarget,
+): Explained {
+  const s = content.stats[stat];
+  if (!s) throw new Error(`Unknown stat ${stat}`);
+  if (s.scope !== target.kind) throw new Error(`Stat ${stat} belongs to a ${s.scope}, not a ${target.kind}`);
+  const owner = target.kind === 'province' ? state.provinces[target.id]?.owner ?? 0 : 0;
+  const lines: ExplainLine[] = [];
+  for (const m of state.modifiers) {
+    const own = sameTarget(m.target, target);
+    const inherited = !own && owner !== 0 && m.target.kind === 'realm' && m.target.id === owner;
+    if (!own && !inherited) continue;
+    const d = content.modifiers[m.def];
+    if (!d) continue;
+    for (const e of d.effects) if (e.stat === stat) lines.push({ label: d.label, op: e.op, value: e.value, inherited, modifierId: m.id });
+  }
+  let add = 0;
+  let pct = 0;
+  for (const l of lines) {
+    if (l.op === 'add') add += l.value;
+    else pct += l.value;
+  }
+  const raw = Math.trunc(((s.base + add) * (10000 + pct)) / 10000);
+  return { stat, value: Math.min(s.max, Math.max(s.min, raw)), base: s.base, raw, min: s.min, max: s.max, lines };
+}
+
+export function statValue(
+  state: Pick<GameState, 'modifiers' | 'provinces'>, content: Content, stat: string, target: ModifierTarget,
+): number {
+  return explain(state, content, stat, target).value;
+}

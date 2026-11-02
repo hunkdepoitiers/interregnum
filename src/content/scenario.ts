@@ -32,6 +32,8 @@ export const scenarioSourceSchema = z.object({
   fill: z.array(z.array(point).min(3)).default([]),
   /** Hand edits from the in-game map editor: [lat, lon, realm key or null for unowned]; override everything. */
   overrides: z.array(z.tuple([z.number(), z.number(), key.nullable()])).default([]),
+  /** Modifiers in force at the start: [realm, modifier] (data/content/modifiers.yaml). Every capital also gets `capital`. */
+  modifiers: z.array(z.tuple([key, key])).default([]),
   /** Controller differs from owner at game start: [place, occupying realm]. */
   occupations: z.array(z.tuple([place, key])).default([]),
   realms: z.array(realmSourceSchema).min(1),
