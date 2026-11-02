@@ -1,9 +1,10 @@
 """
-Generates the lower tiers of the title hierarchy into data/map/titles.yaml: counties (about COUNTY_SIZE neighbouring
-land provinces inside one administrative region, named after their main town) and duchies (Natural Earth admin-1
-regions, English names; regions with one county merge into a neighbour, big ones split). Kingdoms, empires and
-hegemonies are hand-made in data/content/titles.yaml. Reads public/generated/map.json, so run after build-map, and
-again whenever province keys change:  py -3.12 -I tools/build_titles.py .
+Generates the lower tiers of the title hierarchy into data/map/titles.yaml: counties (one per land province, which is
+also its barony), duchies (about DUCHY_SIZE neighbouring provinces inside one Natural Earth admin-1 region, named after
+their main town) and areas (a region's duchies, merged or split to about AREA_SIZE duchies), which become kingdoms
+wherever no hand-drawn kingdom reaches. Kingdoms, empires and hegemonies are hand-made in data/content/titles.yaml.
+Reads public/generated/map.json, so run after build-map, and again whenever province keys change:
+py -3.12 -I tools/build_titles.py .
 """
 import json
 import math
@@ -19,8 +20,10 @@ from scipy.cluster.vq import kmeans2
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else '.')
 MAP = ROOT / 'data' / 'map'
 VENDOR = ROOT / 'tools' / 'vendor'
-COUNTY_SIZE = 5     # provinces per county
-DUCHY_MAX = 8       # counties per duchy before an admin region is split
+DUCHY_SIZE = 5      # provinces per duchy
+AREA_SIZE = 8       # duchies per fallback area when an admin region is split
+AREA_MIN = 5        # smaller regions merge into a neighbouring one
+AREA_MAX = 14       # bigger ones are split
 rng = np.random.default_rng(1314)
 
 m = json.loads((ROOT / 'public' / 'generated' / 'map.json').read_text(encoding='utf8'))
@@ -141,7 +144,7 @@ def split(members, size):
     return [p for p in pieces if p]
 
 
-# ---------- counties
+# ---------- counties (one per province) and duchies (about DUCHY_SIZE neighbouring provinces in one admin region)
 used = set()
 
 
@@ -153,77 +156,82 @@ def unique(key):
     return k
 
 
-counties = []  # (key, name, capital index, member indices, region id)
+counties = [(unique('c_' + p['key']), f'County of {p["name"]}', i) for i, p in enumerate(land)]
+duchies = []  # (key, name, member indices, region id)
 by_region = defaultdict(list)
 for i, r in enumerate(region):
     by_region[int(r)].append(i)
 for rid, members in by_region.items():
     for comp in components(members):
-        for piece in split(comp, COUNTY_SIZE):
-            # The capital: a historical seed town if the county has one, else its biggest province.
+        for piece in split(comp, DUCHY_SIZE):
+            # The capital: a historical seed town if the duchy has one, else its biggest province.
             capital = max(piece, key=lambda j: (land[j]['key'] in seed_keys, land[j]['pixels']))
-            name = land[capital]['name']
-            counties.append((unique('c_' + land[capital]['key']), f'County of {name}', capital, piece, rid))
+            duchies.append((unique('d_' + land[capital]['key']), f'Duchy of {land[capital]["name"]}', piece, rid))
 
-# ---------- duchies: a region's counties; one-county regions join a neighbouring duchy of the same country
-county_of = {}
-for ci, c in enumerate(counties):
-    for j in c[3]:
-        county_of[j] = ci
-county_adj = defaultdict(set)
-for ci, c in enumerate(counties):
-    for j in c[3]:
+# ---------- areas: fallback kingdoms where no hand-drawn kingdom reaches. A region's duchies, merged with a
+# neighbour of the same country when small, split when big.
+duchy_of = {}
+for di, d in enumerate(duchies):
+    for j in d[2]:
+        duchy_of[j] = di
+duchy_adj = defaultdict(set)
+for di, d in enumerate(duchies):
+    for j in d[2]:
         for a in land[j]['adjacency']:
             k = index.get(a['id'])
-            if k is not None and a['border'] > 0 and county_of[k] != ci:
-                county_adj[ci].add(county_of[k])
-duchy_of = {ci: c[4] for ci, c in enumerate(counties)}  # start: duchy = region id
-for _ in range(3):
-    size = Counter(duchy_of.values())
-    for ci, c in enumerate(counties):
-        d = duchy_of[ci]
-        if size[d] > 1:
+            if k is not None and a['border'] > 0 and duchy_of[k] != di:
+                duchy_adj[di].add(duchy_of[k])
+area_of = {di: d[3] for di, d in enumerate(duchies)}  # start: area = region id
+for _ in range(6):
+    size = Counter(area_of.values())
+    for di, d in enumerate(duchies):
+        a = area_of[di]
+        if size[a] >= AREA_MIN:
             continue
-        country = regions[c[4]][1]
-        options = [duchy_of[o] for o in county_adj[ci] if regions[counties[o][4]][1] == country and duchy_of[o] != d]
+        country = regions[d[3]][1]
+        options = [area_of[o] for o in duchy_adj[di] if regions[duchies[o][3]][1] == country and area_of[o] != a]
         if options:
             target = min(options, key=lambda o: size[o])
-            size[d] -= 1
-            size[target] += 1
-            duchy_of[ci] = target
-duchies = []  # (key, name, country, county indices)
+            for dj in [x for x, v in area_of.items() if v == a]:
+                area_of[dj] = target
+            size[target] += size[a]
+            size[a] = 0
+areas = []  # (key, name, duchy indices)
 groups = defaultdict(list)
-for ci, d in duchy_of.items():
-    groups[d].append(ci)
-for d, cis in groups.items():
-    name, code, _ = regions[d]
-    if len(cis) <= DUCHY_MAX:
-        parts = [cis]
-    else:  # split a big region into duchies of about DUCHY_MAX / 2 counties
-        k = max(2, round(len(cis) / (DUCHY_MAX / 2)))
-        pts = np.array([[np.mean(cx[counties[ci][3]]), np.mean(cy[counties[ci][3]])] for ci in cis])
+for di, a in area_of.items():
+    groups[a].append(di)
+for a, dis in groups.items():
+    name = regions[a][0]
+    if len(dis) <= AREA_MAX:
+        parts = [dis]
+    else:
+        k = max(2, round(len(dis) / AREA_SIZE))
+        pts = np.array([[np.mean(cx[duchies[di][2]]), np.mean(cy[duchies[di][2]])] for di in dis])
         _, lab = kmeans2(pts, k, minit='++', seed=rng)
-        parts = [[ci for ci, l in zip(cis, lab) if l == g] for g in range(k)]
-        parts = [p for p in parts if p]
+        parts = [p for p in ([di for di, l in zip(dis, lab) if l == g] for g in range(k)) if p]
     for part in parts:
         if len(parts) == 1:
-            dname = name
+            aname = name
         else:
-            big = max(part, key=lambda ci: len(counties[ci][3]))
-            dname = land[counties[big][2]]['name']
-        duchies.append((unique('d_' + slugify(dname)), f'Duchy of {dname}', code, part))
+            big = max(part, key=lambda di: len(duchies[di][2]))
+            aname = land[max(duchies[big][2], key=lambda j: (land[j]['key'] in seed_keys, land[j]['pixels']))]['name']
+        areas.append((unique('a_' + slugify(aname)), aname, part))
+area_key = {}
+for key, _, part in areas:
+    for di in part:
+        area_key[di] = key
 
-country_names = {code: cname for _, code, cname in regions}
 lines = ['# Generated by tools/build_titles.py: do not edit by hand (kingdoms and above: data/content/titles.yaml).',
-         '# counties: [key, name, capital province, [provinces]]. duchies: [key, name, country code, [counties]].',
-         'countries:']
-for code in sorted({d[2] for d in duchies}):
-    lines.append(f'  {code}: {json.dumps(country_names.get(code, code), ensure_ascii=False)}')
+         '# areas: fallback kingdoms (key: name). counties: [key, name, capital province, [provinces]].',
+         '# duchies: [key, name, area, [counties]].',
+         'areas:']
+for key, name, _ in areas:
+    lines.append(f'  {key}: {json.dumps(name, ensure_ascii=False)}')
 lines.append('counties:')
-for key, name, cap, members, _ in counties:
-    lines.append(f'  - [{key}, {json.dumps(name, ensure_ascii=False)}, {land[cap]["key"]}, [{", ".join(land[j]["key"] for j in members)}]]')
+for key, name, i in counties:
+    lines.append(f'  - [{key}, {json.dumps(name, ensure_ascii=False)}, {land[i]["key"]}, [{land[i]["key"]}]]')
 lines.append('duchies:')
-for key, name, code, cis in duchies:
-    lines.append(f'  - [{key}, {json.dumps(name, ensure_ascii=False)}, {code}, [{", ".join(counties[ci][0] for ci in cis)}]]')
+for di, (key, name, members, _) in enumerate(duchies):
+    lines.append(f'  - [{key}, {json.dumps(name, ensure_ascii=False)}, {area_key[di]}, [{", ".join(counties[j][0] for j in members)}]]')
 (MAP / 'titles.yaml').write_text('\n'.join(lines) + '\n', encoding='utf8', newline='\n')
-print(f'{len(counties)} counties, {len(duchies)} duchies, {len(country_names)} countries')
+print(f'{len(counties)} counties, {len(duchies)} duchies, {len(areas)} areas')

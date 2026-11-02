@@ -1,214 +1,610 @@
-# Upper title tiers (de jure). Counties and duchies are generated (data/map/titles.yaml, tools/build_titles.py).
-# kingdoms: rough [lat, lon] outlines; a duchy belongs to the kingdom holding most of its provinces (later outlines
-# paint over earlier ones; inside `fill`, gaps take the nearest kingdom). Duchies outside all that form a kingdom per
-# modern country, keyed k_auto_<country code> (named in
-# country_kingdoms, else after the country) until someone draws one. empires: lists of kingdoms. hegemonies: lists of
-# empires; only those with `de_jure: true` are part of the de jure chain at the start, the rest are formed by
-# decisions later (M10) and only record what they would unite. Outlines are rough: GUESS.
+# Upper title tiers (de jure). Counties (one per province, also its barony) and duchies (about five provinces) are
+# generated into data/map/titles.yaml by tools/build_titles.py.
+# kingdoms: the size of a historical area (a few duchies), drawn as rough [lat, lon] outlines; a duchy belongs to the
+# kingdom holding most of its provinces (later outlines paint over earlier ones; inside `fill`, gaps take the nearest
+# kingdom). Duchies outside all that form a kingdom from their generated area, keyed k_<area>. France and Germany
+# are kept whole as single great kingdoms.
+# empires: historical regions, drawn as outlines; a kingdom belongs to the empire listed with it, else to the one
+# whose outline holds most of its provinces (gaps inside `empire_fill` take the nearest).
+# hegemonies: lists of empires; only those with `de_jure: true` are part of the de jure chain at the start, the rest
+# are formed by decisions later (M10) and only record what they would unite. Outlines are rough: GUESS.
 
-country_kingdoms:
-  RUS: Sibir
-  KAZ: the Kazakh Steppe
-  CAN: Kanata
-  USA: Turtle Island
-  BRA: Pindorama
-  AUS: the Southern Land
-  CHN: Cathay
-
-# Inside these outlines land no kingdom outline reaches goes to the nearest drawn kingdom (no automatic kingdoms).
 fill:
-  - [[71.5, -25], [71.5, 60], [56, 60], [50, 82], [47, 92], [42, 97], [36, 100], [30, 98], [23, 98], [22, 91], [5, 82], [5, 76], [22, 66], [12, 52], [12, 42], [6, 33], [9, -18], [36, -18]]
-  - [[54, 96], [54, 142], [46, 147], [30, 132], [22, 122], [8, 106], [-10, 104], [-10, 118], [5, 100], [16, 94], [24, 96]]
+  - [[72, -26], [72, 66], [56, 66], [54, 76], [48, 82], [47, 92], [44, 97], [38, 100], [30, 100], [27, 98.5], [22, 93], [8, 82], [5, 76], [22, 66], [12, 53], [11, 51.5], [2, 47], [-2, 42], [-11, 42], [-11, 38], [5, 35], [8, -18], [36, -18]]
+  - [[57, 88], [57, 115], [54, 120], [54, 142], [46, 147.5], [30, 147.5], [24, 124], [18, 112], [8, 110], [0, 105], [-10, 105], [-10, 117], [5, 100], [8, 98], [16, 93], [22, 93], [27, 98.5], [30, 100], [38, 100], [44, 97], [48, 90]]
 
 kingdoms:
   # ---------- Iberia
-  - { key: k_castile, name: Kingdom of Castile, area: [[[43.6, -6.0], [43.4, -1.8], [41.3, -1.9], [40.2, -1.4], [38.7, -1.0], [37.5, -1.8], [37.6, -4.0], [38.4, -7.2], [41.0, -6.8]]] }
-  - { key: k_leon, name: Kingdom of León, area: [[[43.9, -9.5], [43.6, -6.0], [41.0, -6.8], [40.2, -6.9], [41.8, -9.0]]] }
-  - { key: k_portugal, name: Kingdom of Portugal, area: [[[41.9, -9.8], [41.95, -6.5], [41.0, -6.8], [39.6, -7.5], [38.2, -6.95], [37.0, -7.4], [36.8, -9.9]]] }
-  - { key: k_navarra, name: Kingdom of Navarre, area: [[[43.5, -3.3], [43.4, -1.0], [42.3, -1.0], [42.2, -2.6]]] }
-  - { key: k_aragon, name: Kingdom of Aragon, area: [[[42.9, -1.0], [42.9, 3.3], [41.0, 1.8], [39.8, 0.2], [38.2, 0.0], [37.8, -0.8], [38.7, -1.0], [40.2, -1.4], [41.3, -1.9], [42.3, -1.0]], [[40.2, 1.1], [40.2, 4.5], [38.6, 4.5], [38.6, 1.1]]] }
-  - { key: k_andalusia, name: Kingdom of Andalusia, area: [[[38.4, -7.2], [37.6, -4.0], [37.5, -1.8], [36.5, -1.6], [35.9, -5.3], [36.8, -7.5]]] }
-  # ---------- France and the British Isles
-  - { key: k_france, name: Kingdom of France, area: [[[51.1, 1.5], [50.9, 4.2], [49.5, 4.9], [48.6, 5.3], [47.5, 4.3], [46.3, 3.0], [46.3, 0.5], [47.3, -1.2], [48.6, -1.6], [49.7, -1.9], [50.3, 1.4]]] }
-  - { key: k_aquitaine, name: Kingdom of Aquitaine, area: [[[47.3, -1.2], [46.3, 0.5], [46.3, 3.0], [45.0, 4.0], [43.8, 3.5], [42.5, 2.0], [42.8, -0.7], [43.4, -1.8], [45.5, -1.4]]] }
-  - { key: k_brittany, name: Kingdom of Brittany, area: [[[48.95, -5.2], [48.65, -1.5], [47.6, -1.2], [47.2, -1.8], [46.8, -4]]] }
-  - { key: k_burgundy, name: Kingdom of Burgundy, area: [[[48.6, 3.5], [48.4, 5.3], [47.5, 7.2], [46.4, 7.1], [45.2, 7.1], [43.7, 7.6], [43.0, 6.0], [43.3, 3.8], [45.0, 4.0], [46.3, 3.0], [47.5, 3.3]]] }
-  - { key: k_england, name: Kingdom of England, area: [[[55.8, -2.1], [55.0, -3.0], [54.0, -3.5], [53.4, -3.1], [52.0, -2.9], [51.5, -3.0], [50.6, -4.0], [50.0, -5.8], [50.6, 1.6], [53.0, 2.0]]] }
+  - { key: k_galicia, name: Kingdom of Galicia, area: [[[43.9, -9.5], [43.6, -7.0], [42.0, -6.8], [41.9, -8.9]]] }
+  - { key: k_asturias, name: Kingdom of Asturias, area: [[[43.7, -7.1], [43.5, -4.5], [42.6, -4.6], [42.6, -7.0]]] }
+  - { key: k_leon, name: Kingdom of León, area: [[[42.6, -7.0], [42.6, -4.6], [41.5, -4.6], [40.5, -5.5], [40.3, -6.9], [41.95, -6.5]]] }
+  - { key: k_castile, name: Kingdom of Castile, area: [[[43.5, -4.5], [43.4, -3.2], [42.6, -2.9], [42.0, -1.9], [41.3, -1.9], [40.9, -3.5], [41.5, -4.6], [42.6, -4.6]]] }
+  - { key: k_navarre, name: Kingdom of Navarre, area: [[[43.4, -2.9], [43.3, -1.0], [42.3, -1.0], [42.0, -1.9], [42.6, -2.9]]] }
+  - { key: k_aragon, name: Kingdom of Aragon, area: [[[42.9, -1.0], [42.7, 0.6], [41.0, 0.3], [40.0, -0.5], [40.2, -1.6], [41.3, -1.9], [42.0, -1.9], [42.3, -1.0]]] }
+  - { key: k_catalonia, name: Kingdom of Catalonia, area: [[[42.9, 0.6], [42.9, 3.3], [41.0, 1.8], [40.5, 0.6], [41.0, 0.3]]] }
+  - { key: k_toledo, name: Kingdom of Toledo, area: [[[41.3, -1.9], [40.2, -1.6], [38.6, -2.2], [38.5, -4.6], [39.4, -5.4], [40.5, -5.5], [40.9, -3.5]]] }
+  - { key: k_murcia, name: Kingdom of Murcia, area: [[[38.9, -1.3], [38.7, -0.9], [37.8, -0.7], [37.3, -1.65], [37.7, -2.6], [38.6, -2.4]]] }
+  - { key: k_valencia, name: Kingdom of Valencia, area: [[[40.5, 0.6], [39.8, 0.2], [38.6, 0.3], [38.0, -0.8], [38.9, -1.3], [40.0, -0.5]]] }
+  - { key: k_majorca, name: Kingdom of Majorca, area: [[[40.2, 1.1], [40.2, 4.5], [38.6, 4.5], [38.6, 1.1]]] }
+  - { key: k_extremadura, name: Kingdom of Extremadura, area: [[[40.3, -6.9], [40.5, -5.5], [39.4, -5.4], [38.5, -4.6], [38.0, -5.6], [38.2, -7.0], [39.6, -7.5]]] }
+  - { key: k_andalusia, name: Kingdom of Andalusia, area: [[[38.5, -4.6], [38.6, -2.4], [37.7, -2.6], [37.3, -4.0], [37.2, -5.4], [36.5, -5.8], [36.8, -6.6], [37.3, -7.4], [38.2, -7.0], [38.0, -5.6]]] }
+  - { key: k_granada, name: Kingdom of Granada, area: [[[37.7, -2.6], [37.3, -1.65], [36.6, -1.9], [36.0, -5.4], [36.5, -5.8], [37.2, -5.4], [37.3, -4.0]]] }
+  - { key: k_portucale, name: Kingdom of Portucale, area: [[[41.9, -9.0], [41.95, -6.5], [40.3, -6.9], [40.5, -8.9]]] }
+  - { key: k_lisbon, name: Kingdom of Lisbon, area: [[[40.5, -8.9], [40.3, -6.9], [39.6, -7.5], [38.2, -7.0], [37.9, -8.0], [38.4, -9.5]]] }
+  - { key: k_algarve, name: Kingdom of the Algarve, area: [[[38.4, -9.5], [37.9, -8.0], [38.2, -7.0], [37.0, -7.4], [36.8, -9.0]]] }
+
+  # ---------- France and the Empire, kept whole
+  - { key: k_france, name: Kingdom of France, area: [[[51.1, 1.5], [51.4, 2.6], [51.4, 4.2], [50.7, 3.9], [50.3, 4.3], [49.6, 5.2], [48.8, 5.3], [47.9, 4.9], [47.2, 5.2], [46.3, 4.8], [45.6, 4.8], [44.3, 4.7], [43.4, 4.6], [43.3, 3.3], [42.6, 1.8], [42.7, 0.6], [42.9, -0.5], [43.3, -1.8], [44.6, -1.3], [46.3, -1.5], [47.2, -2.6], [47.2, -4.6], [48.95, -5.2], [48.7, -1.6], [49.75, -1.95], [49.7, 0.1], [50.3, 1.4]]] }
+  - { key: k_germany, name: Kingdom of Germany, area: [[[53.5, 3.3], [53.7, 8.5], [54.9, 8.2], [54.6, 10.8], [54.2, 13.0], [54.6, 16.5], [54.2, 17.3], [53.2, 16.3], [52.5, 14.8], [51.9, 14.7], [51.0, 15.0], [50.8, 14.4], [50.3, 12.2], [49.0, 13.8], [48.6, 16.9], [47.8, 16.9], [47.0, 16.1], [46.5, 15.0], [46.4, 13.6], [46.6, 12.0], [46.5, 10.4], [46.0, 8.3], [46.2, 6.9], [47.5, 6.6], [48.4, 5.6], [49.6, 5.2], [50.3, 4.3], [50.7, 3.9], [51.4, 4.2], [51.4, 3.3]]] }
+  - { key: k_bohemia, name: Kingdom of Bohemia, area: [[[51.0, 15.0], [50.4, 16.4], [50.0, 18.3], [49.3, 18.6], [48.7, 17.2], [48.6, 16.9], [49.0, 13.8], [50.3, 12.2], [50.8, 14.4]]] }
+  - { key: k_arles, name: Kingdom of Arles, area: [[[47.9, 4.9], [47.9, 6.8], [47.3, 7.0], [46.2, 6.9], [46.0, 7.0], [45.1, 7.0], [44.2, 7.7], [43.75, 7.6], [43.0, 6.0], [43.4, 4.6], [44.3, 4.7], [45.6, 4.8], [46.3, 4.8], [47.2, 5.2]]] }
+
+  # ---------- British Isles
+  - { key: k_dumnonia, name: Kingdom of Dumnonia, area: [[[51.3, -5.8], [51.2, -3.0], [50.6, -2.9], [50.0, -5.8]]] }
+  - { key: k_wessex, name: Kingdom of Wessex, area: [[[51.7, -3.0], [51.8, -1.2], [51.3, -0.6], [50.7, -0.6], [50.6, -2.9], [51.2, -3.0]]] }
+  - { key: k_essex, name: Kingdom of Essex, area: [[[52.1, -1.2], [52.0, 1.6], [51.3, 1.5], [50.9, 1.0], [50.7, -0.6], [51.3, -0.6], [51.8, -1.2]]] }
+  - { key: k_east_anglia, name: Kingdom of East Anglia, area: [[[53.0, 0.0], [53.0, 2.0], [52.0, 1.8], [52.1, -0.2]]] }
+  - { key: k_mercia, name: Kingdom of Mercia, area: [[[53.4, -3.1], [53.6, -0.5], [53.0, 0.3], [52.1, -0.2], [52.1, -1.2], [51.8, -1.2], [51.7, -3.0], [52.0, -2.9]]] }
+  - { key: k_northumbria, name: Kingdom of Northumbria, area: [[[55.8, -2.1], [55.0, -2.5], [54.0, -2.2], [53.4, -1.8], [53.6, -0.5], [54.6, -0.5], [55.6, -1.6]]] }
+  - { key: k_cumbria, name: Kingdom of Cumbria, area: [[[55.0, -3.6], [55.0, -2.5], [54.0, -2.2], [53.4, -1.8], [53.4, -3.1], [54.0, -3.5]]] }
   - { key: k_wales, name: Kingdom of Wales, area: [[[53.5, -4.8], [53.3, -3.1], [52.0, -2.9], [51.55, -3.1], [51.5, -5.4], [52.3, -4.6]]] }
-  - { key: k_scotland, name: Kingdom of Scotland, area: [[[61, -8.5], [61, -0.5], [55.8, -1.9], [55.0, -3.0], [54.6, -5.1], [55.0, -7.5]]] }
-  - { key: k_ireland, name: Kingdom of Ireland, area: [[[55.5, -10.8], [55.5, -5.4], [51.2, -5.8], [51.2, -10.8]]] }
-  # ---------- The Empire and Italy
-  - { key: k_frisia, name: Kingdom of Frisia, area: [[[53.6, 4.6], [53.7, 8.8], [52.6, 8.6], [52.2, 6.8], [52.6, 4.6]]] }
-  - { key: k_lotharingia, name: Kingdom of Lotharingia, area: [[[52.6, 3.0], [52.2, 6.8], [50.8, 6.1], [49.6, 6.5], [48.2, 7.3], [48.4, 5.3], [49.5, 4.9], [50.9, 4.2], [51.1, 2.5]]] }
-  - { key: k_germany, name: Kingdom of Germany, area: [[[54.9, 8.2], [54.6, 10.8], [54.2, 13.0], [54.6, 16.5], [53.0, 16.3], [52.5, 14.8], [51.0, 15.0], [50.3, 12.2], [49.5, 11.0], [49.0, 9.0], [48.2, 7.3], [49.6, 6.5], [50.8, 6.1], [52.2, 6.8], [52.6, 8.6], [53.7, 8.8]]] }
-  - { key: k_bavaria, name: Kingdom of Bavaria, area: [[[50.3, 12.2], [49.0, 13.8], [48.6, 16.9], [47.8, 16.9], [46.9, 16.1], [46.5, 13.6], [46.6, 10.4], [47.5, 9.5], [47.6, 7.5], [48.2, 7.3], [49.0, 9.0], [49.5, 11.0]]] }
-  - { key: k_bohemia, name: Kingdom of Bohemia, area: [[[51.05, 14.3], [50.6, 16.3], [50.05, 17.7], [49.75, 18.4], [48.8, 17.3], [48.6, 16.4], [48.8, 15.0], [48.6, 14.0], [49.0, 13.0], [50.25, 12.1], [50.75, 13.8]]] }
-  - { key: k_italy, name: Kingdom of Italy, area: [[[46.6, 6.9], [46.6, 13.8], [45.5, 13.9], [44.1, 12.6], [42.6, 14.2], [41.3, 13.6], [41.2, 12.2], [42.4, 11.0], [43.8, 9.8], [43.7, 7.5], [44.5, 6.9]]] }
-  - { key: k_sicily, name: Kingdom of Sicily, area: [[[42.6, 14.2], [42.0, 15.5], [40.6, 18.7], [39.8, 18.6], [36.4, 15.3], [37.0, 12.2], [38.4, 12.2], [40.0, 15.0], [41.3, 13.6]]] }
-  - { key: k_sardinia, name: Kingdom of Sardinia and Corsica, area: [[[43.1, 8.0], [43.1, 9.9], [38.8, 9.9], [38.8, 8.0]]] }
-  # ---------- Scandinavia and the Baltic
-  - { key: k_denmark, name: Kingdom of Denmark, area: [[[57.9, 7.9], [57.8, 10.8], [56.6, 11.3], [57.3, 12.05], [56.4, 14.4], [56.1, 16.3], [55.0, 15.7], [54.5, 12.5], [54.6, 10.8], [54.9, 8.2]]] }
-  - { key: k_sweden, name: Kingdom of Sweden, area: [[[66.0, 15.0], [66.0, 24.0], [63.5, 25.0], [61.5, 29.0], [60.2, 29.0], [59.5, 23.0], [56.0, 17.5], [56.4, 14.4], [57.3, 12.05], [58.9, 11.6], [60.2, 12.6], [62.5, 12.2]]] }
-  - { key: k_norway, name: Kingdom of Norway, area: [[[71.5, 24], [70.5, 31.5], [68.6, 20.0], [66.2, 15.2], [64.6, 14.2], [62.2, 14.2], [61.8, 12.4], [59.4, 11.9], [57.7, 11.0], [58.0, 6.5], [62, 4], [66, 11], [69, 15]], [[66.7, -24.7], [66.7, -13.2], [63.2, -13.2], [63.2, -24.7]], [[60.9, -2.0], [60.9, -0.6], [58.6, -0.6], [58.6, -3.5]]] }
-  - { key: k_finland, name: Kingdom of Finland, area: [[[70, 20], [70, 32], [61.5, 32.5], [60.5, 28.5], [59.8, 21.0], [64, 21]]] }
-  - { key: k_livonia, name: Kingdom of Livonia, area: [[[59.7, 21.8], [59.6, 28.2], [57.5, 27.9], [56.3, 28.0], [56.0, 21.0], [57.8, 20.8]]] }
-  - { key: k_prussia, name: Kingdom of Prussia, area: [[[54.85, 17.3], [55.4, 21.2], [55.1, 22.8], [53.7, 22.5], [53.2, 19.5], [53.4, 17.5]]] }
-  - { key: k_lithuania, name: Kingdom of Lithuania, area: [[[56.3, 21.0], [56.3, 26.5], [55.6, 29.5], [54.0, 28.5], [53.0, 26.5], [53.0, 23.6], [54.3, 22.8], [55.4, 21.2]]] }
-  - { key: k_poland, name: Kingdom of Poland, area: [[[54.6, 16.3], [53.2, 19.5], [53.7, 22.5], [53.0, 23.6], [51.5, 23.7], [50.4, 23.5], [49.4, 22.8], [49.3, 19.5], [50.0, 18.3], [50.4, 16.9], [51.0, 15.0], [52.5, 14.8], [53.0, 16.3]]] }
-  # ---------- Danube and the Balkans
-  - { key: k_hungary, name: Kingdom of Hungary, area: [[[49.6, 17.1], [49.4, 22.5], [48.3, 24.5], [47.3, 25.6], [46.4, 26.3], [45.5, 25.5], [45.3, 22.5], [44.8, 21.3], [45.4, 19.0], [45.9, 17.3], [46.8, 16.1], [47.8, 16.6], [48.6, 16.9]]] }
-  - { key: k_croatia, name: Kingdom of Croatia, area: [[[46.5, 13.6], [46.4, 17.3], [45.4, 19.0], [45.0, 17.0], [44.3, 17.3], [43.0, 17.8], [42.6, 18.3], [43.5, 16.0], [45.3, 13.6]]] }
-  - { key: k_bosnia, name: Kingdom of Bosnia, area: [[[45.1, 16.3], [45.0, 19.0], [44.2, 19.4], [43.0, 18.9], [42.8, 17.8], [44.0, 16.4]]] }
-  - { key: k_serbia, name: Kingdom of Serbia, area: [[[45.4, 19.0], [45.2, 21.2], [44.3, 22.6], [42.5, 22.6], [41.3, 21.5], [41.8, 19.4], [42.6, 18.5], [43.0, 18.9], [44.2, 19.4]]] }
-  - { key: k_wallachia, name: Kingdom of Wallachia, area: [[[45.6, 22.3], [45.8, 26.5], [45.3, 29.6], [44.0, 28.6], [43.7, 25.0], [44.3, 22.6]]] }
-  - { key: k_moldavia, name: Kingdom of Moldavia, area: [[[48.5, 26.0], [48.2, 28.0], [46.5, 30.0], [45.3, 29.6], [45.8, 26.5], [47.3, 25.6]]] }
-  - { key: k_bulgaria, name: Kingdom of Bulgaria, area: [[[44.2, 22.6], [43.7, 25.0], [44.0, 28.6], [43.0, 28.0], [42.2, 27.8], [41.6, 26.2], [41.4, 24.5], [41.4, 22.9], [42.5, 22.6]]] }
-  - { key: k_thessalonika, name: Kingdom of Thessalonica, area: [[[41.4, 20.5], [41.4, 24.5], [40.3, 24.5], [39.6, 22.0], [39.6, 20.1], [40.4, 19.3], [41.0, 19.4]]] }
-  - { key: k_byzantium, name: Kingdom of Thrace, area: [[[42.2, 27.8], [41.3, 29.3], [40.3, 26.2], [40.8, 24.5], [41.4, 24.5], [41.6, 26.2]], [[41.5, 29.2], [41.5, 31.7], [40.0, 31.7], [40.0, 28.0]]] }
-  - { key: k_greece, name: Kingdom of Hellas, area: [[[39.6, 20.1], [39.6, 22.0], [40.3, 24.5], [37.6, 24.3], [36.2, 23.3], [36.3, 21.5], [38.2, 20.4]], [[40.2, 24.8], [40.2, 29.0], [34.8, 29.0], [34.8, 23.0], [36.8, 23.0], [37.7, 24.3], [38.9, 25.6]], [[35.8, 32.1], [35.8, 34.7], [34.5, 34.7], [34.5, 32.1]]] }
-  # ---------- Rus and the steppe
-  - { key: k_ruthenia, name: Kingdom of Ruthenia, area: [[[53.0, 23.6], [52.5, 26.5], [51.5, 28.5], [49.0, 28.5], [48.3, 25.5], [48.2, 24.0], [49.0, 22.6], [50.4, 23.5], [51.5, 23.7]]] }
-  - { key: k_kiev, name: Kingdom of Kiev, area: [[[54.0, 28.5], [53.5, 32.5], [52.5, 34.5], [50.5, 34.5], [49.0, 32.5], [49.0, 28.5], [51.5, 28.5], [52.5, 26.5]]] }
-  - { key: k_novgorod, name: Kingdom of Novgorod, area: [[[61.5, 28.5], [62.0, 40.0], [64.5, 52.0], [67.5, 53.5], [68.5, 45.0], [66.5, 38.0], [66.8, 33.0], [63.0, 30.5]], [[61.5, 28.5], [60.0, 36.0], [57.5, 34.0], [56.2, 29.5], [57.5, 27.9], [59.0, 27.8]]] }
-  - { key: k_vladimir, name: Kingdom of Vladimir, area: [[[60.0, 36.0], [62.0, 40.0], [61.0, 48.0], [56.5, 46.0], [55.5, 42.5], [54.5, 39.0], [55.0, 35.5], [56.0, 31.0], [57.5, 34.0]]] }
-  - { key: k_chernigov, name: Kingdom of Chernigov, area: [[[56.0, 31.0], [55.0, 35.5], [54.5, 39.0], [52.5, 39.5], [52.5, 34.5], [53.5, 32.5], [54.0, 28.5], [55.6, 29.5]]] }
-  - { key: k_volga_bulgaria, name: Kingdom of Volga Bulgaria, area: [[[61.0, 48.0], [60.0, 60.0], [52.0, 60.0], [52.0, 48.0], [54.0, 45.0], [56.5, 46.0]]] }
-  - { key: k_cumania, name: Kingdom of Cumania, area: [[[54.5, 39.0], [55.5, 42.5], [54.0, 45.0], [52.0, 48.0], [48.0, 47.5], [46.5, 45.0], [45.2, 36.6], [46.0, 30.6], [46.5, 30.0], [48.2, 28.0], [49.0, 32.5], [50.5, 34.5], [52.5, 34.5], [52.5, 39.5]]] }
-  - { key: k_taurica, name: Kingdom of Taurica, area: [[[46.2, 32.6], [46.2, 36.6], [44.4, 36.6], [44.4, 32.6]]] }
-  - { key: k_white_horde, name: Kingdom of the White Horde, area: [[[52.0, 48.0], [52.0, 60.0], [55.0, 66.0], [53.5, 76.0], [50.0, 82.0], [46.5, 80.0], [44.5, 72.0], [44.5, 62.0], [44.0, 53.0], [46.5, 49.0], [48.0, 47.5]]] }
-  - { key: k_alania, name: Kingdom of Alania, area: [[[46.5, 45.0], [48.0, 47.5], [46.5, 49.0], [44.0, 48.5], [42.0, 48.5], [43.0, 45.0], [43.2, 42.0], [43.6, 40.0], [45.2, 36.6]]] }
-  - { key: k_georgia, name: Kingdom of Georgia, area: [[[43.4, 40.0], [42.8, 43.0], [42.6, 45.0], [41.5, 46.8], [41.0, 45.8], [41.1, 43.5], [41.4, 41.6], [42.2, 41.5]]] }
-  - { key: k_armenia, name: Kingdom of Armenia, area: [[[41.1, 43.0], [41.0, 46.8], [39.2, 47.5], [38.4, 45.0], [38.4, 42.5], [39.5, 41.0], [40.6, 42.0]]] }
-  - { key: k_azerbaijan, name: Kingdom of Azerbaijan, area: [[[42.0, 46.8], [41.5, 49.5], [40.0, 50.0], [38.0, 49.0], [37.5, 46.0], [39.2, 47.5], [41.0, 46.8]]] }
-  # ---------- Anatolia and the Levant
-  - { key: k_anatolia, name: Kingdom of Anatolia, area: [[[42.2, 31.7], [41.8, 36.5], [40.5, 38.0], [39.0, 37.5], [38.0, 36.4], [37.0, 37.0], [36.2, 34.8], [36.1, 32.5], [36.5, 29.5], [37.0, 27.2], [38.5, 26.3], [40.0, 26.0], [40.3, 26.2], [40.0, 28.0], [40.0, 31.7]]] }
-  - { key: k_trebizond, name: Kingdom of Trebizond, area: [[[41.8, 36.5], [41.6, 41.6], [40.5, 41.2], [40.0, 39.0], [40.5, 38.0]]] }
-  - { key: k_cilicia, name: Kingdom of Cilicia, area: [[[38.0, 34.6], [38.0, 36.4], [37.0, 37.0], [36.6, 36.6], [36.2, 34.8], [36.8, 34.3]]] }
-  - { key: k_syria, name: Kingdom of Syria, area: [[[37.3, 36.4], [37.2, 38.5], [36.0, 40.5], [34.5, 41.0], [32.5, 38.5], [33.2, 35.3], [35.6, 35.7]]] }
-  - { key: k_jerusalem, name: Kingdom of Jerusalem, area: [[[33.2, 35.3], [32.5, 38.5], [31.0, 38.5], [29.4, 35.0], [31.2, 34.2]]] }
-  - { key: k_jazira, name: Kingdom of Jazira, area: [[[38.4, 38.5], [38.4, 42.5], [37.0, 44.5], [35.5, 43.5], [34.5, 41.0], [36.0, 40.5], [37.2, 38.5]]] }
-  - { key: k_mesopotamia, name: Kingdom of Mesopotamia, area: [[[35.5, 43.5], [34.0, 45.8], [33.0, 46.5], [30.0, 48.6], [29.5, 47.5], [31.0, 45.0], [33.0, 42.0], [34.5, 41.0]]] }
-  # ---------- Arabia and Africa
-  - { key: k_egypt, name: Kingdom of Egypt, area: [[[31.8, 24.5], [31.6, 32.5], [31.2, 34.3], [29.5, 35.0], [27.0, 34.0], [24.0, 35.5], [22.0, 36.8], [22.0, 31.0], [24.0, 30.0], [29.5, 27.0], [30.5, 24.5]]] }
-  - { key: k_arabia, name: Kingdom of Arabia, area: [[[31.0, 38.5], [30.0, 40.0], [29.5, 47.5], [27.0, 49.0], [24.5, 51.0], [22.5, 55.5], [19.0, 55.5], [17.0, 52.0], [18.0, 42.5], [22.0, 39.0], [28.0, 34.8], [29.4, 35.0]]] }
-  - { key: k_yemen, name: Kingdom of Yemen, area: [[[18.5, 42.3], [18.5, 46.0], [17.0, 52.0], [16.0, 55.0], [12.6, 45.0], [12.6, 43.4], [15.0, 42.6]]] }
-  - { key: k_oman, name: Kingdom of Oman, area: [[[26.4, 56.0], [24.0, 58.5], [22.5, 59.9], [19.0, 57.5], [19.0, 55.5], [22.5, 55.5], [24.0, 55.8]]] }
-  - { key: k_libya, name: Kingdom of Libya, area: [[[33.5, 11.5], [33.0, 25.0], [30.5, 25.0], [28.0, 15.0], [30.0, 11.0]]] }
-  - { key: k_ifriqiya, name: Kingdom of Ifriqiya, area: [[[37.6, 4.0], [37.6, 11.5], [33.5, 11.5], [32.0, 8.0], [33.5, 4.0]]] }
-  - { key: k_tlemcen, name: Kingdom of Tlemcen, area: [[[36.5, -2.0], [37.0, 4.0], [33.5, 4.0], [32.0, 2.0], [32.5, -1.6], [35.0, -2.0]]] }
-  - { key: k_morocco, name: Kingdom of Morocco, area: [[[36.1, -10.5], [36.0, -5.0], [35.0, -2.0], [32.5, -1.6], [29.5, -3.5], [28, -9], [27.5, -13.5], [31.5, -10.5]]] }
-  - { key: k_nubia, name: Kingdom of Nubia, area: [[[22.0, 29.5], [22.0, 37.0], [15.5, 37.5], [12.5, 35.0], [12.5, 29.5]]] }
-  - { key: k_abyssinia, name: Kingdom of Abyssinia, area: [[[16.5, 36.5], [15.5, 40.0], [12.5, 43.4], [9.0, 43.0], [7.0, 40.0], [7.0, 36.0], [12.0, 35.5]]] }
-  - { key: k_mali, name: Kingdom of Mali, area: [[[17.0, -12.5], [16.5, -3.5], [13.5, -1.0], [10.5, -4.0], [9.0, -8.0], [10.0, -12.5], [12.5, -14.5]]] }
-  - { key: k_songhai, name: Kingdom of Songhai, area: [[[18.0, -3.5], [17.5, 4.0], [12.0, 4.0], [13.5, -1.0], [16.5, -3.5]]] }
-  - { key: k_ghana, name: Kingdom of Ghana, area: [[[18.5, -17.5], [17.5, -12.5], [14.5, -12.0], [12.5, -14.5], [13.0, -17.5]]] }
-  - { key: k_kanem, name: Kingdom of Kanem, area: [[[17.5, 11.0], [17.5, 20.0], [12.0, 20.0], [11.0, 13.0], [12.0, 11.0]]] }
+  - { key: k_lothian, name: Kingdom of Lothian, area: [[[56.4, -6.0], [56.4, -2.5], [55.8, -1.9], [55.0, -3.0], [54.6, -5.1], [55.3, -6.6]]] }
+  - { key: k_alba, name: Kingdom of Alba, area: [[[58.8, -7.8], [58.8, -2.8], [57.7, -1.7], [56.4, -2.5], [56.4, -7.8]]] }
+  - { key: k_northern_isles, name: Kingdom of the Northern Isles, area: [[[60.9, -2.0], [60.9, -0.6], [58.75, -0.6], [58.75, -3.5]]] }
+  - { key: k_ulster, name: Kingdom of Ulster, area: [[[55.5, -8.6], [55.5, -5.4], [54.0, -5.8], [54.0, -8.6]]] }
+  - { key: k_connacht, name: Kingdom of Connacht, area: [[[54.4, -10.8], [54.0, -8.0], [53.0, -7.9], [52.9, -10.8]]] }
+  - { key: k_leinster, name: Kingdom of Leinster, area: [[[54.0, -8.0], [54.0, -5.8], [52.1, -6.2], [52.4, -7.6], [53.0, -7.9]]] }
+  - { key: k_munster, name: Kingdom of Munster, area: [[[52.9, -10.8], [53.0, -7.9], [52.4, -7.6], [52.1, -6.2], [51.2, -7.5], [51.2, -10.8]]] }
+
+  # ---------- Scandinavia and Finland
+  - { key: k_jutland, name: Kingdom of Jutland, area: [[[57.9, 7.9], [57.8, 10.8], [56.6, 11.0], [55.3, 10.0], [54.6, 10.8], [54.9, 8.2]]] }
+  - { key: k_zealand, name: Kingdom of Zealand, area: [[[56.2, 10.5], [56.2, 12.7], [54.5, 12.5], [54.6, 10.8], [55.3, 10.0]]] }
+  - { key: k_scania, name: Kingdom of Scania, area: [[[57.3, 12.05], [56.4, 14.4], [56.1, 16.3], [55.3, 14.5], [55.3, 12.8], [56.6, 12.7]]] }
+  - { key: k_gotaland, name: Kingdom of Götaland, area: [[[59.4, 11.5], [59.0, 16.5], [57.0, 16.8], [56.1, 16.3], [56.4, 14.4], [57.3, 12.05], [58.9, 11.2]]] }
+  - { key: k_svealand, name: Kingdom of Svealand, area: [[[61.0, 12.5], [61.0, 18.0], [59.5, 19.5], [59.0, 16.5], [59.4, 11.5], [60.2, 12.6]]] }
+  - { key: k_norrland, name: Kingdom of Norrland, area: [[[69.0, 18.0], [65.5, 25.0], [64.5, 21.5], [61.0, 18.0], [61.0, 12.5], [62.5, 12.2], [64.0, 13.0], [66.2, 15.2]]] }
+  - { key: k_gotland, name: Kingdom of Gotland, area: [[[58.0, 18.0], [58.0, 19.4], [56.8, 19.4], [56.8, 18.0]]] }
+  - { key: k_ostlandet, name: Kingdom of Viken, area: [[[62.2, 12.2], [61.8, 12.4], [59.4, 11.9], [58.9, 11.2], [58.5, 8.5], [60.0, 8.0], [62.0, 9.0]]] }
+  - { key: k_vestlandet, name: Kingdom of Gulatingslag, area: [[[62.6, 4.5], [62.2, 9.0], [60.0, 8.0], [58.5, 8.5], [58.0, 6.5]]] }
+  - { key: k_trondelag, name: Kingdom of Trøndelag, area: [[[65.0, 10.5], [64.6, 14.2], [62.2, 12.2], [62.2, 9.0], [62.6, 6.0]]] }
+  - { key: k_halogaland, name: Kingdom of Hålogaland, area: [[[71.5, 31.0], [69.5, 31.0], [69.0, 18.0], [66.2, 15.2], [64.6, 14.2], [65.0, 10.5], [67.0, 12.5], [69.0, 15.0], [70.5, 20.0]]] }
+  - { key: k_iceland, name: Kingdom of Iceland, area: [[[66.7, -24.7], [66.7, -13.2], [63.2, -13.2], [63.2, -24.7]], [[62.4, -7.8], [62.4, -6.2], [61.3, -6.2], [61.3, -7.8]]] }
+  - { key: k_finland, name: Kingdom of Finland, area: [[[61.8, 21.0], [61.5, 23.5], [60.8, 26.5], [60.3, 26.5], [59.8, 23.0], [60.2, 21.3]], [[60.6, 19.2], [60.6, 21.0], [59.8, 21.0], [59.8, 19.2]]] }
+  - { key: k_tavastia, name: Kingdom of Tavastia, area: [[[63.5, 21.5], [64.0, 26.0], [62.0, 30.0], [61.0, 28.5], [60.8, 26.5], [61.5, 23.5], [61.8, 21.0]]] }
+  - { key: k_ostrobothnia, name: Kingdom of Ostrobothnia, area: [[[66.0, 21.0], [66.5, 30.0], [64.0, 30.0], [64.0, 26.0], [63.5, 21.5]]] }
+
+  # ---------- The Baltic and Poland
+  - { key: k_estonia, name: Kingdom of Estonia, area: [[[59.7, 21.8], [59.6, 28.2], [57.9, 27.7], [57.9, 26.5], [58.2, 24.0], [58.0, 21.8]]] }
+  - { key: k_livonia, name: Kingdom of Livonia, area: [[[58.0, 21.0], [57.9, 26.5], [57.5, 27.9], [56.6, 27.9], [56.6, 24.0], [57.0, 23.0], [57.6, 21.6]]] }
+  - { key: k_courland, name: Kingdom of Courland, area: [[[57.6, 21.0], [57.0, 23.0], [56.6, 24.0], [56.6, 25.5], [56.2, 25.5], [56.3, 21.0]]] }
+  - { key: k_samogitia, name: Kingdom of Samogitia, area: [[[56.4, 21.0], [56.3, 23.5], [55.3, 23.5], [55.1, 22.4], [55.4, 21.2]]] }
+  - { key: k_lithuania, name: Kingdom of Lithuania, area: [[[56.3, 23.5], [56.2, 26.5], [55.0, 26.8], [54.0, 25.5], [54.0, 23.4], [55.3, 23.5]]] }
+  - { key: k_prussia, name: Kingdom of Prussia, area: [[[55.0, 19.4], [55.1, 22.4], [54.0, 23.4], [53.4, 21.0], [53.5, 19.3], [54.4, 18.9]]] }
+  - { key: k_pomerelia, name: Kingdom of Pomerelia, area: [[[54.8, 16.8], [54.8, 18.8], [54.4, 18.9], [53.5, 19.3], [53.1, 18.2], [53.6, 16.8]]] }
+  - { key: k_greater_poland, name: Kingdom of Greater Poland, area: [[[53.6, 15.5], [53.1, 18.2], [52.6, 19.2], [51.7, 18.8], [51.4, 17.6], [51.7, 16.0], [52.4, 15.0]]] }
+  - { key: k_mazovia, name: Kingdom of Mazovia, area: [[[53.5, 19.3], [53.4, 21.0], [53.8, 22.5], [53.0, 23.4], [52.0, 23.2], [51.6, 21.5], [51.7, 19.6], [52.6, 19.2], [53.1, 18.2]]] }
+  - { key: k_lesser_poland, name: Kingdom of Lesser Poland, area: [[[51.7, 18.8], [51.6, 21.5], [51.0, 22.5], [50.2, 22.6], [49.4, 22.0], [49.3, 19.5], [50.0, 18.9], [51.4, 17.6]]] }
+  - { key: k_silesia, name: Kingdom of Silesia, area: [[[51.8, 15.0], [51.4, 17.6], [50.2, 18.9], [50.0, 18.3], [50.5, 16.4], [51.0, 15.0]]] }
+
+  # ---------- Hungary, Croatia and the Romanian lands
+  - { key: k_upper_hungary, name: Kingdom of Upper Hungary, area: [[[49.6, 17.1], [49.4, 22.5], [48.4, 22.3], [47.8, 19.0], [47.8, 17.2]]] }
+  - { key: k_transdanubia, name: Kingdom of Pannonia, area: [[[48.0, 16.1], [47.8, 19.0], [46.8, 19.0], [45.8, 18.8], [45.9, 17.3], [46.8, 16.1]]] }
+  - { key: k_alfold, name: Kingdom of the Alföld, area: [[[48.4, 22.3], [47.8, 19.0], [46.8, 19.0], [45.8, 18.8], [45.3, 20.5], [45.6, 21.5], [46.4, 22.1], [47.6, 22.9]]] }
+  - { key: k_transylvania, name: Kingdom of Transylvania, area: [[[48.2, 23.0], [47.8, 24.3], [47.0, 25.5], [46.7, 26.0], [45.8, 26.3], [45.5, 24.5], [45.7, 22.6], [46.4, 22.1], [47.6, 22.9]]] }
+  - { key: k_banat, name: Kingdom of the Banat, area: [[[45.6, 21.5], [45.7, 22.6], [45.0, 22.5], [44.6, 21.5], [45.0, 20.3], [45.3, 20.5]]] }
+  - { key: k_croatia, name: Kingdom of Croatia, area: [[[46.4, 15.6], [46.3, 17.3], [45.6, 19.0], [45.0, 19.0], [45.0, 16.3], [45.3, 15.0], [45.3, 13.6], [45.8, 15.0]]] }
+  - { key: k_dalmatia, name: Kingdom of Dalmatia, area: [[[45.3, 13.6], [45.0, 16.3], [44.0, 16.4], [43.2, 17.8], [42.6, 18.3], [43.5, 16.0], [44.5, 14.8]]] }
+  - { key: k_bosnia, name: Kingdom of Bosnia, area: [[[45.1, 16.3], [45.0, 19.0], [44.2, 19.4], [43.3, 18.9], [43.2, 17.8], [44.0, 16.4]]] }
+  - { key: k_oltenia, name: Kingdom of Oltenia, area: [[[45.7, 22.6], [45.8, 24.5], [44.0, 24.0], [43.7, 23.0], [44.3, 22.6]]] }
+  - { key: k_wallachia, name: Kingdom of Wallachia, area: [[[45.8, 24.5], [45.8, 26.3], [45.5, 27.5], [45.2, 28.3], [44.2, 27.5], [43.7, 25.0], [44.0, 24.0]]] }
+  - { key: k_moldavia, name: Kingdom of Moldavia, area: [[[48.5, 26.0], [48.2, 28.0], [46.5, 30.0], [45.5, 28.2], [45.8, 26.3], [46.7, 26.0], [47.8, 24.3], [48.2, 25.0]]] }
+
+  # ---------- The Balkans and Greece
+  - { key: k_serbia, name: Kingdom of Serbia, area: [[[45.0, 19.2], [44.6, 21.5], [44.2, 22.6], [43.5, 22.6], [43.0, 21.3], [42.8, 20.0], [43.3, 18.9], [44.2, 19.4]]] }
+  - { key: k_zeta, name: Kingdom of Zeta, area: [[[43.3, 18.4], [42.8, 20.0], [42.2, 20.6], [41.9, 19.4], [42.4, 18.5]]] }
+  - { key: k_macedonia, name: Kingdom of Macedonia, area: [[[43.0, 21.3], [42.5, 22.5], [42.0, 22.9], [41.0, 23.0], [40.8, 22.0], [41.0, 20.6], [42.2, 20.6], [42.8, 20.0]]] }
+  - { key: k_albania, name: Kingdom of Albania, area: [[[41.9, 19.4], [42.2, 20.6], [41.0, 20.6], [40.4, 20.9], [39.6, 20.1], [40.4, 19.3]]] }
+  - { key: k_epirus, name: Kingdom of Epirus, area: [[[40.4, 20.9], [39.9, 21.4], [38.8, 21.6], [38.2, 20.4], [39.6, 20.1]]] }
+  - { key: k_thessaly, name: Kingdom of Thessaly, area: [[[40.4, 21.4], [40.0, 23.0], [39.0, 23.3], [38.8, 21.6], [39.9, 21.4]]] }
+  - { key: k_thessalonica, name: Kingdom of Thessalonica, area: [[[41.0, 23.0], [41.2, 24.5], [40.8, 24.8], [40.0, 24.0], [40.0, 23.0], [40.4, 21.4], [40.8, 22.0]]] }
+  - { key: k_hellas, name: Kingdom of Hellas, area: [[[39.0, 21.6], [39.0, 24.4], [37.9, 24.2], [37.9, 22.8], [38.3, 21.0]]] }
+  - { key: k_morea, name: Kingdom of the Morea, area: [[[38.3, 21.0], [38.3, 23.4], [36.3, 23.3], [36.4, 21.5]]] }
+  - { key: k_archipelago, name: Kingdom of the Archipelago, area: [[[38.9, 24.6], [38.9, 26.6], [36.6, 27.0], [35.8, 28.4], [36.0, 24.6]]] }
+  - { key: k_crete, name: Kingdom of Crete, area: [[[35.8, 23.3], [35.8, 26.4], [34.8, 26.4], [34.8, 23.3]]] }
+  - { key: k_bulgaria, name: Kingdom of Bulgaria, area: [[[44.2, 22.6], [43.7, 25.0], [44.2, 27.5], [43.4, 28.6], [42.9, 27.7], [42.7, 25.5], [42.7, 23.0], [43.5, 22.6]], [[45.2, 28.3], [45.2, 29.7], [43.4, 28.6], [44.2, 27.5]]] }
+  - { key: k_rhodope, name: Kingdom of Rhodope, area: [[[42.9, 27.7], [42.2, 27.0], [41.4, 26.0], [40.8, 24.8], [41.2, 24.5], [41.5, 23.8], [42.7, 23.0], [42.7, 25.5]]] }
+  - { key: k_thrace, name: Kingdom of Thrace, area: [[[42.2, 27.0], [42.0, 28.0], [41.3, 29.3], [40.9, 28.0], [40.6, 26.5], [41.4, 26.0]]] }
+
+  # ---------- Italy
+  - { key: k_piedmont, name: Kingdom of Piedmont, area: [[[46.5, 6.9], [46.4, 8.4], [45.2, 8.7], [44.4, 8.6], [44.2, 7.6], [45.1, 7.0]]] }
+  - { key: k_liguria, name: Kingdom of Liguria, area: [[[44.6, 7.6], [44.6, 9.9], [44.0, 10.0], [43.75, 7.6]]] }
+  - { key: k_lombardy, name: Kingdom of Lombardy, area: [[[46.5, 8.4], [46.5, 10.4], [45.8, 10.8], [45.0, 11.2], [44.9, 10.0], [45.0, 8.6]]] }
+  - { key: k_venetia, name: Kingdom of Venetia, area: [[[46.6, 10.8], [46.6, 12.8], [45.4, 12.6], [44.9, 12.4], [45.0, 11.2]]] }
+  - { key: k_friuli, name: Kingdom of Friuli, area: [[[46.6, 12.8], [46.6, 13.8], [45.6, 13.9], [44.8, 13.95], [45.4, 12.6]]] }
+  - { key: k_emilia, name: Kingdom of Emilia, area: [[[45.0, 9.0], [45.0, 11.2], [44.9, 12.4], [44.3, 11.5], [44.3, 10.0], [44.6, 9.4]]] }
+  - { key: k_romagna, name: Kingdom of Romagna, area: [[[44.9, 12.4], [44.4, 12.4], [43.9, 12.6], [43.9, 11.5], [44.3, 11.5]]] }
+  - { key: k_tuscany, name: Kingdom of Tuscany, area: [[[44.4, 9.9], [44.3, 11.5], [43.9, 11.5], [43.5, 12.2], [42.8, 12.0], [42.3, 11.2], [43.0, 10.4], [43.9, 10.1]]] }
+  - { key: k_marche, name: Kingdom of the Marches, area: [[[43.9, 12.6], [43.5, 13.6], [42.7, 13.9], [42.7, 13.0], [43.5, 12.2]]] }
+  - { key: k_latium, name: Kingdom of Latium, area: [[[43.5, 12.2], [42.7, 13.0], [42.0, 13.4], [41.2, 13.6], [41.3, 12.3], [42.3, 11.3], [42.8, 12.0]]] }
+  - { key: k_abruzzo, name: Kingdom of the Abruzzi, area: [[[42.7, 13.9], [42.0, 15.0], [41.5, 14.5], [41.5, 13.6], [42.0, 13.4], [42.7, 13.0]]] }
+  - { key: k_campania, name: Kingdom of Campania, area: [[[41.5, 13.6], [41.5, 15.2], [40.5, 15.6], [40.0, 15.4], [40.8, 14.0], [41.2, 13.6]]] }
+  - { key: k_apulia, name: Kingdom of Apulia, area: [[[42.0, 15.0], [41.8, 16.2], [40.6, 18.7], [39.8, 18.6], [40.4, 16.5], [40.9, 15.5], [41.5, 15.2], [41.5, 14.5]]] }
+  - { key: k_calabria, name: Kingdom of Calabria, area: [[[40.5, 15.6], [40.4, 16.5], [39.8, 17.2], [37.9, 15.7], [39.0, 15.8], [40.0, 15.4]]] }
+  - { key: k_sicily, name: Kingdom of Sicily, area: [[[38.4, 12.2], [38.33, 15.7], [36.6, 15.3], [37.0, 12.2]], [[36.1, 14.1], [36.1, 14.6], [35.8, 14.6], [35.8, 14.1]]] }
+  - { key: k_sardinia, name: Kingdom of Sardinia, area: [[[41.3, 8.0], [41.3, 9.9], [38.8, 9.9], [38.8, 8.0]]] }
+  - { key: k_corsica, name: Kingdom of Corsica, area: [[[43.1, 8.4], [43.1, 9.7], [41.3, 9.7], [41.3, 8.4]]] }
+
+  # ---------- Rus
+  - { key: k_novgorod, name: Kingdom of Novgorod, area: [[[60.0, 28.0], [61.0, 30.0], [61.0, 35.0], [59.6, 37.5], [58.0, 36.0], [57.5, 33.0], [58.0, 30.5], [59.0, 28.0]]] }
+  - { key: k_pskov, name: Kingdom of Pskov, area: [[[59.0, 27.8], [58.0, 30.5], [57.5, 33.0], [56.5, 31.0], [57.5, 27.9]]] }
+  - { key: k_karelia, name: Kingdom of Karelia, area: [[[66.5, 30.0], [66.5, 36.5], [61.6, 36.0], [61.0, 30.0], [61.8, 29.5], [63.5, 30.6]]] }
+  - { key: k_pomorye, name: Kingdom of Pomorye, area: [[[68.5, 36.5], [67.0, 45.0], [64.0, 47.0], [61.5, 47.5], [61.0, 41.0], [63.0, 37.5], [66.5, 36.5]]] }
+  - { key: k_beloozero, name: Kingdom of Beloozero, area: [[[61.6, 36.0], [61.0, 41.0], [59.0, 40.5], [59.0, 36.5], [59.6, 37.5]]] }
+  - { key: k_ustyug, name: Kingdom of Ustyug, area: [[[61.5, 47.5], [61.5, 50.0], [59.5, 49.0], [58.8, 45.0], [59.5, 41.5], [61.0, 41.0]]] }
+  - { key: k_tver, name: Kingdom of Tver, area: [[[58.0, 33.0], [58.5, 36.5], [57.0, 37.5], [56.4, 36.0], [56.5, 34.5], [57.5, 33.0]]] }
+  - { key: k_vladimir, name: Kingdom of Vladimir, area: [[[59.0, 36.5], [59.0, 40.5], [58.5, 44.0], [57.0, 44.0], [56.2, 41.0], [56.6, 38.5], [57.0, 37.5], [58.5, 36.5]]] }
+  - { key: k_moscow, name: Kingdom of Moscow, area: [[[57.0, 37.5], [56.6, 38.5], [56.2, 41.0], [55.3, 40.0], [54.8, 38.0], [55.2, 35.5], [56.4, 36.0]]] }
+  - { key: k_nizhny, name: Kingdom of Nizhny Novgorod, area: [[[57.5, 42.0], [57.0, 45.5], [55.6, 45.3], [55.3, 42.3], [56.2, 41.0]]] }
+  - { key: k_ryazan, name: Kingdom of Ryazan, area: [[[55.3, 40.0], [55.3, 42.3], [53.5, 42.0], [53.0, 39.5], [53.6, 38.0], [54.8, 38.0]]] }
+  - { key: k_smolensk, name: Kingdom of Smolensk, area: [[[56.5, 31.0], [56.5, 34.5], [55.2, 35.5], [54.0, 35.0], [54.0, 31.5], [55.3, 30.5]]] }
+  - { key: k_polotsk, name: Kingdom of Polotsk, area: [[[56.3, 26.5], [56.5, 31.0], [55.3, 30.5], [54.6, 29.0], [54.6, 26.8], [55.0, 26.8]]] }
+  - { key: k_black_ruthenia, name: Kingdom of Black Ruthenia, area: [[[54.2, 24.5], [54.4, 26.5], [54.6, 29.0], [53.5, 29.5], [53.0, 27.0], [53.0, 24.5]]] }
+  - { key: k_polesia, name: Kingdom of Polesia, area: [[[53.0, 23.6], [53.0, 27.0], [53.5, 29.5], [52.5, 31.0], [51.6, 30.5], [51.5, 26.0], [51.6, 23.6]]] }
+  - { key: k_severia, name: Kingdom of Severia, area: [[[53.8, 31.5], [54.0, 35.0], [53.0, 36.0], [51.6, 35.0], [50.8, 33.5], [51.5, 31.5], [52.5, 31.0]]] }
+  - { key: k_kursk, name: Kingdom of Kursk, area: [[[53.0, 36.0], [53.6, 38.0], [53.0, 39.5], [51.0, 39.5], [50.5, 36.5], [51.6, 35.0]]] }
+  - { key: k_kiev, name: Kingdom of Kiev, area: [[[51.6, 30.5], [51.5, 31.5], [50.8, 33.5], [49.5, 33.0], [49.2, 31.0], [49.5, 29.0], [50.5, 28.5], [51.4, 28.5]]] }
+  - { key: k_volhynia, name: Kingdom of Volhynia, area: [[[51.6, 23.6], [51.5, 26.0], [51.4, 28.5], [50.5, 28.5], [50.2, 26.0], [50.5, 24.0], [50.9, 23.6]]] }
+  - { key: k_halych, name: Kingdom of Halych, area: [[[50.5, 24.0], [50.2, 26.0], [49.0, 26.0], [48.3, 25.0], [48.6, 23.5], [49.2, 22.5], [50.2, 22.6]]] }
+  - { key: k_podolia, name: Kingdom of Podolia, area: [[[50.2, 26.0], [50.5, 28.5], [49.5, 29.0], [49.2, 31.0], [48.0, 30.0], [48.3, 28.0], [49.0, 26.0]]] }
+
+  # ---------- The Pontic and Kazakh steppe, Volga and Urals
+  - { key: k_yedisan, name: Kingdom of Yedisan, area: [[[48.0, 30.0], [47.5, 32.0], [46.5, 32.5], [46.0, 30.6], [45.4, 29.6], [46.5, 29.5]]] }
+  - { key: k_zaporozhia, name: Kingdom of Zaporozhia, area: [[[49.5, 33.0], [49.0, 36.0], [47.0, 36.5], [46.5, 33.0], [47.5, 32.0], [48.0, 30.0], [49.2, 31.0]]] }
+  - { key: k_crimea, name: Kingdom of Crimea, area: [[[46.2, 32.5], [46.2, 36.7], [44.4, 36.7], [44.4, 32.5]]] }
+  - { key: k_azov, name: Kingdom of Azov, area: [[[49.0, 36.0], [50.0, 39.5], [49.0, 42.0], [47.0, 42.0], [46.5, 39.0], [47.0, 36.5]]] }
+  - { key: k_don, name: Kingdom of the Don, area: [[[51.0, 39.5], [52.5, 40.0], [52.0, 43.5], [50.0, 44.0], [49.0, 42.0], [50.0, 39.5]]] }
+  - { key: k_kuban, name: Kingdom of Kuban, area: [[[46.5, 37.5], [46.5, 42.0], [45.0, 42.0], [44.8, 38.0], [45.3, 36.7]]] }
+  - { key: k_kuma, name: Kingdom of the Kuma, area: [[[47.0, 42.0], [46.0, 44.5], [44.0, 45.5], [43.5, 44.0], [44.5, 42.0], [45.0, 42.0]]] }
+  - { key: k_sarai, name: Kingdom of Sarai, area: [[[50.0, 44.0], [49.0, 47.5], [47.0, 48.5], [46.0, 49.5], [45.0, 47.5], [46.0, 44.5], [47.0, 42.0], [49.0, 42.0]]] }
+  - { key: k_mordovia, name: Kingdom of Mordovia, area: [[[55.6, 42.5], [55.6, 46.0], [54.2, 46.5], [53.3, 46.0], [53.5, 42.5]]] }
+  - { key: k_burtasia, name: Kingdom of Burtasia, area: [[[54.2, 46.5], [53.3, 49.5], [52.0, 48.5], [52.5, 46.0], [53.3, 46.0]]] }
+  - { key: k_mari, name: Kingdom of Mari, area: [[[58.0, 44.5], [57.5, 50.0], [56.4, 50.0], [56.0, 46.5], [57.0, 45.5]]] }
+  - { key: k_kazan, name: Kingdom of Kazan, area: [[[56.4, 47.0], [56.5, 51.0], [55.3, 51.5], [54.8, 48.0], [55.6, 46.0]]] }
+  - { key: k_bolghar, name: Kingdom of Bolghar, area: [[[55.3, 48.0], [55.3, 53.0], [53.5, 53.5], [53.0, 50.0], [54.2, 48.0]]] }
+  - { key: k_samara, name: Kingdom of Samara, area: [[[53.5, 48.5], [53.0, 52.5], [51.5, 53.0], [51.0, 49.0], [52.0, 48.5]]] }
+  - { key: k_perm, name: Kingdom of Perm, area: [[[61.5, 50.0], [61.5, 57.5], [58.0, 58.5], [56.5, 55.0], [56.5, 51.0], [58.0, 50.0], [59.5, 49.0]]] }
+  - { key: k_bashkiria, name: Kingdom of Bashkiria, area: [[[56.5, 54.0], [56.5, 60.0], [52.0, 60.0], [51.5, 56.0], [53.5, 53.5], [55.3, 53.0]]] }
+  - { key: k_pechora, name: Kingdom of Pechora, area: [[[68.5, 45.0], [68.5, 66.0], [61.5, 62.0], [61.5, 50.0], [64.0, 47.0], [67.0, 45.0]]] }
+  - { key: k_yaik, name: Kingdom of the Yaik, area: [[[51.5, 49.0], [51.5, 56.0], [47.5, 57.0], [46.5, 52.0], [47.0, 48.5], [49.0, 47.5]]] }
+  - { key: k_mangyshlak, name: Kingdom of Mangyshlak, area: [[[47.0, 50.5], [46.0, 56.0], [42.5, 56.0], [41.5, 52.5], [44.5, 50.5]]] }
+  - { key: k_turgai, name: Kingdom of Turgai, area: [[[52.0, 60.0], [52.0, 66.0], [47.5, 67.0], [46.5, 60.0], [47.5, 57.0]]] }
+  - { key: k_sygnak, name: Kingdom of Sygnak, area: [[[46.5, 60.0], [47.5, 67.0], [45.0, 70.0], [42.5, 69.0], [43.5, 64.0], [45.0, 61.0]]] }
+  - { key: k_sary_arka, name: Kingdom of Sary-Arka, area: [[[54.0, 66.0], [54.0, 76.0], [48.0, 79.0], [46.5, 73.0], [47.5, 67.0], [52.0, 66.0]]] }
+  - { key: k_balkhash, name: Kingdom of Balkhash, area: [[[48.0, 73.0], [48.0, 81.0], [45.5, 81.0], [45.5, 74.0], [45.0, 70.0], [46.5, 73.0]]] }
+
+  # ---------- The Caucasus
+  - { key: k_circassia, name: Kingdom of Circassia, area: [[[45.0, 36.6], [44.9, 40.5], [43.5, 42.5], [43.4, 40.0], [44.6, 37.5]]] }
+  - { key: k_alania, name: Kingdom of Alania, area: [[[44.0, 42.5], [43.8, 45.0], [42.8, 45.0], [42.7, 43.0], [43.4, 42.0]]] }
+  - { key: k_dagestan, name: Kingdom of Dagestan, area: [[[44.0, 45.5], [43.8, 47.8], [41.4, 48.8], [41.6, 46.6], [42.6, 45.5]]] }
+  - { key: k_imereti, name: Kingdom of Imereti, area: [[[43.4, 40.0], [42.7, 43.0], [41.8, 43.0], [41.6, 41.6], [42.3, 41.4]]] }
+  - { key: k_georgia, name: Kingdom of Georgia, area: [[[42.6, 43.0], [42.6, 45.5], [41.6, 46.6], [41.0, 45.8], [41.2, 43.8], [41.8, 43.0]]] }
+  - { key: k_shirvan, name: Kingdom of Shirvan, area: [[[41.6, 46.6], [41.4, 48.8], [40.2, 50.4], [39.6, 48.8], [40.4, 46.5], [41.0, 45.8]]] }
+  - { key: k_arran, name: Kingdom of Arran, area: [[[41.0, 45.0], [40.4, 46.5], [39.6, 48.8], [39.0, 48.0], [39.2, 46.5], [40.3, 45.0]]] }
+  - { key: k_armenia, name: Kingdom of Armenia, area: [[[41.2, 43.0], [41.0, 45.0], [40.3, 45.0], [39.2, 46.5], [39.0, 45.0], [39.8, 43.5], [40.6, 42.6]]] }
+
+  # ---------- Anatolia and Cyprus
+  - { key: k_bithynia, name: Kingdom of Bithynia, area: [[[41.2, 29.05], [41.2, 31.5], [40.5, 31.5], [40.1, 30.0], [40.2, 28.0], [40.5, 29.0]]] }
+  - { key: k_mysia, name: Kingdom of Mysia, area: [[[40.6, 26.2], [40.4, 28.0], [40.2, 28.0], [39.4, 28.5], [39.0, 27.0], [39.3, 26.5]]] }
+  - { key: k_lydia, name: Kingdom of Lydia, area: [[[39.3, 26.5], [39.0, 27.0], [39.4, 28.5], [38.6, 29.5], [37.7, 28.5], [37.8, 27.0], [38.5, 26.3]]] }
+  - { key: k_caria, name: Kingdom of Caria, area: [[[37.8, 27.0], [37.7, 28.5], [37.0, 29.5], [36.5, 29.5], [36.7, 27.3]]] }
+  - { key: k_pamphylia, name: Kingdom of Pamphylia, area: [[[37.0, 29.5], [37.6, 31.0], [37.0, 33.0], [36.0, 32.8], [36.2, 30.5], [36.5, 29.5]]] }
+  - { key: k_phrygia, name: Kingdom of Phrygia, area: [[[40.1, 30.0], [40.5, 31.5], [39.5, 32.5], [38.6, 31.5], [38.6, 29.5], [39.4, 28.5], [40.2, 28.0]]] }
+  - { key: k_paphlagonia, name: Kingdom of Paphlagonia, area: [[[42.0, 32.0], [42.0, 35.5], [41.0, 35.5], [40.5, 33.5], [40.5, 31.5], [41.2, 31.5]]] }
+  - { key: k_galatia, name: Kingdom of Galatia, area: [[[40.5, 31.5], [40.5, 33.5], [41.0, 35.5], [40.0, 35.5], [39.0, 34.5], [39.0, 32.5], [39.5, 32.5]]] }
+  - { key: k_karaman, name: Kingdom of Karaman, area: [[[39.0, 32.5], [39.0, 34.5], [38.0, 35.0], [37.0, 34.5], [37.0, 33.0], [37.6, 31.0], [38.6, 31.5]]] }
+  - { key: k_cappadocia, name: Kingdom of Cappadocia, area: [[[40.0, 35.5], [39.8, 37.0], [38.6, 37.6], [38.0, 36.5], [38.0, 35.0], [39.0, 34.5]]] }
+  - { key: k_sivas, name: Kingdom of Sivas, area: [[[41.5, 35.5], [41.3, 37.6], [40.4, 39.0], [39.5, 38.5], [39.8, 37.0], [40.0, 35.5], [41.0, 35.5]]] }
+  - { key: k_trebizond, name: Kingdom of Trebizond, area: [[[41.3, 37.6], [41.5, 41.4], [40.9, 41.0], [40.3, 40.0], [40.4, 39.0]]] }
+  - { key: k_cilicia, name: Kingdom of Cilicia, area: [[[37.5, 33.8], [38.0, 35.0], [38.0, 36.5], [37.6, 37.2], [36.6, 36.4], [36.2, 34.8], [36.5, 33.8]]] }
+  - { key: k_erzurum, name: Kingdom of Erzurum, area: [[[40.9, 41.0], [41.2, 42.8], [40.6, 42.6], [39.8, 43.5], [39.0, 42.5], [39.0, 40.0], [39.5, 38.5], [40.4, 39.0], [40.3, 40.0]]] }
+  - { key: k_melitene, name: Kingdom of Melitene, area: [[[39.5, 38.5], [39.0, 40.0], [38.3, 40.0], [37.8, 38.5], [37.6, 37.2], [38.0, 36.5], [38.6, 37.6]]] }
+  - { key: k_vaspurakan, name: Kingdom of Vaspurakan, area: [[[39.0, 42.5], [39.8, 43.5], [39.0, 45.0], [38.3, 44.3], [37.6, 44.3], [37.8, 42.4], [38.4, 41.0]]] }
+  - { key: k_diyarbakr, name: Kingdom of Diyar Bakr, area: [[[38.3, 40.0], [38.4, 41.0], [37.8, 42.4], [37.2, 42.4], [37.0, 41.0], [37.2, 39.5], [37.8, 38.5]]] }
+  - { key: k_cyprus, name: Kingdom of Cyprus, area: [[[35.8, 32.1], [35.8, 34.7], [34.5, 34.7], [34.5, 32.1]]] }
+
+  # ---------- Syria, Iraq and Palestine
+  - { key: k_aleppo, name: Kingdom of Aleppo, area: [[[37.0, 36.2], [37.2, 38.0], [36.5, 38.6], [35.6, 38.4], [35.6, 36.6], [36.2, 35.9]]] }
+  - { key: k_jazira, name: Kingdom of Jazira, area: [[[37.2, 38.0], [37.2, 39.5], [37.0, 41.0], [37.2, 42.4], [36.3, 42.0], [35.4, 40.6], [35.6, 38.4], [36.5, 38.6]]] }
+  - { key: k_mosul, name: Kingdom of Mosul, area: [[[37.2, 42.4], [37.6, 44.3], [36.6, 45.0], [35.5, 44.5], [35.3, 43.3], [36.3, 42.0]]] }
+  - { key: k_tripoli, name: Kingdom of Tripoli, area: [[[35.6, 35.6], [35.6, 36.6], [34.0, 36.6], [33.3, 35.2], [34.6, 35.8]]] }
+  - { key: k_damascus, name: Kingdom of Damascus, area: [[[34.0, 36.6], [35.6, 36.6], [35.6, 38.4], [34.5, 38.8], [33.0, 38.0], [32.5, 36.0], [33.3, 35.6]]] }
+  - { key: k_jerusalem, name: Kingdom of Jerusalem, area: [[[33.3, 35.2], [33.0, 35.6], [32.5, 36.0], [31.0, 35.6], [29.5, 34.9], [31.3, 34.2]]] }
+  - { key: k_oultrejordain, name: Kingdom of Oultrejordain, area: [[[32.5, 36.0], [33.0, 38.0], [31.0, 38.0], [29.5, 36.0], [29.5, 34.9], [31.0, 35.6]]] }
+  - { key: k_baghdad, name: Kingdom of Baghdad, area: [[[35.3, 43.3], [35.5, 44.5], [34.5, 46.0], [33.0, 46.5], [32.5, 45.0], [33.0, 43.0], [34.0, 42.5]]] }
+  - { key: k_basra, name: Kingdom of Basra, area: [[[33.0, 43.0], [32.5, 45.0], [33.0, 46.5], [31.5, 47.8], [30.0, 48.5], [29.5, 47.5], [30.5, 45.5], [31.5, 44.0]]] }
+
+  # ---------- Arabia
+  - { key: k_hejaz, name: Kingdom of the Hejaz, area: [[[28.0, 34.8], [27.5, 37.0], [24.0, 39.8], [21.0, 41.0], [19.6, 42.0], [19.5, 41.0], [22.0, 38.8], [25.5, 36.5]]] }
+  - { key: k_hasa, name: Kingdom of al-Hasa, area: [[[29.5, 47.5], [27.0, 49.5], [24.5, 51.5], [23.5, 50.0], [24.5, 47.5], [27.0, 47.5]]] }
+  - { key: k_oman, name: Kingdom of Oman, area: [[[26.4, 56.0], [24.0, 58.5], [22.5, 59.9], [19.0, 57.5], [20.5, 56.0], [23.5, 55.5], [24.5, 54.0]]] }
+  - { key: k_yemen, name: Kingdom of Yemen, area: [[[18.0, 42.3], [17.5, 46.0], [14.0, 46.5], [12.6, 45.0], [12.6, 43.4], [15.0, 42.6]]] }
+  - { key: k_hadramawt, name: Kingdom of Hadramawt, area: [[[18.0, 46.0], [17.0, 52.0], [16.0, 54.5], [14.0, 48.5], [14.0, 46.5], [17.5, 46.0]]] }
+
+  # ---------- Egypt and Libya
+  - { key: k_delta, name: Kingdom of the Delta, area: [[[31.6, 30.0], [31.4, 32.4], [30.0, 32.6], [29.8, 31.0], [30.6, 30.0]]] }
+  - { key: k_alexandria, name: Kingdom of Alexandria, area: [[[31.6, 25.0], [31.6, 30.0], [30.6, 30.0], [29.5, 27.5], [30.0, 25.0]]] }
+  - { key: k_middle_egypt, name: Kingdom of Middle Egypt, area: [[[29.8, 31.0], [30.0, 32.6], [27.0, 32.5], [27.0, 30.5], [29.0, 30.4]]] }
+  - { key: k_upper_egypt, name: Kingdom of Upper Egypt, area: [[[27.0, 30.5], [27.0, 34.0], [22.0, 36.8], [22.0, 31.0], [24.0, 30.0]]] }
+  - { key: k_sinai, name: Kingdom of Sinai, area: [[[31.3, 32.6], [31.3, 34.3], [29.5, 34.9], [27.8, 34.3], [29.9, 32.6]]] }
+  - { key: k_cyrenaica, name: Kingdom of Cyrenaica, area: [[[33.0, 19.5], [32.9, 22.5], [31.8, 25.0], [29.0, 25.0], [29.0, 19.5]]] }
+  - { key: k_tripolitania, name: Kingdom of Tripolitania, area: [[[33.5, 11.5], [32.8, 13.5], [32.2, 15.6], [31.0, 19.5], [29.0, 19.5], [29.5, 11.5]]] }
+
+  # ---------- The Maghreb and the Sahara
+  - { key: k_ifriqiya, name: Kingdom of Ifriqiya, area: [[[37.5, 8.3], [37.5, 11.5], [35.5, 11.2], [35.2, 8.3]]] }
+  - { key: k_jarid, name: Kingdom of the Jarid, area: [[[35.5, 11.2], [33.5, 11.5], [33.0, 8.3], [35.2, 8.3]]] }
+  - { key: k_constantine, name: Kingdom of Constantine, area: [[[37.3, 4.5], [37.3, 8.4], [35.2, 8.3], [35.0, 4.5]]] }
+  - { key: k_algiers, name: Kingdom of Algiers, area: [[[37.0, 1.0], [37.0, 4.5], [35.0, 4.5], [35.0, 1.0]]] }
+  - { key: k_tlemcen, name: Kingdom of Tlemcen, area: [[[36.0, -2.0], [36.5, 1.0], [34.0, 1.0], [34.0, -1.6], [35.2, -2.2]]] }
+  - { key: k_zab, name: Kingdom of the Zab, area: [[[35.0, 4.5], [35.0, 8.3], [33.0, 8.3], [31.0, 6.5], [32.0, 3.0], [34.0, 3.0]]] }
+  - { key: k_fez, name: Kingdom of Fez, area: [[[35.9, -6.0], [35.2, -2.2], [34.0, -1.6], [33.0, -4.0], [33.8, -6.2]]] }
+  - { key: k_marrakesh, name: Kingdom of Marrakesh, area: [[[33.8, -6.2], [33.0, -4.0], [31.0, -6.0], [30.5, -9.8], [32.5, -9.4]]] }
+  - { key: k_sus, name: Kingdom of Sus, area: [[[30.5, -9.8], [31.0, -6.0], [29.0, -6.0], [28.0, -11.5], [29.5, -10.0]]] }
+  - { key: k_tafilalt, name: Kingdom of Tafilalt, area: [[[33.0, -4.0], [32.0, -1.0], [30.0, -1.0], [29.5, -6.0], [31.0, -6.0]]] }
+  - { key: k_air, name: Kingdom of Aïr, area: [[[20.5, 5.5], [20.5, 10.5], [16.0, 10.5], [16.0, 5.5]]] }
+  - { key: k_adrar, name: Kingdom of Adrar, area: [[[23.0, -14.0], [23.0, -8.0], [18.0, -8.0], [18.0, -16.5]]] }
+
+  # ---------- The Sudan, Nubia, Ethiopia and the Swahili coast
+  - { key: k_wagadu, name: Kingdom of Wagadu, area: [[[17.5, -12.5], [17.0, -6.5], [14.5, -6.5], [14.0, -12.0]]] }
+  - { key: k_mali, name: Kingdom of Mali, area: [[[14.0, -12.0], [14.5, -6.5], [11.0, -6.5], [10.0, -10.0], [11.5, -12.0]]] }
+  - { key: k_masina, name: Kingdom of Masina, area: [[[16.0, -6.5], [15.5, -3.5], [13.0, -3.5], [13.0, -6.5]]] }
+  - { key: k_timbuktu, name: Kingdom of Timbuktu, area: [[[18.0, -6.0], [18.0, -1.5], [15.5, -1.5], [15.5, -6.0]]] }
+  - { key: k_gao, name: Kingdom of Gao, area: [[[18.0, -1.5], [17.5, 4.0], [14.0, 4.0], [14.0, -1.0], [15.5, -1.5]]] }
+  - { key: k_mossi, name: Kingdom of Mossi, area: [[[14.5, -3.5], [14.0, 1.5], [11.0, 1.5], [11.0, -3.5]]] }
+  - { key: k_takrur, name: Kingdom of Takrur, area: [[[16.6, -16.5], [16.6, -12.5], [14.5, -12.0], [14.5, -14.5]]] }
+  - { key: k_jolof, name: Kingdom of Jolof, area: [[[16.6, -17.5], [16.0, -15.0], [14.0, -15.0], [13.5, -16.8], [14.6, -17.5]]] }
+  - { key: k_kaabu, name: Kingdom of Kaabu, area: [[[13.6, -16.8], [13.6, -12.0], [11.5, -12.0], [11.0, -16.0]]] }
+  - { key: k_futa_jallon, name: Kingdom of Futa Jallon, area: [[[11.5, -14.5], [11.5, -10.0], [9.0, -10.0], [9.0, -14.0]]] }
   - { key: k_hausaland, name: Kingdom of Hausaland, area: [[[14.5, 4.0], [14.5, 11.0], [10.5, 11.0], [10.0, 6.0], [12.0, 4.0]]] }
-  # ---------- Iran and Central Asia
-  - { key: k_persia, name: Kingdom of Persia, area: [[[38.0, 46.0], [38.0, 49.0], [36.5, 50.0], [36.5, 55.0], [33.5, 56.0], [30.5, 53.5], [29.5, 50.0], [30.5, 48.5], [32.5, 47.5], [34.3, 45.7], [36.8, 46.2]]] }
-  - { key: k_tabaristan, name: Kingdom of Tabaristan, area: [[[38.0, 49.0], [37.3, 54.5], [36.5, 55.0], [36.5, 50.0]]] }
-  - { key: k_kerman, name: Kingdom of Kerman, area: [[[33.5, 56.0], [31.0, 60.0], [28.5, 61.8], [26.8, 62.6], [25.3, 57.3], [27.0, 52.0], [29.5, 50.0], [30.5, 53.5]]] }
-  - { key: k_khorasan, name: Kingdom of Khorasan, area: [[[38.5, 55.0], [37.6, 59.6], [37.8, 62.0], [36.5, 66.5], [34.5, 66.5], [31.0, 66.0], [29.6, 64.5], [28.5, 61.8], [31.0, 60.0], [33.5, 56.0], [36.5, 55.0], [37.3, 54.5]]] }
-  - { key: k_afghanistan, name: Kingdom of Kabulistan, area: [[[36.5, 66.5], [36.8, 71.5], [35.0, 71.8], [33.0, 71.0], [31.0, 70.5], [30.0, 67.5], [31.0, 66.0], [34.5, 66.5]]] }
-  - { key: k_khwarazm, name: Kingdom of Khwarazm, area: [[[44.0, 53.0], [44.5, 62.0], [42.5, 62.0], [40.0, 62.5], [38.5, 55.0], [40.0, 53.0]]] }
-  - { key: k_transoxiana, name: Kingdom of Transoxiana, area: [[[44.5, 62.0], [44.5, 72.0], [41.5, 72.5], [39.0, 71.5], [37.0, 68.0], [37.6, 64.5], [37.8, 62.0], [40.0, 62.5], [42.5, 62.0]]] }
-  - { key: k_ferghana, name: Kingdom of Ferghana, area: [[[42.5, 69.5], [42.5, 73.5], [40.0, 74.0], [39.0, 71.5], [41.5, 70.0]]] }
-  - { key: k_jetisu, name: Kingdom of Jetisu, area: [[[46.5, 72.0], [47.0, 82.0], [44.0, 82.0], [42.5, 80.0], [42.5, 73.5], [44.5, 72.0]]] }
-  - { key: k_tarim, name: Kingdom of Tarim, area: [[[42.5, 73.5], [42.5, 80.0], [42.5, 88.5], [38.5, 90.0], [36.5, 84.0], [36.5, 77.0], [38.5, 73.5]]] }
-  - { key: k_uyghurstan, name: Kingdom of Uyghurstan, area: [[[47.0, 82.0], [47.0, 92.0], [44.0, 96.0], [41.5, 96.0], [42.5, 88.5], [42.5, 80.0], [44.0, 82.0]]] }
-  - { key: k_tibet, name: Kingdom of Tibet, area: [[[36.5, 77.0], [36.5, 84.0], [37.0, 90.0], [36.0, 97.0], [33.0, 100.0], [29.0, 99.0], [28.0, 92.0], [28.0, 88.5], [29.5, 82.0], [31.5, 78.5], [33.0, 77.5]]] }
+  - { key: k_bornu, name: Kingdom of Bornu, area: [[[13.0, 11.0], [13.0, 15.0], [10.5, 15.0], [10.5, 11.0]]] }
+  - { key: k_kanem, name: Kingdom of Kanem, area: [[[17.5, 13.0], [17.5, 20.0], [13.0, 20.0], [13.0, 13.0]]] }
+  - { key: k_darfur, name: Kingdom of Darfur, area: [[[15.5, 21.5], [15.5, 27.5], [11.0, 27.5], [11.0, 21.5]]] }
+  - { key: k_kordofan, name: Kingdom of Kordofan, area: [[[15.0, 27.5], [15.0, 32.0], [11.0, 32.0], [11.0, 27.5]]] }
+  - { key: k_makuria, name: Kingdom of Makuria, area: [[[22.0, 29.5], [22.0, 34.0], [17.0, 34.0], [17.0, 29.5]]] }
+  - { key: k_alodia, name: Kingdom of Alodia, area: [[[17.0, 30.0], [17.0, 36.0], [12.5, 36.0], [12.5, 32.0]]] }
+  - { key: k_beja, name: Kingdom of the Beja, area: [[[22.0, 34.0], [22.0, 37.5], [16.0, 39.0], [17.0, 35.0]]] }
+  - { key: k_tigray, name: Kingdom of Tigray, area: [[[16.5, 37.0], [15.5, 40.0], [13.0, 40.0], [13.0, 37.0], [14.5, 36.4]]] }
+  - { key: k_amhara, name: Kingdom of Amhara, area: [[[13.0, 36.5], [13.0, 40.0], [10.5, 40.0], [10.0, 37.0]]] }
+  - { key: k_shewa, name: Kingdom of Shewa, area: [[[10.5, 37.0], [10.5, 40.0], [8.0, 40.0], [8.0, 37.5]]] }
+  - { key: k_damot, name: Kingdom of Damot, area: [[[11.0, 34.5], [10.0, 37.0], [7.5, 37.5], [7.0, 35.0]]] }
+  - { key: k_ifat, name: Kingdom of Ifat, area: [[[11.5, 40.0], [11.5, 44.0], [9.0, 44.0], [8.5, 40.0]]] }
+  - { key: k_dankali, name: Kingdom of Dankali, area: [[[15.5, 40.0], [12.5, 43.4], [11.5, 42.6], [11.5, 40.0], [13.0, 40.0]]] }
+  - { key: k_berbera, name: Kingdom of Berbera, area: [[[11.5, 44.0], [11.8, 51.3], [9.0, 50.5], [8.5, 44.0]]] }
+  - { key: k_mogadishu, name: Kingdom of Mogadishu, area: [[[6.5, 46.0], [8.0, 49.5], [2.0, 46.5], [-1.0, 42.5], [1.5, 42.0]]] }
+  - { key: k_zanj, name: Kingdom of the Zanj, area: [[[-1.5, 40.0], [-1.5, 42.0], [-5.0, 40.5], [-5.0, 38.8]]] }
+  - { key: k_kilwa, name: Kingdom of Kilwa, area: [[[-5.0, 38.8], [-5.0, 40.5], [-11.0, 41.0], [-11.0, 38.8]]] }
+
+  # ---------- Iran
+  - { key: k_azerbaijan, name: Kingdom of Azerbaijan, area: [[[39.6, 44.2], [39.0, 45.0], [39.2, 46.5], [39.0, 48.0], [38.3, 48.9], [37.0, 48.5], [36.6, 47.0], [37.0, 45.0], [38.3, 44.3]]] }
+  - { key: k_kurdistan, name: Kingdom of Kurdistan, area: [[[36.6, 45.0], [36.6, 47.0], [35.5, 46.5], [34.5, 46.5], [33.5, 48.5], [33.0, 46.5], [34.5, 46.0], [35.5, 44.5]]] }
+  - { key: k_jibal, name: Kingdom of Jibal, area: [[[36.6, 47.0], [36.0, 50.0], [35.7, 52.5], [34.0, 53.0], [32.5, 52.5], [32.0, 50.5], [33.5, 48.5], [34.5, 46.5], [35.5, 46.5]]] }
+  - { key: k_luristan, name: Kingdom of Luristan, area: [[[33.5, 48.5], [32.0, 50.5], [31.0, 50.0], [32.4, 47.6], [33.0, 46.5]]] }
+  - { key: k_khuzestan, name: Kingdom of Khuzestan, area: [[[33.0, 46.5], [32.4, 47.6], [31.0, 50.0], [30.0, 50.0], [29.8, 48.5], [31.5, 47.8]]] }
+  - { key: k_fars, name: Kingdom of Fars, area: [[[31.0, 50.0], [32.0, 50.5], [32.5, 52.5], [31.0, 54.0], [28.5, 55.0], [27.5, 53.0], [28.5, 51.0], [30.0, 50.0]]] }
+  - { key: k_hormuz, name: Kingdom of Hormuz, area: [[[28.5, 51.0], [27.5, 53.0], [28.5, 55.0], [27.3, 57.0], [26.0, 57.8], [26.5, 54.0], [27.0, 52.0]]] }
+  - { key: k_kerman, name: Kingdom of Kerman, area: [[[32.5, 54.0], [31.0, 59.0], [28.5, 59.5], [27.3, 57.0], [28.5, 55.0], [31.0, 54.0]]] }
+  - { key: k_makran, name: Kingdom of Makran, area: [[[27.3, 57.0], [28.5, 59.5], [27.5, 63.0], [25.2, 61.6], [25.3, 57.3], [26.0, 57.8]]] }
+  - { key: k_tabaristan, name: Kingdom of Tabaristan, area: [[[38.3, 48.9], [37.0, 51.0], [36.8, 54.0], [36.2, 54.0], [36.0, 50.0], [36.6, 48.5], [37.0, 48.5]]] }
+  - { key: k_gurgan, name: Kingdom of Gurgan, area: [[[38.0, 54.0], [37.8, 56.5], [36.5, 57.0], [36.2, 54.0], [36.8, 54.0]]] }
+  - { key: k_yazd, name: Kingdom of Yazd, area: [[[34.0, 53.0], [35.7, 52.5], [36.2, 54.0], [35.5, 56.0], [33.5, 57.5], [32.5, 54.0], [32.5, 52.5]]] }
+
+  # ---------- Khorasan and Afghanistan
+  - { key: k_nishapur, name: Kingdom of Nishapur, area: [[[37.8, 56.5], [37.5, 59.5], [36.0, 61.2], [35.0, 60.5], [35.5, 56.0], [36.5, 57.0]]] }
+  - { key: k_quhistan, name: Kingdom of Quhistan, area: [[[35.5, 56.0], [35.0, 60.5], [33.0, 61.0], [31.0, 59.0], [32.5, 54.0], [33.5, 57.5]]] }
+  - { key: k_herat, name: Kingdom of Herat, area: [[[36.0, 61.2], [35.3, 64.0], [33.5, 64.0], [33.0, 61.0], [35.0, 60.5]]] }
+  - { key: k_sistan, name: Kingdom of Sistan, area: [[[31.5, 59.5], [32.0, 63.0], [30.0, 64.0], [28.5, 61.5], [28.5, 59.5], [31.0, 59.0]]] }
+  - { key: k_merv, name: Kingdom of Merv, area: [[[38.5, 60.0], [38.0, 63.5], [36.0, 63.5], [36.0, 61.2], [37.5, 59.5]]] }
+  - { key: k_balkh, name: Kingdom of Balkh, area: [[[37.5, 64.5], [37.3, 68.5], [36.0, 69.5], [35.5, 66.0], [36.0, 63.5]]] }
+  - { key: k_ghur, name: Kingdom of Ghur, area: [[[35.5, 63.5], [35.5, 67.5], [33.5, 68.0], [33.0, 65.0], [33.5, 64.0]]] }
+  - { key: k_kabul, name: Kingdom of Kabul, area: [[[36.0, 68.5], [35.5, 71.5], [33.5, 71.0], [33.5, 68.0], [34.5, 67.0]]] }
+  - { key: k_kandahar, name: Kingdom of Kandahar, area: [[[33.5, 64.0], [33.0, 65.0], [33.5, 68.0], [32.0, 69.0], [30.5, 67.0], [30.0, 64.0], [32.0, 63.0]]] }
+  - { key: k_turan, name: Kingdom of Turan, area: [[[30.5, 64.5], [30.5, 68.0], [27.0, 68.0], [26.0, 65.5], [27.5, 63.0]]] }
+
+  # ---------- Transoxiana, Khwarazm and the Tarim
+  - { key: k_khwarazm, name: Kingdom of Khwarazm, area: [[[43.5, 57.5], [43.5, 61.5], [41.0, 62.0], [40.5, 60.0], [41.5, 58.5]]] }
+  - { key: k_dahistan, name: Kingdom of Dahistan, area: [[[41.5, 52.8], [41.5, 58.5], [40.5, 60.0], [38.5, 60.0], [37.8, 56.5], [38.0, 54.0], [39.0, 53.0]]] }
+  - { key: k_bukhara, name: Kingdom of Bukhara, area: [[[41.0, 62.0], [40.5, 65.5], [39.0, 65.5], [38.0, 63.5], [38.5, 60.0], [40.5, 60.0]]] }
+  - { key: k_samarkand, name: Kingdom of Samarkand, area: [[[40.5, 65.5], [40.5, 68.0], [39.0, 68.5], [38.5, 67.0], [39.0, 65.5]]] }
+  - { key: k_chaghaniyan, name: Kingdom of Chaghaniyan, area: [[[39.0, 65.5], [38.5, 67.0], [39.0, 68.5], [38.0, 69.0], [37.2, 68.5], [37.3, 66.0], [38.0, 64.5]]] }
+  - { key: k_badakhshan, name: Kingdom of Badakhshan, area: [[[39.0, 68.5], [39.5, 71.5], [37.5, 74.5], [36.5, 71.5], [36.0, 69.5], [37.3, 68.5], [38.0, 69.0]]] }
+  - { key: k_shash, name: Kingdom of Shash, area: [[[42.5, 68.0], [42.5, 71.0], [41.0, 71.0], [40.5, 68.0]]] }
+  - { key: k_ferghana, name: Kingdom of Ferghana, area: [[[41.5, 70.5], [41.5, 73.8], [40.0, 74.0], [39.8, 70.5]]] }
+  - { key: k_jetisu, name: Kingdom of Jetisu, area: [[[45.5, 74.0], [45.5, 81.0], [42.5, 80.5], [42.5, 74.0]]] }
+  - { key: k_tian_shan, name: Kingdom of the Tian Shan, area: [[[42.5, 73.8], [42.5, 80.0], [40.5, 78.0], [40.0, 74.0]]] }
+  - { key: k_kashgar, name: Kingdom of Kashgar, area: [[[40.5, 73.5], [41.0, 79.0], [39.0, 80.5], [37.0, 77.5], [38.5, 74.5]]] }
+  - { key: k_khotan, name: Kingdom of Khotan, area: [[[39.0, 78.0], [38.5, 84.0], [36.5, 84.0], [36.0, 78.0]]] }
+  - { key: k_kucha, name: Kingdom of Kucha, area: [[[42.5, 79.0], [42.5, 86.0], [40.5, 87.0], [39.5, 84.0], [41.0, 79.0]]] }
+  - { key: k_cherchen, name: Kingdom of Cherchen, area: [[[40.5, 87.0], [41.0, 92.0], [38.0, 92.0], [37.0, 85.0], [38.5, 84.0], [39.5, 84.0]]] }
+  - { key: k_uyghurstan, name: Kingdom of Uyghurstan, area: [[[44.5, 86.0], [44.0, 96.0], [41.5, 96.0], [41.0, 88.0], [42.5, 86.0]]] }
+  - { key: k_dzungaria, name: Kingdom of Dzungaria, area: [[[48.0, 81.0], [47.5, 90.0], [44.5, 91.0], [44.5, 86.0], [45.5, 81.0]]] }
+
+  # ---------- Mongolia and southern Siberia
+  - { key: k_khovd, name: Kingdom of Khovd, area: [[[51.0, 88.0], [50.0, 98.0], [47.0, 98.0], [45.0, 93.0], [46.5, 88.5]]] }
+  - { key: k_karakorum, name: Kingdom of Karakorum, area: [[[50.0, 98.0], [50.0, 106.0], [46.0, 106.0], [45.5, 100.0], [47.0, 98.0]]] }
+  - { key: k_kerulen, name: Kingdom of the Kerulen, area: [[[51.0, 106.0], [50.5, 116.0], [47.0, 119.0], [46.0, 112.0], [46.0, 106.0]]] }
+  - { key: k_gobi, name: Kingdom of the Gobi, area: [[[46.0, 98.0], [46.0, 112.0], [42.5, 112.0], [42.0, 100.0], [43.5, 96.0]]] }
+  - { key: k_ongud, name: Kingdom of the Ongud, area: [[[45.0, 112.0], [46.0, 119.0], [43.0, 122.0], [41.5, 118.0], [41.0, 111.0], [42.5, 112.0]]] }
+  - { key: k_hulunbuir, name: Kingdom of Hulunbuir, area: [[[51.0, 116.0], [52.5, 121.5], [48.0, 122.0], [47.0, 119.0]]] }
+  - { key: k_bargujin, name: Kingdom of Bargujin, area: [[[56.0, 99.0], [56.0, 114.0], [51.0, 116.0], [51.0, 106.0], [50.5, 99.0]]] }
+  - { key: k_tuva, name: Kingdom of Tuva, area: [[[52.5, 88.5], [52.5, 99.0], [50.0, 99.0], [50.0, 88.5]]] }
+  - { key: k_altai, name: Kingdom of the Altai, area: [[[53.5, 82.0], [53.5, 88.5], [49.5, 89.0], [49.5, 84.0]]] }
+  - { key: k_kyrgyz, name: Kingdom of the Yenisei Kyrgyz, area: [[[56.5, 88.0], [56.5, 95.0], [52.5, 95.0], [52.5, 88.5]]] }
+
+  # ---------- Tibet and the Himalaya
+  - { key: k_u, name: Kingdom of Ü, area: [[[31.5, 89.0], [31.0, 94.0], [28.5, 94.0], [28.0, 90.5]]] }
+  - { key: k_tsang, name: Kingdom of Tsang, area: [[[31.5, 84.0], [31.5, 89.0], [28.0, 90.5], [28.5, 85.0]]] }
+  - { key: k_ngari, name: Kingdom of Ngari, area: [[[36.0, 77.5], [35.0, 84.0], [31.5, 84.0], [29.5, 82.0], [31.0, 78.5], [33.0, 77.5]]] }
+  - { key: k_changtang, name: Kingdom of Changtang, area: [[[37.0, 84.0], [36.0, 92.0], [33.0, 94.0], [31.5, 89.0], [31.5, 84.0], [35.0, 84.0]]] }
+  - { key: k_kham, name: Kingdom of Kham, area: [[[33.0, 94.0], [33.0, 100.0], [28.0, 99.5], [28.5, 94.0], [31.0, 94.0]]] }
+  - { key: k_amdo, name: Kingdom of Amdo, area: [[[38.0, 96.0], [37.5, 101.5], [35.0, 103.0], [33.0, 103.0], [33.0, 97.0], [36.0, 92.0]]] }
+  - { key: k_nepal, name: Kingdom of Nepal, area: [[[30.5, 80.0], [28.0, 88.2], [26.5, 88.0], [26.5, 85.0], [28.0, 81.0], [29.0, 80.0]]] }
+
   # ---------- India
-  - { key: k_punjab, name: Kingdom of Punjab, area: [[[34.0, 71.5], [33.0, 75.8], [31.0, 77.0], [29.5, 76.5], [28.5, 72.5], [29.5, 70.5], [31.5, 70.0]]] }
-  - { key: k_sindh, name: Kingdom of Sindh, area: [[[29.5, 66.5], [29.5, 70.5], [28.5, 72.5], [26.5, 71.0], [24.3, 71.0], [23.7, 68.3], [25.0, 66.5]]] }
-  - { key: k_rajputana, name: Kingdom of Rajputana, area: [[[29.5, 72.5], [28.5, 77.0], [26.5, 77.5], [24.5, 76.0], [24.0, 73.0], [24.5, 71.0], [26.5, 71.0]]] }
-  - { key: k_gujarat, name: Kingdom of Gujarat, area: [[[24.5, 68.5], [24.5, 73.0], [23.5, 74.5], [21.0, 73.5], [20.5, 70.5], [22.0, 68.8]]] }
-  - { key: k_delhi, name: Kingdom of Delhi, area: [[[31.0, 77.0], [30.0, 80.5], [27.5, 81.5], [25.5, 81.0], [25.0, 78.5], [26.5, 77.5], [28.5, 77.0], [29.5, 76.5]]] }
-  - { key: k_oudh, name: Kingdom of Oudh, area: [[[30.0, 80.5], [27.0, 88.2], [25.5, 87.5], [24.5, 84.0], [25.5, 81.0], [27.5, 81.5]]] }
-  - { key: k_malwa, name: Kingdom of Malwa, area: [[[25.0, 74.5], [25.5, 81.0], [23.0, 82.0], [21.5, 78.5], [22.0, 74.0], [23.5, 74.5]]] }
-  - { key: k_bengal, name: Kingdom of Bengal, area: [[[27.0, 87.5], [26.5, 90.0], [24.5, 92.5], [22.0, 92.3], [21.5, 88.0], [22.5, 86.5], [24.5, 84.0], [25.5, 87.5]]] }
-  - { key: k_kamarupa, name: Kingdom of Kamarupa, area: [[[28.5, 89.5], [28.5, 97.0], [24.0, 95.5], [24.5, 92.5], [26.5, 90.0]]] }
-  - { key: k_kalinga, name: Kingdom of Kalinga, area: [[[23.0, 82.0], [22.5, 86.5], [21.5, 88.0], [19.0, 85.0], [17.7, 83.4], [19.5, 82.0]]] }
-  - { key: k_gondwana, name: Kingdom of Gondwana, area: [[[23.0, 78.5], [23.0, 82.0], [19.5, 82.0], [19.0, 79.5], [21.5, 78.5]]] }
-  - { key: k_maharashtra, name: Kingdom of Maharashtra, area: [[[21.8, 72.8], [21.5, 78.5], [19.0, 79.5], [17.5, 77.0], [16.0, 75.5], [15.5, 73.5], [18.5, 72.8]]] }
-  - { key: k_telingana, name: Kingdom of Telingana, area: [[[19.5, 77.5], [19.5, 82.0], [17.7, 83.4], [15.5, 81.0], [13.5, 80.2], [14.0, 78.0], [16.0, 77.0], [17.5, 77.0]]] }
-  - { key: k_karnata, name: Kingdom of Karnata, area: [[[17.5, 74.0], [16.5, 77.5], [14.0, 78.0], [12.0, 78.3], [11.8, 76.5], [13.0, 74.8], [15.0, 74.0]]] }
-  - { key: k_tamilakam, name: Kingdom of Tamilakam, area: [[[13.6, 78.0], [13.6, 80.4], [8.0, 78.6], [8.2, 77.4], [10.0, 77.2], [11.5, 76.8], [12.2, 78.3]]] }
+  - { key: k_peshawar, name: Kingdom of Peshawar, area: [[[35.5, 71.0], [34.5, 73.5], [33.5, 73.5], [33.0, 71.0], [34.0, 70.5]]] }
+  - { key: k_lahore, name: Kingdom of Lahore, area: [[[33.5, 73.5], [32.7, 74.8], [31.8, 76.0], [30.5, 75.0], [30.5, 73.0], [32.5, 72.0]]] }
+  - { key: k_multan, name: Kingdom of Multan, area: [[[32.5, 72.0], [30.5, 73.0], [30.5, 74.0], [29.0, 72.5], [28.5, 70.5], [30.0, 69.5], [31.5, 70.5]]] }
+  - { key: k_sindh, name: Kingdom of Sindh, area: [[[28.5, 67.5], [28.5, 70.5], [26.5, 71.0], [25.5, 69.5], [26.0, 67.5]]] }
+  - { key: k_thatta, name: Kingdom of Thatta, area: [[[26.0, 67.0], [25.5, 69.5], [26.0, 71.0], [24.3, 71.0], [23.7, 68.3], [25.0, 66.8]]] }
+  - { key: k_delhi, name: Kingdom of Delhi, area: [[[31.8, 76.0], [30.5, 77.8], [29.0, 78.0], [28.0, 77.8], [28.3, 76.0], [29.5, 74.5], [30.5, 75.0]]] }
+  - { key: k_kannauj, name: Kingdom of Kannauj, area: [[[29.0, 78.0], [28.5, 79.5], [27.0, 80.5], [26.0, 79.5], [26.5, 77.5], [28.0, 77.8]]] }
+  - { key: k_katehar, name: Kingdom of Katehar, area: [[[30.5, 77.8], [30.0, 80.5], [28.5, 80.5], [28.5, 79.5], [29.0, 78.0]]] }
+  - { key: k_awadh, name: Kingdom of Awadh, area: [[[28.5, 80.5], [28.0, 83.0], [26.5, 84.0], [25.8, 82.5], [26.0, 81.0], [27.0, 80.5]]] }
+  - { key: k_kara, name: Kingdom of Kara, area: [[[26.0, 79.5], [27.0, 80.5], [26.0, 81.0], [25.8, 82.5], [25.0, 83.0], [24.5, 81.5], [25.2, 80.0]]] }
+  - { key: k_magadha, name: Kingdom of Magadha, area: [[[27.5, 83.5], [26.8, 88.0], [25.0, 88.0], [24.5, 86.0], [24.5, 84.0], [25.0, 83.0], [25.8, 82.5], [26.5, 84.0]]] }
+  - { key: k_tirhut, name: Kingdom of Tirhut, area: [[[27.5, 84.0], [26.8, 88.0], [25.8, 87.5], [25.8, 84.5]]] }
+  - { key: k_gauda, name: Kingdom of Gauda, area: [[[26.8, 88.0], [26.4, 89.8], [24.5, 89.5], [22.5, 88.5], [22.5, 87.0], [24.5, 86.0], [25.0, 88.0]]] }
+  - { key: k_vanga, name: Kingdom of Vanga, area: [[[26.4, 89.8], [25.0, 92.0], [23.0, 92.0], [22.0, 91.5], [21.6, 89.0], [22.5, 88.5], [24.5, 89.5]]] }
+  - { key: k_chittagong, name: Kingdom of Chittagong, area: [[[23.0, 91.5], [23.0, 93.0], [20.5, 93.0], [21.0, 91.8]]] }
+  - { key: k_kamarupa, name: Kingdom of Kamarupa, area: [[[28.0, 89.5], [28.0, 96.0], [26.0, 96.0], [25.5, 90.0], [26.4, 89.8]]] }
+  - { key: k_manipur, name: Kingdom of Manipur, area: [[[25.0, 92.0], [25.5, 94.5], [23.0, 94.5], [23.0, 92.0]]] }
+  - { key: k_jharkhand, name: Kingdom of Jharkhand, area: [[[24.5, 83.0], [24.5, 86.0], [22.5, 87.0], [22.0, 84.0], [23.0, 83.0]]] }
+  - { key: k_utkala, name: Kingdom of Utkala, area: [[[22.5, 84.0], [22.5, 87.5], [19.0, 85.0], [18.0, 83.4], [19.5, 82.5], [21.5, 82.5]]] }
+  - { key: k_bundelkhand, name: Kingdom of Bundelkhand, area: [[[26.0, 77.5], [25.2, 80.0], [24.5, 81.5], [23.5, 80.5], [23.5, 78.5], [24.5, 77.5]]] }
+  - { key: k_gwalior, name: Kingdom of Gwalior, area: [[[27.0, 77.0], [26.5, 77.5], [26.0, 79.0], [24.5, 77.5], [25.0, 76.5], [26.0, 76.0]]] }
+  - { key: k_ajmer, name: Kingdom of Ajmer, area: [[[27.5, 73.5], [27.0, 77.0], [26.0, 76.0], [25.0, 75.5], [25.5, 73.8]]] }
+  - { key: k_marwar, name: Kingdom of Marwar, area: [[[28.0, 71.0], [27.5, 73.5], [25.5, 73.8], [24.8, 72.5], [25.5, 71.0]]] }
+  - { key: k_jangladesh, name: Kingdom of Jangladesh, area: [[[30.0, 72.5], [29.5, 74.5], [28.3, 76.0], [27.5, 73.5], [28.0, 71.0]]] }
+  - { key: k_mewar, name: Kingdom of Mewar, area: [[[25.5, 73.8], [25.0, 75.5], [24.0, 75.5], [23.8, 73.5], [24.8, 72.5]]] }
+  - { key: k_malwa, name: Kingdom of Malwa, area: [[[25.0, 75.5], [25.0, 76.5], [24.5, 77.5], [23.5, 78.5], [22.5, 78.0], [22.3, 75.5], [23.5, 74.5], [24.0, 75.5]]] }
+  - { key: k_gujarat, name: Kingdom of Gujarat, area: [[[24.5, 71.0], [24.5, 73.5], [23.0, 74.0], [22.2, 73.0], [22.5, 71.5], [23.5, 70.5]]] }
+  - { key: k_kutch, name: Kingdom of Kutch, area: [[[24.5, 68.0], [24.3, 71.0], [23.0, 71.0], [22.8, 68.5]]] }
+  - { key: k_saurashtra, name: Kingdom of Saurashtra, area: [[[23.0, 68.8], [22.8, 72.0], [21.5, 72.2], [20.7, 70.8], [22.0, 68.8]]] }
+  - { key: k_lata, name: Kingdom of Lata, area: [[[23.0, 72.5], [23.0, 74.0], [21.5, 74.2], [20.2, 73.0], [21.5, 72.6]]] }
+  - { key: k_khandesh, name: Kingdom of Khandesh, area: [[[22.0, 73.8], [22.3, 76.5], [21.0, 77.0], [20.8, 74.0]]] }
+  - { key: k_berar, name: Kingdom of Berar, area: [[[21.5, 76.5], [21.5, 79.5], [20.0, 79.8], [19.8, 77.0]]] }
+  - { key: k_gondwana, name: Kingdom of Gondwana, area: [[[23.5, 78.5], [23.0, 83.0], [21.0, 82.5], [20.0, 80.5], [21.5, 79.5], [22.5, 78.0]]] }
+  - { key: k_bastar, name: Kingdom of Bastar, area: [[[21.0, 80.5], [21.0, 82.5], [19.5, 82.5], [18.0, 81.5], [18.5, 80.5]]] }
+  - { key: k_devagiri, name: Kingdom of Devagiri, area: [[[21.0, 74.0], [20.8, 77.0], [19.8, 77.0], [18.5, 76.5], [18.5, 74.0], [19.8, 73.5]]] }
+  - { key: k_konkan, name: Kingdom of Konkan, area: [[[20.2, 72.8], [19.8, 73.5], [18.5, 74.0], [16.0, 74.0], [15.5, 73.5], [17.5, 73.0]]] }
+  - { key: k_kalyani, name: Kingdom of Kalyani, area: [[[18.5, 74.0], [18.5, 77.0], [17.0, 77.8], [15.5, 76.5], [15.5, 74.5], [16.0, 74.0]]] }
+  - { key: k_telingana, name: Kingdom of Telingana, area: [[[19.8, 77.0], [20.0, 79.8], [18.5, 80.5], [17.0, 80.5], [17.0, 77.8], [18.5, 77.0]]] }
+  - { key: k_vengi, name: Kingdom of Vengi, area: [[[18.5, 80.5], [19.5, 82.5], [18.0, 83.4], [16.5, 82.4], [15.5, 80.2], [17.0, 80.5]]] }
+  - { key: k_kampili, name: Kingdom of Kampili, area: [[[17.0, 77.8], [17.0, 80.5], [15.5, 80.2], [13.8, 80.2], [13.8, 77.5], [15.5, 76.5]]] }
+  - { key: k_hoysala, name: Kingdom of Hoysala, area: [[[15.5, 74.5], [15.5, 76.5], [13.8, 77.5], [12.0, 78.3], [11.8, 76.5], [13.0, 74.8]]] }
+  - { key: k_tondaimandalam, name: Kingdom of Tondaimandalam, area: [[[13.8, 78.5], [13.8, 80.3], [12.0, 80.0], [12.0, 78.5]]] }
+  - { key: k_chola, name: Kingdom of Chola, area: [[[12.0, 78.0], [12.0, 80.0], [10.0, 79.9], [10.0, 78.0]]] }
+  - { key: k_kongu, name: Kingdom of Kongu, area: [[[12.0, 76.6], [12.0, 78.0], [10.0, 78.0], [10.2, 76.8]]] }
+  - { key: k_pandya, name: Kingdom of Pandya, area: [[[10.0, 77.2], [10.0, 79.9], [8.0, 78.6], [8.2, 77.4]]] }
   - { key: k_kerala, name: Kingdom of Kerala, area: [[[12.8, 74.8], [11.8, 76.5], [10.0, 77.2], [8.2, 77.4], [8.1, 76.5], [10.5, 75.8]]] }
-  - { key: k_lanka, name: Kingdom of Lanka, area: [[[9.9, 79.5], [9.9, 82.0], [5.8, 82.0], [5.8, 79.5]]] }
-  - { key: k_nepal, name: Kingdom of Nepal, area: [[[30.5, 80.0], [29.5, 84.0], [28.0, 88.2], [26.5, 88.0], [27.5, 84.0], [28.8, 80.0]]] }
-  # ---------- China, Korea, Japan, Southeast Asia
-  - { key: k_hebei, name: Kingdom of Hebei, area: [[[42.0, 113.0], [40.5, 120.0], [38.0, 118.5], [36.0, 117.0], [36.0, 113.5], [39.0, 112.5]]] }
-  - { key: k_shandong, name: Kingdom of Shandong, area: [[[38.0, 116.0], [38.0, 123.0], [34.5, 120.5], [34.5, 116.0]]] }
-  - { key: k_henan, name: Kingdom of Henan, area: [[[36.5, 110.5], [36.0, 116.0], [33.5, 117.0], [31.5, 116.0], [32.0, 111.0], [34.5, 110.0]]] }
-  - { key: k_shaanxi, name: Kingdom of Shaanxi, area: [[[42.0, 98.0], [40.0, 112.5], [36.5, 110.5], [34.5, 110.0], [32.0, 106.0], [34.5, 102.5], [37.5, 99.0]]] }
-  - { key: k_sichuan, name: Kingdom of Shu, area: [[[34.5, 102.5], [32.0, 106.0], [31.5, 110.0], [28.0, 109.5], [27.0, 103.5], [29.5, 101.0]]] }
-  - { key: k_jiangnan, name: Kingdom of Jiangnan, area: [[[34.5, 116.0], [34.5, 122.0], [29.0, 123.0], [27.0, 120.5], [28.0, 115.5], [31.5, 116.0], [33.5, 117.0]]] }
-  - { key: k_huguang, name: Kingdom of Chu, area: [[[32.0, 111.0], [31.5, 116.0], [28.0, 115.5], [25.5, 114.0], [25.5, 109.5], [28.0, 109.5], [31.5, 110.0]]] }
-  - { key: k_minyue, name: Kingdom of Min, area: [[[28.5, 115.5], [28.5, 121.0], [23.5, 118.5], [24.0, 115.5]]] }
-  - { key: k_lingnan, name: Kingdom of Lingnan, area: [[[25.5, 104.5], [25.5, 115.5], [23.5, 118.0], [21.0, 113.0], [18.0, 108.5], [21.5, 107.5], [23.0, 105.0]]] }
-  - { key: k_dali, name: Kingdom of Dali, area: [[[29.0, 98.5], [29.0, 104.0], [25.5, 104.5], [23.0, 105.5], [21.5, 101.0], [24.0, 98.0]]] }
-  - { key: k_mongolia, name: Kingdom of Mongolia, area: [[[53.0, 87.0], [53.0, 122.0], [45.0, 124.0], [41.5, 115.0], [41.5, 105.0], [42.5, 96.0], [46.0, 88.0]]] }
-  - { key: k_manchuria, name: Kingdom of Manchuria, area: [[[53.5, 120.0], [53.0, 140.0], [43.0, 135.0], [42.0, 128.0], [40.0, 124.0], [42.0, 119.0], [45.0, 120.0]]] }
-  - { key: k_korea, name: Kingdom of Korea, area: [[[43.0, 124.0], [43.0, 131.0], [38.5, 129.0], [34.5, 129.6], [34.0, 125.5], [38.0, 124.0]]] }
-  - { key: k_japan, name: Kingdom of Japan, area: [[[41.6, 139.5], [41.5, 142.0], [35.0, 141.8], [31.0, 131.6], [30.9, 129.4], [33.5, 129.2], [34.5, 131.0], [37.0, 136.5], [38.5, 139.0], [40.5, 139.6]]] }
-  - { key: k_dai_viet, name: Kingdom of Dai Viet, area: [[[23.3, 105.3], [22.5, 107.0], [21.5, 108.1], [20.0, 107.0], [17.5, 107.2], [16.2, 108.3], [16.0, 107.6], [17.5, 106.0], [19.0, 104.3], [20.6, 103.5], [22.4, 102.6]]] }
-  - { key: k_champa, name: Kingdom of Champa, area: [[[16.0, 108.4], [15.5, 108.9], [12.0, 109.5], [10.8, 108.0], [11.5, 107.5], [14.0, 107.6], [16.0, 107.6]]] }
-  - { key: k_kambuja, name: Kingdom of Kambuja, area: [[[15.5, 102.0], [15.0, 105.0], [14.4, 106.5], [13.5, 107.6], [11.5, 107.5], [10.5, 107.0], [9.0, 105.5], [10.4, 104.3], [11.8, 102.8], [13.0, 101.8], [14.5, 101.5]]] }
-  - { key: k_siam, name: Kingdom of Siam, area: [[[22.0, 98.0], [22.0, 103.0], [19.0, 104.3], [17.5, 106.0], [15.5, 102.0], [14.0, 100.8], [13.0, 99.8], [10.0, 99.3], [8.0, 99.8], [8.0, 98.3], [11.0, 98.5], [16.0, 98.6], [19.0, 97.8]]] }
-  - { key: k_burma, name: Kingdom of Burma, area: [[[28.0, 94.0], [27.0, 98.5], [22.0, 98.0], [16.5, 98.5], [15.0, 97.6], [16.5, 94.5], [21.0, 92.2], [24.0, 94.0]]] }
-  - { key: k_malaya, name: Kingdom of Malaya, area: [[[7.0, 99.5], [7.0, 104.5], [1.2, 104.5], [1.2, 101.0]], [[5.8, 95.0], [5.8, 98.5], [-6.0, 106.0], [-6.0, 101.0], [2.0, 98.0]]] }
-  - { key: k_java, name: Kingdom of Java, area: [[[-5.8, 105.0], [-6.5, 115.8], [-8.9, 115.8], [-8.0, 105.0]]] }
+  - { key: k_jaffna, name: Kingdom of Jaffna, area: [[[9.9, 79.6], [9.9, 81.0], [8.6, 81.0], [8.6, 79.6]]] }
+  - { key: k_lanka, name: Kingdom of Lanka, area: [[[8.6, 79.6], [8.6, 82.0], [5.8, 82.0], [5.8, 79.6]]] }
+
+  # ---------- China: the north
+  - { key: k_yan, name: Kingdom of Yan, area: [[[41.5, 114.5], [41.8, 118.0], [40.0, 119.8], [39.0, 118.5], [39.0, 115.5], [40.0, 114.5]]] }
+  - { key: k_hebei, name: Kingdom of Hebei, area: [[[39.0, 114.0], [39.0, 118.0], [38.0, 117.8], [36.0, 116.0], [36.0, 114.0]]] }
+  - { key: k_jinan, name: Kingdom of Jinan, area: [[[38.0, 115.5], [38.0, 118.5], [36.5, 119.0], [35.0, 117.5], [35.0, 115.5], [36.0, 115.5]]] }
+  - { key: k_qingzhou, name: Kingdom of Qingzhou, area: [[[37.8, 118.5], [37.6, 122.7], [36.0, 120.5], [35.0, 119.2], [36.5, 119.0]]] }
+  - { key: k_datong, name: Kingdom of Datong, area: [[[41.0, 111.0], [40.8, 114.5], [39.0, 114.5], [38.0, 112.5], [39.0, 111.0]]] }
+  - { key: k_hedong, name: Kingdom of Hedong, area: [[[38.0, 111.0], [38.0, 114.0], [36.0, 114.2], [35.0, 112.5], [35.0, 110.5], [36.5, 110.5]]] }
+  - { key: k_henan, name: Kingdom of Henan, area: [[[36.0, 111.0], [36.0, 116.0], [34.5, 116.5], [34.0, 113.5], [34.3, 111.0]]] }
+  - { key: k_huaibei, name: Kingdom of Huaibei, area: [[[35.0, 115.5], [35.0, 119.2], [33.0, 120.5], [32.5, 117.0], [33.5, 115.5]]] }
+  - { key: k_nanyang, name: Kingdom of Nanyang, area: [[[34.0, 111.0], [34.0, 116.0], [33.5, 115.5], [32.0, 115.5], [31.8, 113.5], [32.5, 111.0]]] }
+  # ---------- China: the northwest
+  - { key: k_guanzhong, name: Kingdom of Guanzhong, area: [[[35.5, 106.5], [35.5, 110.5], [34.3, 111.0], [33.8, 110.0], [34.0, 106.5]]] }
+  - { key: k_yanan, name: Kingdom of Yan'an, area: [[[39.5, 107.0], [39.0, 111.0], [36.5, 110.5], [35.5, 110.5], [35.5, 107.5], [37.5, 107.0]]] }
+  - { key: k_ordos, name: Kingdom of the Ordos, area: [[[41.5, 106.5], [40.5, 111.0], [39.3, 111.0], [39.5, 107.0], [40.5, 105.0]]] }
+  - { key: k_ningxia, name: Kingdom of Ningxia, area: [[[40.5, 104.5], [39.5, 107.0], [37.5, 107.0], [36.5, 105.5], [37.5, 104.0]]] }
+  - { key: k_hexi, name: Kingdom of Hexi, area: [[[41.0, 94.5], [40.0, 100.0], [37.5, 104.0], [36.5, 103.0], [38.5, 99.0], [39.5, 95.0]]] }
+  - { key: k_longxi, name: Kingdom of Longxi, area: [[[37.5, 104.0], [36.5, 105.5], [35.5, 107.5], [35.5, 106.5], [34.0, 106.5], [34.0, 104.0], [36.5, 103.0]]] }
+  - { key: k_hanzhong, name: Kingdom of Hanzhong, area: [[[34.0, 105.5], [33.8, 110.0], [32.5, 111.0], [32.0, 108.0], [32.5, 105.5]]] }
+  # ---------- China: the southwest
+  - { key: k_shu, name: Kingdom of Shu, area: [[[33.0, 102.5], [32.5, 105.5], [30.5, 105.0], [29.5, 104.0], [29.5, 102.5], [31.0, 102.5]]] }
+  - { key: k_ba, name: Kingdom of Ba, area: [[[32.5, 105.5], [32.0, 108.0], [31.0, 110.0], [29.5, 108.5], [28.5, 106.0], [29.5, 104.0], [30.5, 105.0]]] }
+  - { key: k_wumeng, name: Kingdom of Wumeng, area: [[[29.5, 102.5], [29.5, 104.0], [28.5, 106.0], [27.5, 105.5], [27.5, 101.5], [28.5, 101.0]]] }
+  - { key: k_bozhou, name: Kingdom of Bozhou, area: [[[28.5, 105.5], [29.0, 108.5], [27.0, 109.5], [25.5, 108.5], [25.5, 104.5], [27.5, 105.5]]] }
+  - { key: k_yunnan, name: Kingdom of Yunnan, area: [[[27.5, 101.5], [28.0, 104.0], [25.5, 104.5], [23.0, 105.5], [22.5, 101.0], [24.0, 101.5]]] }
+  # ---------- China: the lower Yangtze and the southeast coast
+  - { key: k_wu, name: Kingdom of Wu, area: [[[32.5, 119.0], [32.0, 121.8], [30.5, 122.5], [29.8, 121.0], [30.2, 119.0], [31.5, 118.5]]] }
+  - { key: k_huainan, name: Kingdom of Huainan, area: [[[33.0, 117.0], [33.0, 120.5], [32.0, 121.0], [32.5, 119.0], [31.5, 118.5], [30.5, 117.0], [31.8, 115.5], [32.5, 115.5]]] }
+  - { key: k_zhedong, name: Kingdom of Zhedong, area: [[[30.2, 119.0], [29.8, 121.0], [30.0, 122.3], [28.0, 121.5], [27.2, 120.3], [28.3, 118.5], [29.2, 118.2]]] }
+  - { key: k_huizhou, name: Kingdom of Huizhou, area: [[[31.0, 117.0], [30.2, 119.0], [29.2, 118.2], [29.6, 116.5]]] }
+  - { key: k_jiangxi, name: Kingdom of Jiangxi, area: [[[30.0, 114.0], [29.8, 117.5], [28.3, 118.5], [27.5, 117.0], [27.5, 114.0]]] }
+  - { key: k_ganzhou, name: Kingdom of Ganzhou, area: [[[27.5, 114.0], [27.5, 117.0], [26.0, 116.5], [24.5, 115.5], [25.0, 114.0]]] }
+  - { key: k_min, name: Kingdom of Min, area: [[[28.3, 117.5], [27.2, 120.3], [25.5, 119.8], [25.5, 118.0], [26.5, 117.0]]] }
+  - { key: k_quanzhou, name: Kingdom of Quanzhou, area: [[[25.5, 117.0], [25.5, 119.8], [23.5, 117.5], [24.0, 116.5]]] }
+  # ---------- China: the middle Yangtze
+  - { key: k_jingxiang, name: Kingdom of Jingxiang, area: [[[32.5, 110.5], [32.0, 113.5], [30.5, 113.8], [29.8, 112.0], [30.5, 110.0], [31.5, 110.0]]] }
+  - { key: k_ezhou, name: Kingdom of Ezhou, area: [[[32.0, 113.5], [31.8, 115.5], [30.5, 117.0], [29.6, 116.5], [29.8, 114.0], [30.5, 113.8]]] }
+  - { key: k_changsha, name: Kingdom of Changsha, area: [[[29.8, 110.5], [29.8, 114.0], [27.5, 114.0], [26.8, 112.0], [27.5, 110.5]]] }
+  - { key: k_hengzhou, name: Kingdom of Hengzhou, area: [[[27.5, 110.5], [26.8, 112.0], [27.5, 114.0], [25.5, 114.0], [25.3, 111.0]]] }
+  - { key: k_shinan, name: Kingdom of Shinan, area: [[[31.0, 108.5], [30.5, 110.0], [29.8, 110.5], [27.5, 110.5], [27.0, 109.5], [29.0, 108.5]]] }
+  # ---------- China: Lingnan
+  - { key: k_guangzhou, name: Kingdom of Guangzhou, area: [[[25.3, 112.0], [24.5, 115.5], [23.0, 115.5], [21.5, 113.0], [22.0, 111.5], [23.5, 111.0]]] }
+  - { key: k_chaozhou, name: Kingdom of Chaozhou, area: [[[24.5, 115.5], [24.0, 116.5], [23.5, 117.5], [22.6, 116.0], [23.0, 115.5]]] }
+  - { key: k_guilin, name: Kingdom of Guilin, area: [[[26.0, 109.0], [25.3, 111.0], [25.3, 112.0], [23.5, 111.0], [23.5, 109.5], [25.0, 108.5]]] }
+  - { key: k_yongzhou, name: Kingdom of Yongzhou, area: [[[25.5, 104.5], [25.5, 108.5], [23.5, 109.5], [22.0, 109.5], [21.5, 108.0], [22.5, 106.5], [23.0, 105.5]]] }
+  - { key: k_leizhou, name: Kingdom of Leizhou, area: [[[23.5, 109.5], [23.5, 111.0], [22.0, 111.5], [21.5, 111.5], [20.2, 110.3], [21.5, 109.5]]] }
+  - { key: k_qiongzhou, name: Kingdom of Qiongzhou, area: [[[20.2, 108.5], [20.2, 111.2], [18.0, 111.2], [18.0, 108.5]]] }
+
+  # ---------- Manchuria and Korea
+  - { key: k_liaodong, name: Kingdom of Liaodong, area: [[[42.5, 119.0], [43.0, 124.5], [40.5, 125.0], [39.0, 121.5], [40.0, 119.8], [41.8, 118.0]]] }
+  - { key: k_haixi, name: Kingdom of Haixi, area: [[[46.0, 122.0], [46.0, 129.0], [42.5, 129.5], [42.5, 124.0], [43.0, 122.0]]] }
+  - { key: k_songhua, name: Kingdom of the Songhua, area: [[[50.0, 122.0], [48.0, 127.0], [48.0, 132.0], [46.0, 129.0], [46.0, 122.0], [48.0, 122.0]]] }
+  - { key: k_nurgan, name: Kingdom of Nurgan, area: [[[53.5, 120.0], [53.0, 140.0], [48.0, 140.0], [48.0, 127.0], [50.0, 122.0]]] }
+  - { key: k_yilan, name: Kingdom of Yilan, area: [[[48.0, 130.0], [48.0, 140.0], [43.0, 135.0], [42.5, 130.5], [45.0, 130.0]]] }
+  - { key: k_seogyeong, name: Kingdom of Seogyeong, area: [[[40.8, 124.2], [40.8, 127.0], [38.6, 127.0], [38.6, 124.8]]] }
+  - { key: k_dongbuk, name: Kingdom of Dongbuk, area: [[[42.5, 127.0], [42.5, 130.5], [39.0, 128.0], [38.6, 127.0], [40.8, 127.0]]] }
+  - { key: k_gyeonggi, name: Kingdom of Gyeonggi, area: [[[38.6, 126.0], [38.5, 127.8], [37.0, 127.8], [36.9, 126.3]]] }
+  - { key: k_gyoju, name: Kingdom of Gyoju, area: [[[38.6, 127.8], [39.0, 128.0], [37.0, 129.6], [37.0, 127.8]]] }
+  - { key: k_gyeongsang, name: Kingdom of Gyeongsang, area: [[[37.0, 127.8], [37.0, 129.6], [35.0, 129.4], [34.8, 127.6]]] }
+  - { key: k_jeolla, name: Kingdom of Jeolla, area: [[[37.0, 125.5], [37.0, 127.8], [34.8, 127.6], [34.0, 126.0]], [[33.6, 126.0], [33.6, 127.0], [33.1, 127.0], [33.1, 126.0]]] }
+
+  # ---------- Japan
+  - { key: k_saikaido, name: Kingdom of Saikaidō, area: [[[34.0, 129.0], [34.0, 132.0], [31.0, 132.0], [30.9, 129.4]]] }
+  - { key: k_nankaido, name: Kingdom of Nankaidō, area: [[[34.4, 132.0], [34.4, 134.8], [32.7, 134.8], [32.7, 132.0]]] }
+  - { key: k_sanyodo, name: Kingdom of San'yōdō, area: [[[34.9, 131.0], [34.9, 134.5], [34.2, 134.5], [33.8, 131.0]]] }
+  - { key: k_sanindo, name: Kingdom of San'indō, area: [[[36.0, 131.5], [35.8, 134.8], [34.9, 134.5], [34.9, 131.0], [34.4, 130.8]]] }
+  - { key: k_kinai, name: Kingdom of Kinai, area: [[[35.5, 134.8], [35.3, 136.5], [34.0, 136.0], [33.4, 135.5], [34.2, 134.8]]] }
+  - { key: k_tokai, name: Kingdom of Tōkai, area: [[[36.0, 136.0], [35.7, 138.0], [34.6, 138.0], [34.2, 136.5], [35.3, 136.5]]] }
+  - { key: k_hokuriku, name: Kingdom of Hokurikudō, area: [[[37.5, 136.5], [38.5, 139.5], [37.0, 139.5], [36.0, 136.0], [35.5, 135.5]]] }
+  - { key: k_shinano, name: Kingdom of Shinano, area: [[[37.0, 137.5], [37.0, 139.0], [35.7, 138.6], [35.5, 137.3]]] }
+  - { key: k_bando, name: Kingdom of Bandō, area: [[[37.0, 139.0], [36.9, 141.0], [35.0, 140.5], [34.9, 139.0], [35.7, 138.6]]] }
+  - { key: k_dewa, name: Kingdom of Dewa, area: [[[40.5, 139.6], [40.5, 140.6], [37.8, 140.4], [38.5, 139.4]]] }
+  - { key: k_mutsu, name: Kingdom of Mutsu, area: [[[41.6, 140.6], [41.5, 142.0], [37.0, 141.2], [37.0, 139.6], [37.8, 140.4], [40.5, 140.6]]] }
+  - { key: k_ezo, name: Kingdom of Ezo, area: [[[45.6, 139.5], [45.6, 146.0], [41.4, 146.0], [41.4, 139.5]]] }
+
+  # ---------- Southeast Asia
+  - { key: k_dai_viet, name: Kingdom of Đại Việt, area: [[[23.3, 105.3], [22.5, 107.0], [21.5, 108.1], [20.0, 107.0], [19.5, 105.8], [20.5, 104.3], [22.4, 102.6]]] }
+  - { key: k_nghe_an, name: Kingdom of Nghệ An, area: [[[20.0, 104.0], [20.0, 106.5], [17.0, 107.2], [16.5, 107.0], [18.5, 104.8]]] }
+  - { key: k_champa, name: Kingdom of Champa, area: [[[17.0, 106.5], [16.0, 108.4], [13.5, 109.4], [13.5, 107.6], [16.0, 107.0]]] }
+  - { key: k_panduranga, name: Kingdom of Panduranga, area: [[[13.5, 107.6], [13.5, 109.4], [11.0, 109.0], [10.8, 107.8], [12.0, 107.2]]] }
+  - { key: k_angkor, name: Kingdom of Angkor, area: [[[15.0, 102.0], [15.0, 105.5], [13.5, 107.0], [12.5, 104.5], [13.5, 102.5]]] }
+  - { key: k_basak, name: Kingdom of Basak, area: [[[12.5, 104.5], [13.5, 107.0], [11.0, 107.5], [9.0, 105.5], [10.4, 104.3]]] }
+  - { key: k_phimai, name: Kingdom of Phimai, area: [[[17.8, 101.5], [17.5, 104.8], [15.5, 105.5], [15.0, 102.0]]] }
+  - { key: k_lan_na, name: Kingdom of Lan Na, area: [[[20.5, 98.0], [20.5, 100.5], [18.0, 100.5], [17.5, 98.5]]] }
+  - { key: k_sukhothai, name: Kingdom of Sukhothai, area: [[[18.0, 98.5], [18.0, 101.5], [16.0, 101.0], [15.5, 99.0]]] }
+  - { key: k_suphannaphum, name: Kingdom of Suphannaphum, area: [[[15.5, 99.0], [15.5, 101.5], [13.0, 102.0], [12.5, 99.5]]] }
+  - { key: k_muang_sua, name: Kingdom of Muang Sua, area: [[[22.0, 100.5], [21.5, 103.5], [19.0, 104.3], [17.8, 103.5], [17.8, 101.5], [19.5, 100.5]]] }
+  - { key: k_tambralinga, name: Kingdom of Tambralinga, area: [[[12.5, 98.5], [12.5, 100.0], [7.0, 100.5], [7.0, 98.3], [10.0, 98.5]]] }
+  - { key: k_sipsongpanna, name: Kingdom of Sipsongpanna, area: [[[23.0, 99.5], [23.0, 102.0], [21.0, 102.0], [21.0, 99.5]]] }
+  - { key: k_shan, name: Kingdom of the Shan, area: [[[25.5, 97.0], [24.5, 99.5], [21.0, 99.5], [20.5, 98.0], [22.0, 97.0]]] }
+  - { key: k_pinya, name: Kingdom of Pinya, area: [[[23.5, 94.5], [23.5, 96.8], [20.5, 96.8], [20.5, 94.5]]] }
+  - { key: k_kachin, name: Kingdom of Kachin, area: [[[27.5, 96.5], [27.5, 98.5], [23.5, 98.0], [23.5, 94.5], [25.5, 94.5]]] }
+  - { key: k_ramanna, name: Kingdom of Rāmañña, area: [[[19.0, 94.8], [19.0, 97.0], [15.5, 98.0], [15.5, 94.5]]] }
+  - { key: k_tenasserim, name: Kingdom of Tenasserim, area: [[[15.5, 97.5], [15.5, 99.0], [12.5, 99.0], [12.5, 98.0]]] }
+  - { key: k_arakan, name: Kingdom of Arakan, area: [[[21.5, 92.2], [21.5, 94.0], [18.0, 94.6], [18.0, 93.8], [20.0, 92.5]]] }
+  - { key: k_malaya, name: Kingdom of Malaya, area: [[[7.0, 99.5], [7.0, 104.5], [1.2, 104.5], [1.2, 101.0]]] }
+  - { key: k_samudra, name: Kingdom of Samudra, area: [[[5.8, 95.0], [5.8, 98.5], [3.0, 99.5], [3.5, 96.5]]] }
+  - { key: k_malayu, name: Kingdom of Malayu, area: [[[3.5, 96.5], [3.0, 99.5], [0.0, 103.8], [-2.0, 104.5], [-1.5, 100.0]]] }
+  - { key: k_palembang, name: Kingdom of Palembang, area: [[[-1.5, 100.0], [-2.0, 104.5], [-3.0, 106.0], [-6.0, 106.0], [-5.0, 102.5]]] }
+  - { key: k_sunda, name: Kingdom of Sunda, area: [[[-5.8, 105.0], [-6.0, 108.5], [-8.0, 108.5], [-7.5, 105.0]]] }
+  - { key: k_majapahit, name: Kingdom of Majapahit, area: [[[-6.0, 108.5], [-6.5, 114.6], [-8.9, 114.6], [-8.0, 108.5]]] }
+  - { key: k_bali, name: Kingdom of Bali, area: [[[-8.0, 114.6], [-8.0, 116.8], [-9.0, 116.8], [-9.0, 114.6]]] }
+
+empire_fill:
+  - [[89, -180], [89, 180], [-89, 180], [-89, -180]]
 
 empires:
-  - { key: e_hispania, name: Empire of Hispania, kingdoms: [k_castile, k_leon, k_portugal, k_navarra, k_aragon, k_andalusia] }
-  - { key: e_francia, name: Empire of Francia, kingdoms: [k_france, k_aquitaine, k_brittany, k_burgundy] }
-  - { key: e_britannia, name: Empire of Britannia, kingdoms: [k_england, k_wales, k_scotland, k_ireland] }
-  - { key: e_hre, name: Holy Roman Empire, kingdoms: [k_germany, k_bavaria, k_bohemia, k_frisia, k_lotharingia] }
-  - { key: e_italy, name: Empire of Italy, kingdoms: [k_italy, k_sicily, k_sardinia] }
-  - { key: e_scandinavia, name: Empire of Scandinavia, kingdoms: [k_denmark, k_sweden, k_norway, k_finland] }
-  - { key: e_west_slavia, name: Empire of Baltia, kingdoms: [k_poland, k_lithuania, k_prussia, k_livonia] }
-  - { key: e_carpathia, name: Empire of Carpathia, kingdoms: [k_hungary, k_croatia, k_bosnia, k_wallachia, k_moldavia] }
-  - { key: e_byzantium, name: Empire of Rome, kingdoms: [k_byzantium, k_thessalonika, k_greece, k_bulgaria, k_serbia, k_anatolia, k_trebizond, k_cilicia] }
-  - { key: e_russia, name: Empire of Rus, kingdoms: [k_novgorod, k_vladimir, k_chernigov, k_kiev, k_ruthenia] }
-  - { key: e_tartaria, name: Empire of Tartaria, kingdoms: [k_cumania, k_taurica, k_volga_bulgaria, k_white_horde, k_alania] }
-  - { key: e_caucasus, name: Empire of the Caucasus, kingdoms: [k_georgia, k_armenia, k_azerbaijan] }
-  - { key: e_arabia, name: Empire of Arabia, kingdoms: [k_syria, k_jerusalem, k_jazira, k_mesopotamia, k_arabia, k_yemen, k_oman, k_egypt] }
-  - { key: e_maghreb, name: Empire of the Maghreb, kingdoms: [k_morocco, k_tlemcen, k_ifriqiya, k_libya] }
-  - { key: e_abyssinia, name: Empire of Abyssinia, kingdoms: [k_nubia, k_abyssinia] }
-  - { key: e_west_sudan, name: Empire of the Western Sudan, kingdoms: [k_mali, k_songhai, k_ghana] }
-  - { key: e_central_sudan, name: Empire of the Central Sudan, kingdoms: [k_kanem, k_hausaland] }
-  - { key: e_persia, name: Empire of Persia, kingdoms: [k_persia, k_tabaristan, k_kerman, k_khorasan, k_afghanistan] }
-  - { key: e_turan, name: Empire of Turan, kingdoms: [k_khwarazm, k_transoxiana, k_ferghana, k_jetisu, k_tarim, k_uyghurstan] }
-  - { key: e_tibet, name: Empire of Tibet, kingdoms: [k_tibet, k_nepal] }
-  - { key: e_rajastan, name: Empire of Rajastan, kingdoms: [k_punjab, k_sindh, k_rajputana, k_gujarat, k_malwa] }
-  - { key: e_madhyadesa, name: Empire of Madhyadesa, kingdoms: [k_delhi, k_oudh, k_bengal, k_kamarupa, k_kalinga] }
-  - { key: e_deccan, name: Empire of the Deccan, kingdoms: [k_maharashtra, k_telingana, k_gondwana, k_karnata] }
-  - { key: e_dravida, name: Empire of Dravida, kingdoms: [k_tamilakam, k_kerala, k_lanka] }
-  - { key: e_china, name: Empire of China, kingdoms: [k_hebei, k_shandong, k_henan, k_shaanxi, k_sichuan, k_jiangnan, k_huguang, k_minyue, k_lingnan, k_dali] }
-  - { key: e_mongolia, name: Empire of Mongolia, kingdoms: [k_mongolia, k_manchuria] }
-  - { key: e_japan, name: Empire of Japan, kingdoms: [k_japan, k_korea] }
-  - { key: e_indochina, name: Empire of Indochina, kingdoms: [k_dai_viet, k_champa, k_kambuja, k_siam, k_burma] }
-  - { key: e_nusantara, name: Empire of Nusantara, kingdoms: [k_malaya, k_java] }
+  # ---------- Europe
+  - { key: e_hispania, name: Empire of Hispania, area: [[[44.0, -10.0], [43.8, -1.6], [42.8, 0.0], [42.7, 3.4], [40.0, 5.0], [36.0, -1.0], [35.8, -6.0], [36.5, -10.0]]] }
+  - { key: e_francia, name: Empire of Francia, kingdoms: [k_france] }
+  - { key: e_hre, name: Holy Roman Empire, kingdoms: [k_germany, k_bohemia, k_arles] }
+  - { key: e_britannia, name: Empire of Britannia, area: [[[61.0, -11.0], [61.0, 1.0], [52.0, 2.5], [50.8, 1.6], [49.8, -6.5], [51.0, -11.0]]] }
+  - { key: e_scandinavia, name: Empire of Scandinavia, area: [[[72.0, -26.0], [72.0, 32.0], [66.5, 32.0], [60.5, 30.0], [59.8, 22.0], [55.2, 16.5], [54.5, 12.5], [54.7, 10.8], [55.2, 8.0], [58.0, 6.0], [63.0, -26.0]]] }
+  - { key: e_baltic, name: Empire of Baltia, area: [[[59.8, 21.5], [59.8, 28.2], [57.5, 28.2], [56.2, 26.5], [54.0, 25.8], [53.8, 23.4], [53.4, 21.0], [53.5, 19.3], [54.4, 18.9], [55.4, 20.5]]] }
+  - { key: e_poland, name: Empire of Lechia, area: [[[54.9, 16.6], [54.8, 19.0], [53.5, 19.3], [53.4, 21.0], [53.8, 23.4], [52.0, 23.6], [50.5, 24.0], [49.2, 22.5], [49.4, 19.0], [50.0, 18.3], [50.4, 16.4], [51.0, 15.0], [52.5, 14.8], [53.2, 16.3]]] }
+  - { key: e_carpathia, name: Empire of Carpathia, area: [[[49.6, 17.0], [49.5, 22.6], [48.4, 23.5], [47.8, 24.8], [47.5, 26.5], [48.6, 26.5], [48.3, 28.0], [46.5, 30.2], [45.3, 29.8], [44.0, 28.0], [43.7, 25.0], [44.2, 22.6], [44.6, 21.4], [45.0, 19.3], [45.0, 16.3], [45.3, 13.6], [46.4, 13.6], [46.8, 16.1], [47.8, 16.9]]] }
+  - { key: e_byzantium, name: Empire of Rome, area: [[[45.0, 19.2], [44.6, 21.4], [44.2, 22.6], [43.7, 25.0], [44.0, 28.0], [45.3, 29.8], [43.0, 28.2], [41.3, 29.4], [40.2, 26.1], [38.9, 27.0], [36.0, 28.4], [34.6, 23.0], [36.0, 21.0], [39.6, 19.6], [42.0, 19.0], [43.3, 18.0], [44.2, 19.4]]] }
+  - { key: e_italy, name: Empire of Italy, area: [[[46.6, 6.9], [46.5, 10.4], [46.6, 12.0], [46.6, 13.8], [45.6, 13.9], [44.8, 14.0], [42.0, 16.5], [40.0, 19.0], [35.6, 15.4], [36.4, 12.0], [38.6, 7.8], [41.3, 8.0], [43.2, 9.0], [43.75, 7.6], [44.2, 7.7], [45.1, 7.0], [45.9, 7.0]]] }
+  - { key: e_ruthenia, name: Empire of Ruthenia, area: [[[56.3, 26.5], [56.5, 31.0], [54.0, 31.5], [54.0, 35.0], [51.6, 35.0], [50.8, 33.5], [49.5, 33.0], [49.2, 31.0], [48.0, 30.0], [48.3, 25.0], [49.2, 22.5], [50.5, 24.0], [52.0, 23.6], [53.8, 23.4], [54.0, 25.8]]] }
+  - { key: e_russia, name: Empire of Rus, area: [[[69.0, 28.0], [69.0, 45.0], [64.0, 48.0], [61.5, 50.0], [59.0, 50.0], [57.5, 46.0], [55.5, 46.0], [55.3, 42.3], [53.5, 42.0], [53.0, 39.5], [51.0, 39.5], [50.5, 36.5], [51.6, 35.0], [54.0, 35.0], [54.0, 31.5], [56.5, 31.0], [57.5, 27.8], [59.8, 28.0], [60.5, 30.0], [66.5, 32.0]]] }
+  - { key: e_ural, name: Empire of Idel-Ural, area: [[[69.0, 45.0], [69.0, 66.0], [56.0, 62.0], [51.0, 60.0], [51.0, 49.0], [52.5, 46.0], [55.5, 46.0], [57.5, 46.0], [59.0, 50.0], [61.5, 50.0], [64.0, 48.0]]] }
+  - { key: e_tartaria, name: Empire of Cumania, area: [[[49.5, 29.0], [50.0, 33.0], [51.0, 39.5], [52.5, 40.0], [52.5, 46.0], [51.0, 49.0], [47.0, 49.5], [45.5, 47.5], [43.5, 46.0], [43.8, 42.5], [44.6, 37.5], [44.4, 33.5], [45.3, 29.6], [46.5, 29.5], [48.0, 29.5]]] }
+  - { key: e_kazakh, name: Empire of the White Horde, area: [[[56.0, 60.0], [55.0, 76.0], [50.0, 83.0], [45.5, 81.0], [44.5, 74.0], [42.5, 69.0], [43.5, 64.0], [44.0, 58.5], [42.0, 55.0], [44.5, 50.5], [47.0, 49.5], [51.0, 49.0], [51.0, 60.0]]] }
+  # ---------- The Near East and North Africa
+  - { key: e_caucasus, name: Empire of the Caucasus, area: [[[44.0, 36.6], [44.6, 37.5], [43.8, 42.5], [43.8, 46.0], [44.0, 47.5], [41.4, 48.9], [40.2, 50.4], [39.4, 48.9], [39.0, 46.5], [39.0, 45.0], [39.8, 43.5], [40.6, 42.6], [41.5, 41.4], [42.3, 41.4], [43.4, 40.0]]] }
+  - { key: e_anatolia, name: Empire of Rum, area: [[[41.3, 26.3], [41.2, 29.05], [42.2, 32.0], [42.1, 35.5], [41.3, 37.6], [41.6, 41.6], [41.0, 43.0], [39.8, 43.5], [39.0, 45.0], [37.6, 44.3], [37.2, 42.4], [37.0, 41.0], [37.2, 38.0], [36.2, 35.9], [36.0, 32.5], [36.2, 30.0], [36.6, 27.3], [38.5, 26.2], [40.0, 26.0]], [[35.8, 32.1], [35.8, 34.7], [34.5, 34.7], [34.5, 32.1]]] }
+  - { key: e_mashriq, name: Empire of the Mashriq, area: [[[37.2, 35.9], [37.2, 38.0], [37.0, 41.0], [37.6, 44.3], [36.6, 45.0], [34.5, 46.0], [33.0, 46.5], [31.5, 47.8], [29.8, 48.5], [29.0, 47.5], [30.5, 42.0], [31.5, 38.0], [29.5, 35.0], [31.3, 34.2], [33.3, 35.0], [35.6, 35.6]]] }
+  - { key: e_arabia, name: Empire of Arabia, area: [[[30.5, 42.0], [29.0, 47.5], [29.8, 48.5], [26.0, 51.0], [24.0, 56.5], [26.4, 56.5], [22.5, 60.0], [16.0, 55.0], [12.5, 44.0], [16.0, 42.5], [22.0, 38.8], [28.0, 34.6], [29.5, 35.0], [31.5, 38.0]]] }
+  - { key: e_egypt, name: Empire of Egypt, area: [[[31.8, 24.8], [31.6, 32.5], [31.3, 34.3], [29.5, 35.0], [27.8, 34.3], [22.0, 37.0], [22.0, 24.8]]] }
+  - { key: e_maghreb, name: Empire of the Maghreb, area: [[[37.6, -6.0], [37.6, 11.5], [33.5, 11.8], [32.2, 15.6], [32.0, 20.0], [32.9, 22.5], [31.8, 24.8], [24.0, 24.8], [24.0, 10.5], [26.0, 3.0], [26.0, -8.0], [27.5, -13.5], [36.0, -10.5]]] }
+  # ---------- Africa south of the Sahara
+  - { key: e_west_sudan, name: Empire of the Western Sudan, area: [[[24.0, -17.5], [26.0, -8.0], [26.0, 3.0], [20.0, 5.0], [14.0, 4.0], [11.0, 1.5], [9.0, -8.0], [9.0, -15.0], [12.0, -17.5]]] }
+  - { key: e_central_sudan, name: Empire of the Central Sudan, area: [[[26.0, 3.0], [24.0, 10.5], [24.0, 24.0], [15.5, 27.5], [10.5, 27.5], [9.0, 14.0], [10.0, 4.0], [14.0, 4.0], [20.0, 5.0]]] }
+  - { key: e_nubia, name: Empire of Nubia, area: [[[22.0, 24.8], [22.0, 37.5], [16.0, 39.0], [12.0, 36.0], [9.5, 33.0], [10.5, 27.5], [15.5, 27.5]]] }
+  - { key: e_abyssinia, name: Empire of Abyssinia, area: [[[16.0, 39.0], [15.5, 40.0], [12.5, 43.4], [11.5, 44.0], [11.8, 51.3], [2.0, 46.5], [-1.5, 42.0], [4.0, 41.0], [5.0, 35.0], [9.5, 33.0], [12.0, 36.0]]] }
+  - { key: e_guinea, name: Empire of Guinea, area: [[[12.0, -17.5], [9.0, -15.0], [9.0, -8.0], [11.0, 1.5], [10.0, 4.0], [9.0, 14.0], [4.0, 10.0], [4.0, -8.0], [8.0, -14.0]]] }
+  - { key: e_kongo, name: Empire of Kongo, area: [[[4.0, 8.5], [4.0, 25.0], [-8.0, 30.0], [-18.0, 24.0], [-18.0, 11.5], [-5.0, 11.5]]] }
+  - { key: e_great_lakes, name: Empire of the Great Lakes, area: [[[5.0, 25.0], [5.0, 35.0], [4.0, 41.0], [-1.5, 40.0], [-11.0, 38.0], [-11.0, 30.0], [-8.0, 30.0], [4.0, 25.0]]] }
+  - { key: e_zanj, name: Empire of the Zanj, area: [[[-1.5, 38.0], [-1.5, 42.0], [-11.0, 41.5], [-11.0, 38.0]]] }
+  - { key: e_zimbabwe, name: Empire of Zimbabwe, area: [[[-11.0, 30.0], [-11.0, 41.0], [-35.0, 35.0], [-35.0, 15.0], [-18.0, 11.5], [-18.0, 24.0]], [[-11.5, 42.5], [-11.5, 51.5], [-26.0, 51.5], [-26.0, 42.5]]] }
+  # ---------- Iran, Turan and the steppe east
+  - { key: e_persia, name: Empire of Persia, area: [[[39.6, 44.2], [38.3, 48.9], [37.0, 51.0], [36.8, 54.0], [37.8, 56.5], [35.5, 56.0], [33.5, 57.5], [31.0, 59.0], [28.5, 59.5], [27.5, 63.0], [25.2, 61.6], [25.3, 57.3], [26.5, 54.0], [27.5, 51.5], [29.5, 50.0], [29.8, 48.5], [31.5, 47.8], [33.0, 46.5], [34.5, 46.0], [35.5, 44.5], [37.6, 44.3], [38.3, 44.3]]] }
+  - { key: e_khorasan, name: Empire of Khorasan, area: [[[38.5, 53.5], [38.5, 60.0], [38.0, 63.5], [37.5, 64.5], [37.3, 68.5], [36.5, 71.5], [35.5, 71.5], [33.5, 71.0], [32.0, 69.5], [30.5, 68.0], [27.0, 68.0], [25.2, 61.6], [27.5, 63.0], [28.5, 59.5], [31.0, 59.0], [33.5, 57.5], [35.5, 56.0], [37.8, 56.5], [37.8, 54.0]]] }
+  - { key: e_turan, name: Empire of Turan, area: [[[44.0, 56.0], [44.0, 61.5], [43.5, 64.0], [42.5, 69.0], [44.5, 74.0], [40.0, 73.5], [37.5, 74.5], [36.5, 71.5], [37.3, 68.5], [37.5, 64.5], [38.0, 63.5], [38.5, 60.0], [38.5, 53.5], [41.5, 52.8]]] }
+  - { key: e_moghulistan, name: Empire of Moghulistan, area: [[[45.5, 73.5], [48.0, 81.0], [47.5, 91.0], [44.0, 96.0], [41.0, 96.0], [38.0, 92.0], [36.0, 84.0], [36.0, 78.0], [37.5, 74.5], [40.0, 73.5]]] }
+  - { key: e_sibir, name: Empire of Sibir, area: [[[72.0, 63.0], [76.0, 90.0], [56.5, 90.0], [52.5, 87.5], [49.5, 84.0], [50.0, 83.0], [55.0, 76.0], [56.0, 63.0]]] }
+  - { key: e_mongolia, name: Empire of Mongolia, area: [[[52.5, 87.5], [56.0, 99.0], [56.0, 114.0], [52.5, 121.5], [48.0, 122.0], [43.0, 122.0], [41.0, 111.0], [41.5, 106.5], [41.5, 100.0], [42.5, 96.0], [44.5, 91.0], [47.5, 88.0], [49.5, 84.0]]] }
+  - { key: e_east_siberia, name: Empire of Siberia, area: [[[78.0, 90.0], [78.0, 180.0], [50.0, 180.0], [50.0, 141.0], [53.5, 120.0], [56.0, 114.0], [56.0, 99.0], [56.5, 90.0]]] }
+  # ---------- Tibet and India
+  - { key: e_tibet, name: Empire of Tibet, area: [[[36.5, 74.5], [36.5, 84.0], [38.0, 92.0], [38.0, 98.0], [37.0, 102.0], [35.0, 103.0], [33.0, 103.0], [31.0, 102.0], [28.0, 100.0], [27.5, 98.5], [28.0, 96.0], [27.0, 92.0], [27.5, 88.0], [26.5, 86.0], [28.5, 81.0], [30.5, 79.0], [32.5, 77.0], [34.5, 75.5]]] }
+  - { key: e_indus, name: Empire of the Indus, area: [[[36.0, 71.0], [36.0, 76.5], [32.5, 77.0], [30.5, 76.5], [29.0, 74.5], [28.5, 72.5], [27.5, 71.0], [25.0, 71.0], [23.5, 68.3], [25.2, 66.5], [27.5, 67.5], [30.5, 68.0], [32.0, 69.5], [33.5, 71.0]]] }
+  - { key: e_rajputana, name: Empire of Rajputana, area: [[[30.0, 72.5], [29.5, 74.5], [28.3, 76.0], [27.0, 77.2], [26.0, 77.0], [24.5, 77.5], [23.5, 78.5], [22.3, 77.5], [22.0, 73.8], [20.2, 72.8], [20.7, 70.8], [22.8, 68.0], [24.8, 68.0], [25.0, 71.0], [27.5, 71.0], [28.5, 72.5]]] }
+  - { key: e_hindustan, name: Empire of Hindustan, area: [[[32.5, 77.0], [30.5, 80.0], [28.0, 83.5], [27.5, 84.0], [26.8, 88.0], [25.0, 88.0], [24.5, 86.0], [23.0, 83.0], [22.5, 80.5], [23.5, 78.5], [24.5, 77.5], [26.0, 77.0], [27.0, 77.2], [28.3, 76.0], [29.5, 74.5], [30.5, 76.5]]] }
+  - { key: e_bengal, name: Empire of Bengal, area: [[[28.5, 88.0], [28.5, 97.0], [25.0, 95.0], [23.0, 94.5], [20.5, 93.0], [21.6, 89.0], [22.0, 87.5], [19.0, 85.0], [18.0, 83.4], [19.5, 82.5], [22.0, 84.0], [24.5, 86.0], [25.0, 88.0], [26.8, 88.0]]] }
+  - { key: e_deccan, name: Empire of the Deccan, area: [[[22.3, 73.0], [22.3, 77.5], [22.5, 80.5], [23.0, 83.0], [22.0, 84.0], [19.5, 82.5], [18.0, 83.4], [16.5, 82.4], [15.5, 80.2], [15.5, 76.5], [15.5, 73.5], [20.2, 72.8]]] }
+  - { key: e_dravida, name: Empire of Dravida, area: [[[15.5, 73.5], [15.5, 80.2], [13.8, 80.3], [10.0, 79.9], [8.0, 78.6], [5.5, 79.6], [5.5, 82.0], [9.9, 82.0], [8.0, 76.5], [12.8, 74.5]]] }
+  # ---------- China
+  - { key: e_huabei, name: Empire of Huabei, area: [[[42.0, 111.0], [42.0, 119.5], [40.0, 119.8], [38.0, 118.5], [37.8, 122.8], [35.0, 119.5], [33.0, 120.5], [32.2, 117.0], [32.0, 115.5], [32.5, 111.0], [35.0, 110.5], [36.5, 110.5], [39.0, 111.0]]] }
+  - { key: e_xibei, name: Empire of Xibei, area: [[[42.0, 94.0], [42.0, 111.0], [39.0, 111.0], [36.5, 110.5], [34.3, 111.0], [32.5, 111.0], [32.0, 108.0], [32.5, 105.0], [34.0, 104.0], [35.0, 103.0], [37.5, 101.5], [39.5, 95.0]]] }
+  - { key: e_xinan, name: Empire of Xinan, area: [[[33.0, 102.5], [32.5, 105.0], [32.0, 108.0], [31.0, 110.0], [29.0, 108.5], [27.0, 109.5], [25.5, 108.5], [25.5, 104.5], [23.0, 105.5], [22.0, 101.0], [23.5, 98.5], [27.5, 98.5], [29.5, 102.0]]] }
+  - { key: e_jiangnan, name: Empire of Jiangnan, area: [[[33.0, 117.0], [33.0, 120.5], [32.0, 121.8], [30.0, 122.5], [27.2, 120.3], [23.5, 117.5], [24.5, 115.5], [27.5, 114.0], [29.8, 114.0], [30.5, 117.0], [31.8, 115.5], [32.2, 117.0]]] }
+  - { key: e_huguang, name: Empire of Huguang, area: [[[32.5, 110.5], [32.0, 115.5], [31.8, 115.5], [30.5, 117.0], [29.8, 114.0], [27.5, 114.0], [25.5, 114.0], [25.3, 111.0], [26.0, 109.0], [27.0, 109.5], [29.0, 108.5], [31.0, 110.0]]] }
+  - { key: e_lingnan, name: Empire of Lingnan, area: [[[26.0, 109.0], [25.3, 111.0], [25.5, 114.0], [24.5, 115.5], [23.5, 117.5], [22.6, 116.0], [21.5, 113.0], [18.0, 111.2], [18.0, 108.5], [21.5, 108.0], [22.5, 106.5], [23.0, 105.5], [25.5, 104.5]]] }
+  # ---------- Northeast and Southeast Asia
+  - { key: e_manchuria, name: Empire of Manchuria, area: [[[53.5, 120.0], [53.0, 141.0], [43.0, 135.5], [42.5, 130.5], [40.5, 125.0], [40.0, 119.8], [42.5, 119.0], [43.0, 122.0], [48.0, 122.0]]] }
+  - { key: e_korea, name: Empire of Goryeo, area: [[[42.8, 124.0], [42.8, 130.8], [33.0, 128.0], [33.0, 124.5], [38.0, 124.0], [40.0, 124.0]]] }
+  - { key: e_japan, name: Empire of Japan, area: [[[46.0, 128.5], [46.0, 146.5], [24.0, 146.5], [24.0, 128.5]]] }
+  - { key: e_indochina, name: Empire of Indochina, area: [[[23.3, 105.3], [21.5, 108.1], [16.0, 108.4], [11.0, 109.0], [8.5, 105.0], [10.4, 104.3], [12.5, 102.5], [13.0, 99.5], [12.5, 98.5], [16.0, 98.6], [20.5, 98.0], [23.0, 99.5], [23.0, 102.0], [22.4, 102.6]]] }
+  - { key: e_burma, name: Empire of Burma, area: [[[28.5, 97.0], [27.5, 98.5], [25.5, 97.0], [24.5, 99.5], [23.0, 99.5], [20.5, 98.0], [16.0, 98.6], [12.5, 98.5], [12.5, 99.0], [15.5, 94.0], [18.0, 93.8], [21.5, 92.2], [23.0, 94.5], [25.0, 95.0]]] }
+  - { key: e_nusantara, name: Empire of Nusantara, area: [[[7.0, 95.0], [7.0, 105.0], [1.0, 110.0], [-10.0, 125.0], [-10.0, 105.0]], [[7.5, 108.5], [7.5, 125.5], [-6.0, 125.5], [-6.0, 108.5]], [[0.0, 125.5], [0.0, 141.0], [-10.0, 141.0], [-10.0, 125.5]]] }
+  - { key: e_philippines, name: Empire of Maharlika, area: [[[21.0, 116.5], [21.0, 127.0], [4.5, 127.0], [4.5, 116.5]]] }
+  # ---------- The Americas and Oceania
+  - { key: e_arctic, name: Empire of the North, area: [[[84.0, -180.0], [84.0, -10.0], [60.0, -10.0], [60.0, -180.0]]] }
+  - { key: e_canada, name: Empire of Kanata, area: [[[60.0, -140.0], [60.0, -55.0], [45.0, -55.0], [45.0, -95.0], [49.0, -125.0]]] }
+  - { key: e_mississippi, name: Empire of the Mississippi, area: [[[45.0, -95.0], [45.0, -66.0], [25.0, -80.0], [29.0, -95.0]]] }
+  - { key: e_plains, name: Empire of the Plains, area: [[[49.0, -125.0], [45.0, -95.0], [29.0, -95.0], [25.0, -110.0], [32.0, -118.0]]] }
+  - { key: e_mexico, name: Empire of Anahuac, area: [[[32.0, -118.0], [25.0, -110.0], [29.0, -95.0], [25.0, -97.0], [15.0, -85.0], [13.0, -92.0], [18.0, -106.0]]] }
+  - { key: e_caribbean, name: Empire of the Caribbean, area: [[[27.0, -85.0], [27.0, -59.0], [10.0, -59.0], [16.0, -85.0]]] }
+  - { key: e_andes, name: Empire of the Andes, area: [[[12.0, -82.0], [12.0, -66.0], [-25.0, -64.0], [-55.0, -70.0], [-55.0, -78.0], [-5.0, -82.0]]] }
+  - { key: e_brazil, name: Empire of Pindorama, area: [[[5.0, -66.0], [5.0, -34.0], [-34.0, -50.0], [-25.0, -64.0], [-15.0, -62.0]]] }
+  - { key: e_plata, name: Empire of the Plata, area: [[[-25.0, -64.0], [-34.0, -50.0], [-55.0, -64.0], [-55.0, -70.0]]] }
+  - { key: e_australia, name: Empire of the Southern Land, area: [[[-10.0, 112.0], [-10.0, 155.0], [-45.0, 155.0], [-45.0, 112.0]]] }
+  - { key: e_polynesia, name: Empire of Polynesia, area: [[[30.0, 160.0], [30.0, 180.0], [-50.0, 180.0], [-50.0, 160.0]], [[30.0, -180.0], [30.0, -120.0], [-50.0, -120.0], [-50.0, -180.0]]] }
 
 hegemonies:
   - key: h_mongol_empire
     name: Mongol Empire
     de_jure: true
     description: Chinggis Khan's empire, now four khanates that still name the Yuan emperor their Great Khan.
-    empires: [e_mongolia, e_china, e_tartaria, e_turan, e_persia, e_tibet]
+    empires: [e_mongolia, e_tartaria, e_kazakh, e_ural, e_sibir, e_turan, e_moghulistan, e_persia, e_khorasan, e_tibet]
+  - key: h_china
+    name: China
+    de_jure: true
+    description: All under Heaven, the lands of the Han, ruled in 1314 by the Yuan.
+    empires: [e_huabei, e_xibei, e_xinan, e_jiangnan, e_huguang, e_lingnan]
   - key: h_caliphate
     name: United Caliphate
     description: The whole house of Islam under one caliph. Formed by decision.
-    empires: [e_arabia, e_persia, e_maghreb, e_turan]
+    empires: [e_arabia, e_mashriq, e_egypt, e_persia, e_khorasan, e_maghreb, e_turan, e_anatolia]
   - key: h_roman_empire
     name: Roman Empire
     description: East and West under one emperor again. Formed by decision.
-    empires: [e_hre, e_byzantium, e_italy]
+    empires: [e_hre, e_byzantium, e_italy, e_anatolia]
   - key: h_hindustan
     name: Hindustan
     hindu_name: Bharat
     description: All of India under one throne, called Bharat under a Hindu ruler. Formed by decision.
-    empires: [e_rajastan, e_madhyadesa, e_deccan, e_dravida]
+    empires: [e_indus, e_rajputana, e_hindustan, e_bengal, e_deccan, e_dravida]
   - key: h_francia
     name: United Francia
     description: Charlemagne's realm restored. Formed by decision.

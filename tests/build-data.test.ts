@@ -147,16 +147,18 @@ describe('paintRegions and compilePeoples', () => {
 
 describe('compileTitles', () => {
   const gen = generatedTitlesSchema.parse({
-    countries: { AAA: 'Alpha', BBB: 'Beta' },
+    areas: { a_alpha: 'Alpha', a_beta: 'Beta' },
     counties: [['c_a', 'County of A', 'a', ['a', 'b']], ['c_c', 'County of C', 'c', ['c']]],
-    duchies: [['d_ab', 'Duchy of AB', 'AAA', ['c_a']], ['d_c', 'Duchy of C', 'BBB', ['c_c']]],
+    duchies: [['d_ab', 'Duchy of AB', 'a_alpha', ['c_a']], ['d_c', 'Duchy of C', 'a_beta', ['c_c']]],
   });
 
-  it('links counties to duchies, duchies to the drawn kingdom or their country, and up to hegemonies', () => {
+  it('links counties to duchies, duchies to the drawn kingdom or their area, kingdoms to empires, and up to hegemonies', () => {
     const upper = upperTitlesSchema.parse({
-      country_kingdoms: { BBB: 'the Betas' },
       kingdoms: [{ key: 'k_west', name: 'Kingdom of the West', area: [box(-180, -140)] }],
-      empires: [{ key: 'e_all', name: 'Empire of All', kingdoms: ['k_west', 'k_auto_BBB'] }],
+      empires: [
+        { key: 'e_west', name: 'Empire of the West', kingdoms: ['k_west'] },
+        { key: 'e_all', name: 'Empire of All', area: [box(-180, 180)] },
+      ],
       hegemonies: [{ key: 'h_top', name: 'Top', de_jure: true, empires: ['e_all'] }, { key: 'h_dream', name: 'Dream', empires: ['e_all'] }],
     });
     const { titles, county, errors } = compileTitles(gen, upper, provinces, ctx);
@@ -164,9 +166,9 @@ describe('compileTitles', () => {
     expect(county).toEqual([0, 1, 1, 2, 0, 0]);
     expect(titles.counties.map((c) => [c.parent, c.capital])).toEqual([[1, 1], [2, 3]]);
     expect(titles.duchies.map((d) => d.parent)).toEqual([1, 2]);
-    expect(titles.kingdoms.map((k) => [k.key, k.name, k.parent])).toEqual([['k_west', 'Kingdom of the West', 1], ['k_auto_BBB', 'Kingdom of the Betas', 1]]);
-    expect(titles.empires[0]!.parent).toBe(1); // the de jure hegemony, not the formable one
-    expect(titles.hegemonies.map((h) => [h.key, h.deJure, h.empires])).toEqual([['h_top', true, [1]], ['h_dream', false, [1]]]);
+    expect(titles.kingdoms.map((k) => [k.key, k.name, k.parent])).toEqual([['k_west', 'Kingdom of the West', 1], ['k_beta', 'Kingdom of Beta', 2]]);
+    expect(titles.empires[1]!.parent).toBe(1); // the de jure hegemony, not the formable one
+    expect(titles.hegemonies.map((h) => [h.key, h.deJure, h.empires])).toEqual([['h_top', true, [2]], ['h_dream', false, [2]]]);
   });
 
   it('reports stale province keys, unknown members and a kingdom in two empires', () => {
