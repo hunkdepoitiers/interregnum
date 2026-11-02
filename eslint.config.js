@@ -12,7 +12,7 @@ const simBans = [
 ];
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'public/generated/**', 'tools/vendor/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'public/generated/**', 'tools/vendor/**', 'src-tauri/target/**', 'src-tauri/gen/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

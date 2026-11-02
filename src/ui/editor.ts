@@ -37,14 +37,16 @@ function persist() {
 }
 
 /** Replays edits saved in this browser onto a freshly started game. */
-export function restoreEdits() {
+export async function restoreEdits() {
   let saved: { edits: Edit[]; newRealms: NewRealm[] } | null = null;
   try {
     saved = JSON.parse(localStorage.getItem(STORE) ?? 'null');
   } catch { /* ignore unreadable storage */ }
-  const w = world.value;
   const view = currentView();
-  if (!saved || !w || !view) return;
+  if (!saved || !view) return;
+  await view.pickingReady; // edits are stored by map pixel and need province lookups
+  const w = world.value;
+  if (!w) return;
   const ids = new Map(w.realms.filter((r) => r).map((r) => [r!.key, r!.id]));
   saved.newRealms.forEach((r, i) => {
     command({ type: 'addRealm', realm: { ...r, capital: 0, overlord: 0, scripted: false } });
@@ -100,10 +102,11 @@ export function createRealm(name: string, color: string, rank: Rank, government:
 }
 
 /** Downloads 1314-edits.yaml: the edits already in the project plus this session's, newest winning per province. */
-export function exportEdits() {
+export async function exportEdits() {
   const map = mapData.value;
   const view = currentView();
   if (!map || !view) return;
+  await view.pickingReady;
   const proj = map.projection;
   const round = (v: number) => Math.round(v * 10000) / 10000;
   const latLon = (x: number, y: number): [number, number] => {

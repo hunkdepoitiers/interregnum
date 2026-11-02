@@ -3,6 +3,7 @@ import {
   UniformGroup,
 } from 'pixi.js';
 import { lonLatToPixel, type MapData, type RiverData } from '../content/map';
+import { idInRuns, type IdRuns } from './id-runs';
 import type { RealmLabel } from './labels';
 import { LOOKUP_HEIGHT, LOOKUP_ROWS, LOOKUP_WIDTH } from './map-modes';
 
@@ -117,14 +118,18 @@ void main() {
   vec3 rgb;
   if (water) {
     rgb = SEA * (0.94 + 0.12 * fbm(mapPx / 90.0));
-    // A ripple line round the coasts, ~5 screen px out.
+    // A ripple line round the coasts, ~5 screen px out. Four samples per ring, the rings turned 45 degrees apart so
+    // together they cover eight directions; a sample in this same province is water without a lookup.
     bool near = false;
     bool far = false;
-    for (int i = 0; i < 8; i++) {
-      float a = float(i) * 0.785398;
+    for (int i = 0; i < 4; i++) {
+      float a = float(i) * 1.570796;
       vec2 d = vec2(cos(a), sin(a)) * px;
-      if (!isWater(baseOf(idAt(vUV + d * 4.0)).a)) near = true;
-      if (!isWater(baseOf(idAt(vUV + d * 6.0)).a)) far = true;
+      vec2 e = vec2(cos(a + 0.785398), sin(a + 0.785398)) * px;
+      float n4 = idAt(vUV + e * 4.0);
+      float n6 = idAt(vUV + d * 6.0);
+      if (n4 != id && !isWater(baseOf(n4).a)) near = true;
+      if (n6 != id && !isWater(baseOf(n6).a)) far = true;
     }
     if (far && !near) rgb = mix(rgb, PAPER, 0.22);
   } else {
@@ -145,10 +150,10 @@ void main() {
     // A deeper wash just inside realm borders, like the edge of a watercolour.
     if (owned) {
       bool rim = false;
-      for (int i = 0; i < 8; i++) {
-        float a = float(i) * 0.785398;
-        vec4 n = baseOf(idAt(vUV + vec2(cos(a), sin(a)) * px * 4.0));
-        if (!sameColor(n.rgb, base.rgb)) rim = true;
+      for (int i = 0; i < 4; i++) {
+        float a = float(i) * 1.570796 + 0.785398 * mod(floor(screenPx.x) + floor(screenPx.y), 2.0);
+        float n = idAt(vUV + vec2(cos(a), sin(a)) * px * 4.0);
+        if (n != id && !sameColor(baseOf(n).rgb, base.rgb)) rim = true;
       }
       if (rim) rgb = mix(rgb, base.rgb * 0.85, 0.35);
     }
@@ -181,6 +186,7 @@ const MAX_ZOOM = 8;
 const RIVER_SETTLE_MS = 200;
 /** Labels are re-rendered sharp once the camera has been still this long. */
 const LABEL_SETTLE_MS = 150;
+const LABELS_PER_FRAME = 4;
 
 function setLabelSize(text: Text, px: number) {
   const size = Math.round(px);
@@ -192,7 +198,6 @@ function setLabelSize(text: Text, px: number) {
 const MIN_LABEL_PX = 9;
 const MAX_LABEL_PX = 110;
 export const LABEL_FONT = '"IM Fell English SC", "Iowan Old Style", Palatino, Georgia, serif';
-const MAX_DECODED_TILES = 6;
 
 export class MapView {
   readonly app = new Application();
@@ -207,8 +212,6 @@ export class MapView {
   paintMode = false;
   onPaint: (id: number, x: number, y: number, how: 'paint' | 'erase' | 'pick') => void = () => {};
 
-  /** Decoded id arrays of recently hovered tiles (least recently used first), for picking. */
-  private readonly tileIds = new Map<number, Uint16Array>();
 
   constructor(
     private readonly map: MapData,
@@ -251,7 +254,9 @@ export class MapView {
     this.app.stage.addChild(this.world);
     this.labelLayer.eventMode = 'none';
     this.app.stage.addChild(this.labelLayer);
+    this.app.ticker.add(() => this.sharpenSomeLabels());
 
+    void this.decodeTiles();
     this.fitToScreen();
     this.app.renderer.on('resize', () => this.clampCamera());
     this.bindInput();
@@ -348,10 +353,12 @@ export class MapView {
   }
 
   private labelTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Labels waiting to be drawn sharp at their exact size, a few per frame. */
+  private sharpenQueue: { label: RealmLabel; text: Text }[] = [];
 
   /**
-   * Re-rendering label text costs ~40 ms per zoom step, so while the camera moves labels are scaled images; once it
-   * settles they are drawn sharp again at their exact size (immediately only when a scale is off by more than 2x).
+   * Re-rendering label text is slow (all labels at once froze a frame for ~170 ms), so while the camera moves
+   * labels are only scaled images. Once it settles they are redrawn sharp at their exact size, a few per frame.
    */
   private layoutLabels() {
     const s = this.world.scale.x;
@@ -359,22 +366,26 @@ export class MapView {
       text.visible = label.size * s >= MIN_LABEL_PX;
       if (!text.visible) continue;
       const px = Math.min(label.size * s, MAX_LABEL_PX);
-      const ratio = px / Number(text.style.fontSize);
-      if (ratio > 2 || ratio < 0.5) setLabelSize(text, px);
       text.scale.set(px / Number(text.style.fontSize));
       text.position.set(this.world.x + label.x * s, this.world.y + label.y * s);
     }
+    this.sharpenQueue = [];
     clearTimeout(this.labelTimer);
-    this.labelTimer = setTimeout(() => this.sharpenLabels(), LABEL_SETTLE_MS);
+    this.labelTimer = setTimeout(() => {
+      // Biggest first: they are the most visible when blurry.
+      this.sharpenQueue = [...this.labels.values()].filter((l) => l.text.visible).sort((a, b) => b.label.size - a.label.size);
+    }, LABEL_SETTLE_MS);
   }
 
-  private sharpenLabels() {
+  private sharpenSomeLabels() {
     const s = this.world.scale.x;
-    for (const { label, text } of this.labels.values()) {
-      if (!text.visible) continue;
+    for (let n = 0; n < LABELS_PER_FRAME && this.sharpenQueue.length;) {
+      const { label, text } = this.sharpenQueue.shift()!;
       const px = Math.min(label.size * s, MAX_LABEL_PX);
-      if (Math.abs(px / Number(text.style.fontSize) - 1) > 0.05) setLabelSize(text, px);
+      if (Math.abs(px / Number(text.style.fontSize) - 1) <= 0.05) continue;
+      setLabelSize(text, px);
       text.scale.set(px / Number(text.style.fontSize));
+      n++;
     }
   }
 
@@ -419,9 +430,31 @@ export class MapView {
     if (x < 0 || y < 0 || x >= this.map.width || y >= this.map.height) return 0;
     const { tileSize: T, tileCols } = this.map;
     const i = Math.floor(y / T) * tileCols + Math.floor(x / T);
+    const runs = this.tileRuns[i];
+    if (!runs) return 0; // still being decoded (the first second or so after loading)
     const r = this.tileRect(i);
-    return this.tileIdArray(i)[(y - r.y) * r.w + (x - r.x)]!;
+    return idInRuns(runs, x - r.x, y - r.y);
   }
+
+  /** Province lookups per tile, filled by a background worker; `pickingReady` resolves once every tile is in. */
+  private readonly tileRuns: (IdRuns | undefined)[] = [];
+  /** Set by pickingReady's executor below; declared first because fields initialise in order. */
+  private decodeTiles: () => Promise<void> = async () => {};
+  readonly pickingReady = new Promise<void>((resolve) => {
+    this.decodeTiles = async () => {
+      const worker = new Worker(new URL('./id-decoder.worker.ts', import.meta.url), { type: 'module' });
+      let left = this.tiles.length;
+      worker.onmessage = (e: MessageEvent<{ index: number; runs: IdRuns }>) => {
+        this.tileRuns[e.data.index] = e.data.runs;
+        if (--left === 0) { worker.terminate(); resolve(); }
+      };
+      // Copies go to the worker: the originals are the GPU textures.
+      for (let i = 0; i < this.tiles.length; i++) {
+        const bitmap = await createImageBitmap(this.tiles[i]!);
+        worker.postMessage({ index: i, bitmap }, [bitmap]);
+      }
+    };
+  });
 
   private tileRect(i: number) {
     const { tileSize: T, tileCols, width, height } = this.map;
@@ -430,24 +463,6 @@ export class MapView {
     return { x, y, w: Math.min(T, width - x), h: Math.min(T, height - y) };
   }
 
-  /** Decodes a tile's ids on first use; keeps the few most recent so memory stays bounded. */
-  private tileIdArray(i: number): Uint16Array {
-    const cached = this.tileIds.get(i);
-    if (cached) {
-      this.tileIds.delete(i);
-      this.tileIds.set(i, cached);
-      return cached;
-    }
-    const { w, h } = this.tileRect(i);
-    const ctx = new OffscreenCanvas(w, h).getContext('2d', { willReadFrequently: true })!;
-    ctx.drawImage(this.tiles[i]!, 0, 0);
-    const rgba = ctx.getImageData(0, 0, w, h).data;
-    const ids = new Uint16Array(w * h);
-    for (let p = 0; p < ids.length; p++) ids[p] = rgba[p * 4]! | (rgba[p * 4 + 1]! << 8);
-    this.tileIds.set(i, ids);
-    if (this.tileIds.size > MAX_DECODED_TILES) this.tileIds.delete(this.tileIds.keys().next().value!);
-    return ids;
-  }
 
   private fitToScreen() {
     const { width, height } = this.app.screen;

@@ -125,7 +125,7 @@ export function App() {
       const stop = effect(() => {
         if (!world.value || restored) return;
         restored = true;
-        queueMicrotask(() => { stop(); restoreEdits(); });
+        queueMicrotask(() => { stop(); void restoreEdits(); });
       });
       installDebugHooks(map);
       mapData.value = map;
