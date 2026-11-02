@@ -4,7 +4,7 @@ import { command, startGame, world } from '../bridge/client';
 import type { MapData, RiverData } from '../content/map';
 import type { EditsSource, Scenario } from '../content/scenario';
 import type { Content } from '../sim/content';
-import { buildLookup, hexToRgb, type MapMode } from '../render/map-modes';
+import { buildLookup, hexToRgb, type MapMode, type Peoples } from '../render/map-modes';
 import { computeLabels } from '../render/labels';
 import { LABEL_FONT, loadIdTiles, MapView } from '../render/map-view';
 import { editing, paint, restoreEdits, setBaseEdits } from './editor';
@@ -19,6 +19,8 @@ import { TopBar } from './TopBar';
 
 export const mapData = signal<MapData | null>(null);
 export const mapMode = signal<MapMode>('political');
+/** Culture and religion of every province at the start (scenario.json), for the map modes and panels. */
+export const peoples = signal<Peoples | null>(null);
 /** False while the scenario's realms are switched off (provinces-only map). */
 export const hasRealms = computed(() => (world.value?.realms.length ?? 0) > 1);
 export const hovered = signal<{ id: number; x: number; y: number }>({ id: 0, x: 0, y: 0 });
@@ -75,7 +77,7 @@ effect(() => {
   const w = world.value;
   const mode = hasRealms.value ? mapMode.value : 'terrain';
   if (map && view) {
-    view.setLookup(buildLookup(map, mode, w));
+    view.setLookup(buildLookup(map, mode, w, peoples.value));
     view.setLabels(mode === 'political' && w ? computeLabels(map, w) : []);
   }
 });
@@ -110,6 +112,7 @@ export function App() {
         fetch(`${base}generated/content.json`).then((r) => r.json() as Promise<Content>),
       ]);
       content.value = gameContent;
+      peoples.value = { culture: scenario.culture ?? [], religion: scenario.religion ?? [], content: gameContent };
       if (edits) setBaseEdits(edits);
       // Labels are drawn to canvas, so the font must be ready first; without it they fall back to a system serif.
       const [tiles] = await Promise.all([loadIdTiles(base, map), document.fonts.load(`32px ${LABEL_FONT}`).catch(() => [])]);

@@ -14,4 +14,6 @@ export const content: Content = {
     crown: { key: 'crown', label: 'Strong Crown', description: '', stacking: 'replace', days: null, effects: [{ stat: 'tax', op: 'add', value: 500 }, { stat: 'legitimacy', op: 'add', value: 500 }] },
     golden: { key: 'golden', label: 'Golden Age', description: '', stacking: 'replace', days: null, effects: [{ stat: 'development', op: 'add', value: 5000 }] },
   },
+  cultures: [],
+  religions: [],
 };

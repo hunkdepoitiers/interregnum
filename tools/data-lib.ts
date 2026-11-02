@@ -40,25 +40,13 @@ function insidePolygon([x, y]: Pt, poly: Pt[]): boolean {
   return inside;
 }
 
-/** Paints realm outlines onto land provinces, resolves places and keys to ids, and checks the result. */
-export function compileScenario(src: ScenarioSource, provinces: MapProvince[], ctx: MapContext): CompiledScenario {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-  const land = provinces.filter((p) => p.kind === 'land');
-  const maxId = provinces.reduce((m, p) => Math.max(m, p.id), 0);
-  const owner = new Array<number>(maxId + 1).fill(0);
-  const realmId = new Map<string, number>();
-  const byId = new Map(provinces.map((p) => [p.id, p]));
+/**
+ * Finds the land province at a place: the one under it, else (water, mountains, no id map) among those whose box
+ * holds the point the one with the nearest centre. Problems go to `errors`.
+ */
+function placeFinder(land: MapProvince[], byId: Map<number, MapProvince>, ctx: MapContext, errors: string[]) {
   const toPixel = ([lat, lon]: Pt): Pt => lonLatToPixel(ctx.projection, lon, lat);
-
-  src.realms.forEach((r, i) => {
-    if (realmId.has(r.key)) errors.push(`Realm ${r.key}: duplicate key`);
-    realmId.set(r.key, i + 1);
-  });
-
-  // The land province at a place: the one under it, else (water, mountains, no id map) among those whose box holds
-  // the point the one with the nearest centre.
-  const provinceAt = (place: Place, where: string): MapProvince | null => {
+  return (place: Place, where: string): MapProvince | null => {
     let latLon: Pt | undefined;
     if (typeof place === 'string') {
       latLon = ctx.towns.get(place);
@@ -82,6 +70,91 @@ export function compileScenario(src: ScenarioSource, provinces: MapProvince[], c
     }
     return best;
   };
+}
+
+/** A region painted onto land provinces: outlines and single places. */
+export interface PaintRegion {
+  area: Pt[][];
+  add: Place[];
+}
+
+/**
+ * Paints regions onto land provinces (realm-style: outlines in order, later over earlier, then single places on
+ * top), then gives the land inside `fill` that nothing reached the region of the nearest painted land over land
+ * adjacency, and islands still left the region of the nearest painted province centre. Returns, per province id,
+ * the 1-based index of its region (0 = none).
+ */
+export function paintRegions(
+  regions: PaintRegion[], fill: Pt[][], provinces: MapProvince[], ctx: MapContext, errors: string[], label: (i: number) => string,
+): number[] {
+  const land = provinces.filter((p) => p.kind === 'land');
+  const byId = new Map(provinces.map((p) => [p.id, p]));
+  const out = new Array<number>(provinces.reduce((m, p) => Math.max(m, p.id), 0) + 1).fill(0);
+  const toPixel = ([lat, lon]: Pt): Pt => lonLatToPixel(ctx.projection, lon, lat);
+  const provinceAt = placeFinder(land, byId, ctx, errors);
+  regions.forEach((r, i) => {
+    for (const outline of r.area) {
+      const poly = outline.map(toPixel);
+      const xs = poly.map((q) => q[0]);
+      const ys = poly.map((q) => q[1]);
+      const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+      for (const p of land) {
+        const c = p.centroid as Pt;
+        if (c[0] >= x0 && c[0] <= x1 && c[1] >= y0 && c[1] <= y1 && insidePolygon(c, poly)) out[p.id] = i + 1;
+      }
+    }
+  });
+  regions.forEach((r, i) => {
+    for (const place of r.add) {
+      const p = provinceAt(place, `${label(i)} add ${JSON.stringify(place)}`);
+      if (p) out[p.id] = i + 1;
+    }
+  });
+  const fills = fill.map((o) => o.map(toPixel));
+  const fillable = new Set(land.filter((p) => !out[p.id] && fills.some((f) => insidePolygon(p.centroid as Pt, f))).map((p) => p.id));
+  for (let frontier = land.filter((p) => out[p.id]); frontier.length && fillable.size;) {
+    const next: MapProvince[] = [];
+    for (const p of frontier) {
+      for (const n of p.adjacency) {
+        if (!n.border || !fillable.has(n.id)) continue;
+        fillable.delete(n.id);
+        out[n.id] = out[p.id]!;
+        next.push(byId.get(n.id)!);
+      }
+    }
+    frontier = next;
+  }
+  // Islands with no land route to anything painted: the nearest painted province centre.
+  const painted = land.filter((p) => out[p.id]);
+  for (const id of fillable) {
+    const c = byId.get(id)!.centroid;
+    let best = 0, bestD = Infinity;
+    for (const q of painted) {
+      const d = (q.centroid[0] - c[0]) ** 2 + (q.centroid[1] - c[1]) ** 2;
+      if (d < bestD) { bestD = d; best = out[q.id]!; }
+    }
+    out[id] = best;
+  }
+  return out;
+}
+
+/** Paints realm outlines onto land provinces, resolves places and keys to ids, and checks the result. */
+export function compileScenario(src: ScenarioSource, provinces: MapProvince[], ctx: MapContext): CompiledScenario {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const land = provinces.filter((p) => p.kind === 'land');
+  const maxId = provinces.reduce((m, p) => Math.max(m, p.id), 0);
+  const owner = new Array<number>(maxId + 1).fill(0);
+  const realmId = new Map<string, number>();
+  const byId = new Map(provinces.map((p) => [p.id, p]));
+  const toPixel = ([lat, lon]: Pt): Pt => lonLatToPixel(ctx.projection, lon, lat);
+
+  src.realms.forEach((r, i) => {
+    if (realmId.has(r.key)) errors.push(`Realm ${r.key}: duplicate key`);
+    realmId.set(r.key, i + 1);
+  });
+
+  const provinceAt = placeFinder(land, byId, ctx, errors);
 
   // Outlines, in file order: a later realm paints over an earlier one.
   src.realms.forEach((r, i) => {

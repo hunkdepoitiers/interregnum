@@ -1,5 +1,5 @@
 import { world } from '../bridge/client';
-import { hasRealms, mapData, selected, selectProvince } from './App';
+import { hasRealms, mapData, peoples, selected, selectProvince } from './App';
 import { RealmLink } from './RealmPanel';
 import { ModifierList, StatList } from './StatList';
 
@@ -49,6 +49,17 @@ export function ProvincePanel() {
             <dd class="terrain-name">{p.terrain}</dd>
           </>
         )}
+        {p.kind === 'land' && peoples.value && (() => {
+          const { culture, religion, content: c } = peoples.value;
+          const cu = culture[p.id] ? c.cultures[culture[p.id]! - 1] : undefined;
+          const re = religion[p.id] ? c.religions[religion[p.id]! - 1] : undefined;
+          return (
+            <>
+              {cu && (<><dt>Culture</dt><dd>{cu.name} <span class="muted">({cu.groupName})</span></dd></>)}
+              {re && (<><dt>Religion</dt><dd>{re.name}</dd></>)}
+            </>
+          );
+        })()}
         <dt>Area</dt>
         <dd>≈ {(Math.round(areaKm2 / 100) * 100).toLocaleString('en')} km²</dd>
         <dt>Key</dt>

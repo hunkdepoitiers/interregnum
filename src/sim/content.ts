@@ -37,7 +37,27 @@ export interface ModifierDef {
   days: number | null;
 }
 
+export interface ReligionDef {
+  key: string;
+  name: string;
+  family: string;
+  color: string;
+}
+
+export interface CultureDef {
+  key: string;
+  name: string;
+  group: string;
+  groupName: string;
+  /** Default religion: 1-based index into Content.religions. */
+  religion: number;
+  color: string;
+}
+
 export interface Content {
   stats: Record<string, StatDef>;
   modifiers: Record<string, ModifierDef>;
+  /** Culture id i is cultures[i - 1]; 0 means none. Same for religions. */
+  cultures: CultureDef[];
+  religions: ReligionDef[];
 }

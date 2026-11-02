@@ -5,6 +5,8 @@ import { editing } from './editor';
 const MODES: { mode: MapMode; label: string; key: string }[] = [
   { mode: 'political', label: 'Political', key: 'p' },
   { mode: 'terrain', label: 'Terrain', key: 't' },
+  { mode: 'culture', label: 'Culture', key: 'k' },
+  { mode: 'religion', label: 'Religion', key: 'r' },
 ];
 
 export function MapModeBar() {

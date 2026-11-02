@@ -8,9 +8,11 @@ import { PNG } from 'pngjs';
 import { parse } from 'yaml';
 import { seedsSchema, type MapData } from '../src/content/map';
 import { modifiersSourceSchema, statsSourceSchema } from '../src/content/content';
+import { peoplesSourceSchema } from '../src/content/peoples';
 import { editsSourceSchema, scenarioSourceSchema } from '../src/content/scenario';
 import { compileContent } from './content-lib';
 import { compileScenario } from './data-lib';
+import { compilePeoples } from './peoples-lib';
 
 function load<T>(file: string, schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: { issues: { path: PropertyKey[]; message: string }[] } } }): T {
   const r = schema.safeParse(parse(readFileSync(file, 'utf8')));
@@ -69,6 +71,12 @@ function idAt(x: number, y: number): number {
 const { scenario, errors, warnings, unowned } = compileScenario(source, map.provinces, {
   projection: map.projection, towns, idAt, editedFrom: parsed.data.realms.length, content,
 });
+const peoples = compilePeoples(load('data/scenario/1314-peoples.yaml', peoplesSourceSchema), map.provinces, { projection: map.projection, towns, idAt });
+errors.push(...peoples.errors);
+content.cultures = peoples.cultures;
+content.religions = peoples.religions;
+scenario.culture = peoples.culture;
+scenario.religion = peoples.religion;
 for (const w of warnings) console.warn(`warning: ${w}`);
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
@@ -78,4 +86,4 @@ writeFileSync('public/generated/scenario.json', JSON.stringify(scenario));
 writeFileSync('public/generated/scenario-edits.json', JSON.stringify(edits));
 writeFileSync('public/generated/content.json', JSON.stringify(content));
 const owned = scenario.owner.filter(Boolean).length;
-console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${warnings.length} warnings`);
+console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${warnings.length} warnings`);

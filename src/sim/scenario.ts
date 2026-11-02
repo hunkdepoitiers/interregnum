@@ -35,4 +35,7 @@ export interface Scenario {
   owner: number[];
   controller: number[];
   modifiers?: ScenarioModifier[];
+  /** Per province id: culture and religion ids (Content.cultures / religions, 1-based; 0 = none). */
+  culture?: number[];
+  religion?: number[];
 }

@@ -1,4 +1,5 @@
 import type { MapData, ProvinceKind, Terrain } from '../content/map';
+import type { Content } from '../sim/content';
 import type { WorldView } from '../worker/protocol';
 
 /**
@@ -10,7 +11,14 @@ export const LOOKUP_WIDTH = 4096;
 export const LOOKUP_ROWS = 16;
 export const LOOKUP_HEIGHT = LOOKUP_ROWS * 2;
 
-export type MapMode = 'political' | 'terrain';
+export type MapMode = 'political' | 'terrain' | 'culture' | 'religion';
+
+/** Static per-province data the culture and religion map modes colour by. */
+export interface Peoples {
+  culture: number[];
+  religion: number[];
+  content: Content;
+}
 
 type Rgb = [number, number, number];
 /** Terrain map mode colours, before the shader washes them onto the paper. */
@@ -40,7 +48,7 @@ export function hexToRgb(hex: string): Rgb {
  * Layer 0: base colour (the owner's colour in political mode). Layer 1: the controller's colour, drawn as
  * stripes where it differs from layer 0. Alpha encodes the province kind (KIND_ALPHA).
  */
-export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null): Uint8Array {
+export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null, peoples: Peoples | null = null): Uint8Array {
   const lut = new Uint8Array(LOOKUP_WIDTH * LOOKUP_HEIGHT * 4);
   const put = (row: number, id: number, rgb: Rgb, alpha: number) => {
     const o = ((row * LOOKUP_ROWS + Math.floor(id / LOOKUP_WIDTH)) * LOOKUP_WIDTH + (id % LOOKUP_WIDTH)) * 4;
@@ -66,6 +74,11 @@ export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null
     if (mode === 'political') {
       base = realmColor(world?.owner[p.id] ?? 0) ?? UNCLAIMED;
       held = realmColor(world?.controller[p.id] ?? 0) ?? base;
+    } else if (mode === 'culture' || mode === 'religion') {
+      const id = (mode === 'culture' ? peoples?.culture : peoples?.religion)?.[p.id] ?? 0;
+      const def = id ? (mode === 'culture' ? peoples!.content.cultures : peoples!.content.religions)[id - 1] : undefined;
+      base = def ? hexToRgb(def.color) : UNCLAIMED;
+      held = base;
     } else {
       base = TERRAIN_COLOR[p.terrain ?? 'plains'];
       held = base;

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { MapProvince } from '../src/content/map';
 import { scenarioSourceSchema } from '../src/content/scenario';
-import { compileScenario, type MapContext } from '../tools/data-lib';
+import { peoplesSourceSchema } from '../src/content/peoples';
+import { compileScenario, paintRegions, type MapContext } from '../tools/data-lib';
+import { compilePeoples } from '../tools/peoples-lib';
 import { content } from './fixtures/content';
 
 // One pixel per degree: x = lon + 180, y = 90 - lat.
@@ -111,5 +113,30 @@ describe('compileScenario', () => {
       realms: [realm('x'), realm('y', { capital: [80, -150], color: '#f80808' }), realm('z', { capital: 'ccity', color: '#00ff00' })],
     });
     expect(warnings).toEqual(['Neighbouring realms x and y have similar colours (distance 13)']);
+  });
+});
+
+describe('paintRegions and compilePeoples', () => {
+  it('paints in order, adds on top, fills over land and reaches islands by distance', () => {
+    const errors: string[] = [];
+    const islands = [...provinces, prov(6, 'isle', 'land', 130, [])];
+    const out = paintRegions([{ area: [box(-180, -140)], add: [] }, { area: [], add: ['acity'] }], [box(-180, 180)], islands, ctx, errors, (i) => `r${i}`);
+    expect(errors).toEqual([]);
+    expect(out).toEqual([0, 2, 1, 1, 0, 0, 1]); // c filled from b; the island takes its nearest painted province
+  });
+
+  it('gives each province its culture and the culture religion, unless a religion area paints over it', () => {
+    const src = peoplesSourceSchema.parse({
+      religions: [{ key: 'old', name: 'Old', family: 'pagan', color: '#111111' }, { key: 'new', name: 'New', family: 'x', color: '#222222' }],
+      groups: { g: 'Group' },
+      cultures: [{ key: 'one', name: 'One', group: 'g', religion: 'old', color: '#333333', area: [box(-180, -120)] },
+        { key: 'bad', name: 'Bad', group: 'nope', religion: 'gone', color: '#444444', add: ['ccity'] }],
+      religion_areas: [{ religion: 'new', add: ['acity'] }],
+    });
+    const r = compilePeoples(src, provinces, ctx);
+    expect(r.culture).toEqual([0, 1, 1, 2, 0, 0]);
+    expect(r.religion).toEqual([0, 2, 1, 0, 0, 0]);
+    expect(r.cultures[0]).toMatchObject({ key: 'one', groupName: 'Group', religion: 1 });
+    expect(r.errors).toEqual(['Culture bad: unknown group nope', 'Culture bad: unknown religion gone']);
   });
 });
