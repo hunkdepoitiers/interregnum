@@ -35,14 +35,15 @@ KIND_NAME = {v: k for k, v in KINDS.items()}
 F = 8                 # coarse grid cell, px (density and noise amplitude live on it)
 ROWS = 512            # rows per processing chunk
 DENSITY_BLUR = 4      # coarse cells (~45 km)
+SEED_BLUR = 8         # coarse cells (~90 km): spreads the 60 km world seed spacing into an even density
 LLOYD_ITERATIONS = 4  # as OpenGS
 JAGGED = 0.3          # noise amplitude as a fraction of local seed spacing (OpenGS: 0.12 of a single-octave field)
 NOISE_OCTAVES = [(128, 0.55), (32, 0.3), (8, 0.15)]  # (period px, weight)
 MOUNT_AREA = 20_000   # px per mountain province
 WASTE_AREA = 200_000  # px per wasteland province (the Sahara comes out in ~20 chunks)
-SEA_COUNT = 600
-LAND_COUNT = 10_500
-MAX_LAND_AREA = 9_000  # px (~18,000 km2): no land province is planned bigger
+SEA_COUNT = 1_000
+LAND_COUNT = 22_500
+MAX_LAND_AREA = 6_000  # px (~12,000 km2): no land province is planned bigger
 SEA_COAST_BOOST = 15.0  # seas near land get up to 16x the density of open ocean
 SEA_COAST_FALLOFF = 10  # coarse cells (~110 km)
 ISLAND_SHARE = 0.25   # a seedless island gets its own province above this share of a local province's area
@@ -300,14 +301,15 @@ region_factor = ndi.gaussian_filter(region_factor, 12)
 
 
 # ---------- densities (seeds per pixel, on the coarse grid) ----------
-def smooth_ratio(num, den):
-    return ndi.gaussian_filter(num, DENSITY_BLUR) / np.maximum(ndi.gaussian_filter(den, DENSITY_BLUR), 1e-9)
 
-
-inv_area = np.zeros(n_old + 1, np.float64)
-inv_area[1:] = 1.0 / np.maximum(old_area[1:], 1)
+# Base land density from the seed towns (hand-made Europe and Middle East, Natural Earth places elsewhere), not from
+# the current map's province sizes: those already carry the region factors, which would compound run after run.
+seed_cells = np.zeros((HC, WC))
+for _, _, kind, x, y in town_seeds:
+    if kind == LAND and 0 <= x < W and 0 <= y < H:
+        seed_cells[int(y // F), int(x // F)] += 1
 land_count = block_sum(lambda a, b: cls[a:b] == LAND)
-land_dens = smooth_ratio(block_sum(lambda a, b: np.where(cls[a:b] == LAND, inv_area[old_id[a:b]], 0)), land_count)
+land_dens = ndi.gaussian_filter(seed_cells, SEED_BLUR) / np.maximum(ndi.gaussian_filter(land_count.astype(np.float64), SEED_BLUR), 1e-9)
 land_dens *= region_factor
 
 sea_count = block_sum(lambda a, b: cls[a:b] == SEA)

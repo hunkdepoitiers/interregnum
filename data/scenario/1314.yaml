@@ -446,7 +446,7 @@ realms:
     name: County of Luxembourg
     rank: county
     government: feudal_monarchy
-    color: "#e8d06a"
+    color: "#b0d8e8"
     capital: [49.61, 6.13]  # Luxembourg; held by John, King of Bohemia
     overlord: bohemia
     area:
@@ -682,7 +682,7 @@ realms:
     rank: duchy
     government: feudal_monarchy
     color: "#a0a0e0"
-    capital: [53.37, 10.56]  # Lauenburg
+    capital: [53.7, 10.76]  # Ratzeburg country
     area:
       - [[53.75, 10.3], [53.75, 11.0], [53.35, 10.95], [53.35, 10.4]]
   - key: thuringia
