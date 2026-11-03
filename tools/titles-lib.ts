@@ -36,44 +36,47 @@ export function compileTitles(gen: GeneratedTitles, upper: UpperTitles, province
       else stale++;
     }
   }
-  if (stale) errors.push(`data/map/titles.yaml names ${stale} provinces the map does not have; run tools/build_titles.py`);
-
-  // Hand kingdoms painted onto provinces, then each duchy votes.
-  const painted = paintRegions(upper.kingdoms.map((k) => ({ area: k.area, add: [] })), upper.fill, provinces, ctx, errors, (i) => `Kingdom ${upper.kingdoms[i]!.key}`);
-  const kingdoms: TitleDef[] = upper.kingdoms.map((k) => ({ key: k.key, name: k.name, parent: 0 }));
-  const kingdomId = new Map(kingdoms.map((k, i) => [k.key, i + 1]));
   const provincesOf = new Map<number, number[]>();
   county.forEach((c, pid) => { if (c) provincesOf.set(c, [...(provincesOf.get(c) ?? []), pid]); });
-  const duchies: TitleDef[] = [];
+  if (stale) errors.push(`data/map/titles.yaml names ${stale} provinces the map does not have; run tools/build_titles.py`);
+
+  // Hand-drawn duchies take the provinces their outlines hold (inside `fill`, gaps take the nearest); the rest stay
+  // in their generated duchy, whose generated area becomes its kingdom.
+  const handDuchies = upper.kingdoms.flatMap((k, ki) => k.duchies.map(([key, name, ...area]) => ({ key, name: `Duchy of ${name}`, area, kingdom: ki + 1 })));
+  const painted = paintRegions(handDuchies.map((d) => ({ area: d.area, add: [] })), upper.fill, provinces, ctx, errors, (i) => `Duchy ${handDuchies[i]!.key}`);
+  const kingdoms: TitleDef[] = upper.kingdoms.map((k) => ({ key: k.key, name: `Kingdom of ${k.name}`, parent: 0 }));
+  const kingdomId = new Map(kingdoms.map((k, i) => [k.key, i + 1]));
+  const duchies: TitleDef[] = handDuchies.map((d) => ({ key: d.key, name: d.name, parent: d.kingdom }));
   const provincesOfKingdom = new Map<number, number[]>();
+  const claim = (duchy: number, county: number) => {
+    counties[county - 1]!.parent = duchy;
+    const k = duchies[duchy - 1]!.parent;
+    const list = provincesOfKingdom.get(k) ?? [];
+    list.push(...(provincesOf.get(county) ?? []));
+    provincesOfKingdom.set(k, list);
+  };
+  for (const [, , capital] of gen.counties) {
+    const p = byKey.get(capital);
+    const c = p ? county[p.id]! : 0;
+    if (c && painted[p!.id]) claim(painted[p!.id]!, c);
+  }
   for (const [key, name, area, members] of gen.duchies) {
-    const id = duchies.length + 1;
-    const votes = new Map<number, number>();
-    for (const ck of members) {
+    const rest = members.map((ck) => {
       const c = countyId.get(ck);
-      if (!c) { errors.push(`Duchy ${key}: unknown county ${ck}`); continue; }
-      counties[c - 1]!.parent = id;
-      for (const pid of provincesOf.get(c) ?? []) {
-        const k = painted[pid]!;
-        if (k) votes.set(k, (votes.get(k) ?? 0) + 1);
-      }
+      if (!c) errors.push(`Duchy ${key}: unknown county ${ck}`);
+      return c ?? 0;
+    }).filter((c) => c && !counties[c - 1]!.parent);
+    if (!rest.length) continue;
+    const autoKey = `k_${area.replace(/^a_/, '')}`;
+    let k = kingdomId.get(autoKey) ?? 0;
+    if (!k) {
+      if (!gen.areas[area]) errors.push(`Duchy ${key}: unknown area ${area}`);
+      kingdoms.push({ key: autoKey, name: `Kingdom of ${gen.areas[area] ?? area}`, parent: 0 });
+      k = kingdoms.length;
+      kingdomId.set(autoKey, k);
     }
-    let best = 0, bestVotes = 0;
-    for (const [k, v] of votes) if (v > bestVotes) { best = k; bestVotes = v; }
-    if (!best) {
-      const autoKey = `k_${area.replace(/^a_/, '')}`;
-      best = kingdomId.get(autoKey) ?? 0;
-      if (!best) {
-        if (!gen.areas[area]) errors.push(`Duchy ${key}: unknown area ${area}`);
-        kingdoms.push({ key: autoKey, name: `Kingdom of ${gen.areas[area] ?? area}`, parent: 0 });
-        best = kingdoms.length;
-        kingdomId.set(autoKey, best);
-      }
-    }
-    duchies.push({ key, name, parent: best });
-    const list = provincesOfKingdom.get(best) ?? [];
-    for (const ck of members) list.push(...(provincesOf.get(countyId.get(ck) ?? 0) ?? []));
-    provincesOfKingdom.set(best, list);
+    duchies.push({ key, name, parent: k });
+    for (const c of rest) claim(duchies.length, c);
   }
 
   const empires: TitleDef[] = upper.empires.map((e) => ({ key: e.key, name: e.name, parent: 0 }));
@@ -110,8 +113,10 @@ export function compileTitles(gen: GeneratedTitles, upper: UpperTitles, province
     });
     return { key: h.key, name: h.name, ...(h.hindu_name ? { hinduName: h.hindu_name } : {}), description: h.description, deJure: h.de_jure, empires: ids.filter(Boolean) };
   });
-  const usedKingdoms = new Set(duchies.map((d) => d.parent));
-  upper.kingdoms.forEach((k, i) => { if (!usedKingdoms.has(i + 1)) warnings.push(`Kingdom ${k.key} holds no duchy`); });
+  const usedDuchies = new Set(counties.map((c) => c.parent));
+  const usedKingdoms = new Set(duchies.filter((_, i) => usedDuchies.has(i + 1)).map((d) => d.parent));
+  const titular = handDuchies.filter((_, i) => !usedDuchies.has(i + 1)).map((d) => d.key);
+  if (titular.length) warnings.push(`${titular.length} drawn duchies hold no land province and stay titular: ${titular.join(', ')}`);
   const usedEmpires = new Set(kingdoms.filter((k) => usedKingdoms.has(kingdomId.get(k.key)!)).map((k) => k.parent));
   empires.forEach((e, i) => { if (!usedEmpires.has(i + 1)) warnings.push(`Empire ${e.key} holds no kingdom`); });
   return { titles: { counties, duchies, kingdoms, empires, hegemonies }, county, errors, warnings };

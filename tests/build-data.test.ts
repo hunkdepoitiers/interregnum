@@ -152,9 +152,9 @@ describe('compileTitles', () => {
     duchies: [['d_ab', 'Duchy of AB', 'a_alpha', ['c_a']], ['d_c', 'Duchy of C', 'a_beta', ['c_c']]],
   });
 
-  it('links counties to duchies, duchies to the drawn kingdom or their area, kingdoms to empires, and up to hegemonies', () => {
+  it('links counties to the drawn duchy or their generated one, up through kingdoms and empires to hegemonies', () => {
     const upper = upperTitlesSchema.parse({
-      kingdoms: [{ key: 'k_west', name: 'Kingdom of the West', area: [box(-180, -140)] }],
+      kingdoms: [{ key: 'k_west', name: 'the West', duchies: [['d_west', 'the West', box(-180, -140)]] }],
       empires: [
         { key: 'e_west', name: 'Empire of the West', kingdoms: ['k_west'] },
         { key: 'e_all', name: 'Empire of All', area: [box(-180, 180)] },
@@ -165,7 +165,7 @@ describe('compileTitles', () => {
     expect(errors).toEqual([]);
     expect(county).toEqual([0, 1, 1, 2, 0, 0]);
     expect(titles.counties.map((c) => [c.parent, c.capital])).toEqual([[1, 1], [2, 3]]);
-    expect(titles.duchies.map((d) => d.parent)).toEqual([1, 2]);
+    expect(titles.duchies.map((d) => [d.key, d.parent])).toEqual([['d_west', 1], ['d_c', 2]]);
     expect(titles.kingdoms.map((k) => [k.key, k.name, k.parent])).toEqual([['k_west', 'Kingdom of the West', 1], ['k_beta', 'Kingdom of Beta', 2]]);
     expect(titles.empires[1]!.parent).toBe(1); // the de jure hegemony, not the formable one
     expect(titles.hegemonies.map((h) => [h.key, h.deJure, h.empires])).toEqual([['h_top', true, [2]], ['h_dream', false, [2]]]);
@@ -174,7 +174,7 @@ describe('compileTitles', () => {
   it('reports stale province keys, unknown members and a kingdom in two empires', () => {
     const stale = generatedTitlesSchema.parse({ ...gen, counties: [...gen.counties, ['c_x', 'County of X', 'gone', ['gone']]] });
     const upper = upperTitlesSchema.parse({
-      kingdoms: [{ key: 'k_west', name: 'W', area: [box(-180, -140)] }],
+      kingdoms: [{ key: 'k_west', name: 'W', duchies: [['d_w', 'W', box(-180, -140)]] }],
       empires: [{ key: 'e_1', name: 'E1', kingdoms: ['k_west'] }, { key: 'e_2', name: 'E2', kingdoms: ['k_west', 'k_nowhere'] }],
     });
     expect(compileTitles(stale, upper, provinces, ctx).errors).toEqual([

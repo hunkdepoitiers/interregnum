@@ -10,15 +10,24 @@ export const generatedTitlesSchema = z.object({
   duchies: z.array(z.tuple([key, z.string(), key, z.array(key).min(1)])),
 });
 
-/** Shape of data/content/titles.yaml: hand-made kingdoms (areas), empires (regions) and hegemonies. */
+const outlines = z.array(z.array(point).min(3)).default([]);
+
+/**
+ * Shape of data/content/titles.yaml: hand-drawn duchies grouped into kingdoms, empires and hegemonies. Kingdom and
+ * duchy names are bare ("France" becomes "Kingdom of France"); a duchy row is [key, name, outline, ...more outlines].
+ */
 export const upperTitlesSchema = z.object({
-  fill: z.array(z.array(point).min(3)).default([]),
-  kingdoms: z.array(z.object({ key, name: z.string().min(1), area: z.array(z.array(point).min(3)).default([]) })),
-  empire_fill: z.array(z.array(point).min(3)).default([]),
+  fill: outlines,
+  kingdoms: z.array(z.object({
+    key,
+    name: z.string().min(1),
+    duchies: z.array(z.tuple([key, z.string().min(1), z.array(point).min(3)]).rest(z.array(point).min(3))).min(1),
+  })),
+  empire_fill: outlines,
   empires: z.array(z.object({
     key,
     name: z.string().min(1),
-    area: z.array(z.array(point).min(3)).default([]),
+    area: outlines,
     kingdoms: z.array(key).default([]),
   })),
   hegemonies: z.array(z.object({
