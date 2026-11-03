@@ -86,6 +86,7 @@ effect(() => {
  * Debug helpers for testers, from the browser console:
  *   interregnum.occupy('edinburgh', 'scotland')   // occupier, or the owner to lift an occupation
  *   interregnum.transfer('kayseri', 'karaman')
+ *   interregnum.select('vierzon')                  // open a province's panel
  */
 function installDebugHooks(map: MapData) {
   const prov = (key: string) => map.provinces.find((p) => p.key === key)?.id ?? 0;
@@ -94,6 +95,7 @@ function installDebugHooks(map: MapData) {
     interregnum: {
       occupy: (p: string, r: string) => command({ type: 'setController', province: prov(p), realm: realm(r) }),
       transfer: (p: string, r: string) => command({ type: 'setOwner', province: prov(p), realm: realm(r) }),
+      select: (p: string) => selectProvince(prov(p), true),
     },
   });
 }

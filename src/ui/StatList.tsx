@@ -66,43 +66,44 @@ function Breakdown({ def, e, at }: { def: StatDef; e: Explained; at: { left: num
   );
 }
 
-/** Every stat of a province or realm, each with its breakdown on hover or focus. */
-export function StatList({ scope, id }: { scope: StatScope; id: number }) {
+/** One stat of a province or realm, with its breakdown on hover or focus. */
+export function StatRow({ stat, scope, id, label }: { stat: string; scope: StatScope; id: number; label?: string }) {
   // Placed beside the panel in window coordinates: the panel scrolls, which would clip a tooltip inside it.
-  const [open, setOpen] = useState<{ key: string; left: number; top: number } | null>(null);
-  const show = (key: string, el: HTMLElement) => {
+  const [open, setOpen] = useState<{ left: number; top: number } | null>(null);
+  const show = (el: HTMLElement) => {
     const row = el.getBoundingClientRect();
     const panel = el.closest('.panel')?.getBoundingClientRect() ?? row;
     const wide = window.innerWidth > 700;
-    setOpen({ key, left: wide ? panel.right + 10 : panel.left, top: wide ? Math.min(row.top - 6, window.innerHeight - 260) : row.bottom + 4 });
+    setOpen({ left: wide ? panel.right + 10 : panel.left, top: wide ? Math.min(row.top - 6, window.innerHeight - 260) : row.bottom + 4 });
   };
   const c = content.value;
-  if (!c || !world.value) return null;
-  const target: ModifierTarget = { kind: scope, id };
-  const defs = Object.values(c.stats).filter((s) => s.scope === scope);
+  const def = c?.stats[stat];
+  if (!c || !def || def.scope !== scope || !world.value) return null;
+  const e = explainHere(c, stat, { kind: scope, id });
+  if (!e) return null;
   return (
-    <dl class="stats">
-      {defs.map((def) => {
-        const e = explainHere(c, def.key, target);
-        if (!e) return null;
-        return (
-          <div
-            key={def.key}
-            class="stat-row"
-            tabIndex={0}
-            onMouseEnter={(ev) => show(def.key, ev.currentTarget)}
-            onMouseLeave={() => setOpen(null)}
-            onFocus={(ev) => show(def.key, ev.currentTarget)}
-            onBlur={() => setOpen(null)}
-          >
-            <dt>{def.label}</dt>
-            <dd class={e.lines.length ? 'modified' : ''}>{formatStat(def, e.value)}</dd>
-            {open?.key === def.key && <Breakdown def={def} e={e} at={open} />}
-          </div>
-        );
-      })}
-    </dl>
+    <div
+      class="stat-row"
+      tabIndex={0}
+      onMouseEnter={(ev) => show(ev.currentTarget)}
+      onMouseLeave={() => setOpen(null)}
+      onFocus={(ev) => show(ev.currentTarget)}
+      onBlur={() => setOpen(null)}
+    >
+      <dt>{label ?? def.label}</dt>
+      <dd class={e.lines.length ? 'modified' : ''}>{formatStat(def, e.value)}</dd>
+      {open && <Breakdown def={def} e={e} at={open} />}
+    </div>
   );
+}
+
+/** Every stat of a province or realm (except those listed in `skip`), each with its breakdown. */
+export function StatList({ scope, id, skip = [] }: { scope: StatScope; id: number; skip?: string[] }) {
+  const c = content.value;
+  if (!c) return null;
+  const keys = Object.values(c.stats).filter((s) => s.scope === scope && !skip.includes(s.key)).map((s) => s.key);
+  if (!keys.length) return null;
+  return <dl class="stats">{keys.map((k) => <StatRow key={k} stat={k} scope={scope} id={id} />)}</dl>;
 }
 
 /** Modifiers sitting on a province or realm, with the time left. */
@@ -114,8 +115,8 @@ export function ModifierList({ scope, id }: { scope: StatScope; id: number }) {
   if (!mine.length) return null;
   const today = status.value.day;
   return (
-    <>
-      <h3>Modifiers</h3>
+    <section class="folio-sec">
+      <h3><span class="initial">M</span>odifiers</h3>
       <ul class="plain modifiers">
         {mine.map((m) => {
           const d = c.modifiers[m.def];
@@ -127,6 +128,6 @@ export function ModifierList({ scope, id }: { scope: StatScope; id: number }) {
           );
         })}
       </ul>
-    </>
+    </section>
   );
 }

@@ -4,6 +4,7 @@ import { dayToDate, formatDate } from '../sim/calendar';
 import type { Speed } from '../sim/state';
 
 const SPEEDS: Speed[] = [1, 2, 3, 4, 5];
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V'];
 
 export function TopBar() {
   useEffect(() => {
@@ -40,7 +41,7 @@ export function TopBar() {
             aria-pressed={s === status.value.speed}
             onClick={() => command({ type: 'setSpeed', speed: s })}
           >
-            {s}
+            {ROMAN[s]}
           </button>
         ))}
       </span>
