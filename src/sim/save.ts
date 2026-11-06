@@ -1,4 +1,5 @@
 import { startCharacters } from './characters';
+import { startFaith } from './faith';
 import { startEconomy, type EconomyContext } from './economy';
 import type { Scenario } from './scenario';
 import { charactersFromScenario, economyFromScenario, modifiersFromScenario, provincesFromScenario, realmsFromScenario, SAVE_VERSION, type GameState } from './state';
@@ -39,6 +40,13 @@ export const migrations: Record<number, Migration> = {
   4: (s, { scenario, economy }) => {
     const next = { ...s, ...charactersFromScenario(scenario) };
     if (economy) startCharacters(next as unknown as GameState, economy);
+    return next;
+  },
+  // v6 added prestige and piety: every realm starts as a new game would, by rank, government and ruler.
+  5: (s, { economy }) => {
+    const realms = s.realms as unknown[];
+    const next = { ...s, standing: realms.map((r) => (r ? { prestige: 0, piety: 0, log: [], cooldowns: {}, pilgrimage: null } : null)) };
+    if (economy) startFaith(next as unknown as GameState, economy);
     return next;
   },
 };
@@ -103,7 +111,7 @@ function validate(s: GameState): void {
     s.economy.slice(1).every((e) => Number.isInteger(e?.treasury)) && Array.isArray(s.banks) && Array.isArray(s.loans) &&
     s.loans.every((l) => Number.isInteger(l?.principal) && realmRef(l.realm) && s.banks[l.bank] !== undefined) &&
     Array.isArray(s.construction) && typeof s.buildings === 'object' && s.buildings !== null &&
-    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) &&
+    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) && Array.isArray(s.standing) && s.standing.every((x) => x === null || (Number.isInteger(x.prestige) && Number.isInteger(x.piety))) &&
     s.courts.every((c) => c === null || (Number.isInteger(c.ruler) && Array.isArray(c.council))) &&
     s.modifiers.every((m) =>
       Number.isInteger(m?.id) && m.id < s.nextModifierId && typeof m.def === 'string' && Number.isInteger(m.start) &&

@@ -1,0 +1,110 @@
+# Faiths, prestige and piety (M6). Read by tools/build-data.ts (faith-lib).
+# Prestige and piety belong to a realm as the standing of its ruling house. They move only by deeds (alms, a
+# tournament, a pilgrimage, a church, a default, a new house on the throne) and by visible, named sources (holy sites
+# held). Each currency has tiers; a realm carries its tier's modifier, so tier effects show in every stat tooltip.
+# Numbers are tuned for play: GUESS.
+
+# Tiers: from `min` up. Piety tier names depend on the faith family.
+prestige_tiers:
+  - { min: -100000, name: Disgraced, modifier: prestige_disgraced }
+  - { min: 0, name: Obscure, modifier: prestige_obscure }
+  - { min: 100, name: Known }
+  - { min: 250, name: Respected, modifier: prestige_respected }
+  - { min: 500, name: Renowned, modifier: prestige_renowned }
+  - { min: 800, name: Illustrious, modifier: prestige_illustrious }
+  - { min: 1200, name: Legendary, modifier: prestige_legendary }
+piety_tiers:
+  - { min: -100000, modifier: piety_0 }
+  - { min: 0, modifier: piety_1 }
+  - { min: 100 }
+  - { min: 250, modifier: piety_3 }
+  - { min: 500, modifier: piety_4 }
+  - { min: 900, modifier: piety_5 }
+piety_names:
+  christian: [Sinful, Lukewarm, Faithful, Devout, Pious, Saintly]
+  islamic: [Wayward, Lax, Faithful, God-fearing, Righteous, Saintly]
+  abrahamic: [Wayward, Lax, Faithful, Observant, Righteous, Saintly]
+  dharmic: [Adharmic, Lax, Dutiful, Devoted, Virtuous, Holy]
+  buddhist: [Deluded, Lax, Mindful, Devoted, Virtuous, Enlightened]
+  east_asian: [Unfilial, Lax, Proper, Upright, Virtuous, Sage]
+  pagan: [Forsaken, Lax, Faithful, Devoted, Blessed, Chosen]
+
+# Where realms start: prestige by rank, piety by government, plus a ruler's pious trait.
+start:
+  prestige: { empire: 600, kingdom: 300, duchy: 120, county: 40 }
+  piety: 120
+  piety_government: { theocracy: 400, holy_order: 500 }
+  pious_trait: 120
+
+# Heads of faith (a realm key) and holy sites ([name, lat, lon]). Holding a holy site of your own faith brings
+# `holy_site_piety` a month, shown by name, up to the highest piety tier: sites keep a ruler devout; only deeds make
+# a saint.
+holy_site_piety: 1
+faiths:
+  catholic:
+    head: papal_states
+    holy_sites: [[Rome, 41.9, 12.45], [Jerusalem, 31.78, 35.23], [Santiago de Compostela, 42.88, -8.54], [Canterbury, 51.28, 1.08], [Assisi, 43.07, 12.61]]
+  orthodox:
+    head: byzantium
+    holy_sites: [[Constantinople, 41.01, 28.98], [Jerusalem, 31.78, 35.23], [Mount Athos, 40.26, 24.25], [Kyiv, 50.45, 30.52], [Mount Sinai, 28.55, 33.97]]
+  miaphysite:
+    holy_sites: [[Alexandria, 31.2, 29.92], [Aksum, 14.13, 38.73], [Etchmiadzin, 40.16, 44.29], [Jerusalem, 31.78, 35.23]]
+  nestorian:
+    holy_sites: [[Mosul, 36.34, 43.13], [Urmia, 37.55, 45.07]]
+  bosnian_church:
+    holy_sites: [[Visoko, 43.99, 18.18]]
+  sunni:
+    head: mamluks
+    holy_sites: [[Mecca, 21.42, 39.83], [Medina, 24.47, 39.61], [Jerusalem, 31.78, 35.23], [Baghdad, 33.31, 44.36], [Damascus, 33.51, 36.29]]
+  shia:
+    holy_sites: [[Karbala, 32.62, 44.03], [Najaf, 32.0, 44.33], [Mecca, 21.42, 39.83], [Mashhad, 36.29, 59.61]]
+  ibadi:
+    holy_sites: [[Nizwa, 22.93, 57.53], [Djerba, 33.8, 10.85]]
+  jewish:
+    holy_sites: [[Jerusalem, 31.78, 35.23], [Safed, 32.96, 35.5]]
+  hindu:
+    holy_sites: [[Varanasi, 25.32, 83.01], [Mathura, 27.49, 77.67], [Puri, 19.8, 85.83], [Hampi, 15.33, 76.46], [Rameswaram, 9.29, 79.31]]
+  jain:
+    holy_sites: [[Palitana, 21.52, 71.82], [Mount Abu, 24.6, 72.71]]
+  theravada:
+    holy_sites: [[Kandy, 7.29, 80.64], [Pegu, 17.34, 96.48], [Sukhothai, 17.0, 99.82]]
+  mahayana:
+    holy_sites: [[Bodh Gaya, 24.7, 84.99], [Mount Wutai, 39.01, 113.59], [Chang'an, 34.27, 108.94]]
+  vajrayana:
+    head: tibet
+    holy_sites: [[Lhasa, 29.1, 90.5], [Sakya, 28.9, 88.02], [Mount Kailash, 31.07, 81.31]]
+  chinese_folk:
+    holy_sites: [[Mount Tai, 36.25, 117.1], [Qufu, 35.6, 116.99], [Mount Hua, 34.48, 110.08]]
+  shinto:
+    holy_sites: [[Ise, 34.45, 136.72], [Kyoto, 35.01, 135.77]]
+  tengri:
+    holy_sites: [[Karakorum, 47.2, 102.8], [Burkhan Khaldun, 48.76, 108.68]]
+  baltic_pagan:
+    holy_sites: [[Vilnius, 54.69, 25.28], [Romuva, 54.8, 21.2]]
+
+# Deeds a ruler may do. cost_months: months of the realm's gross income (at least `min_cost` ducats); income_months:
+# months of income gained; cooldown in days.
+deeds:
+  small_alms: { name: Give alms, cost: 100, piety: 5, cooldown: 30, description: Bread and coin for the poor at the gates. }
+  great_alms: { name: Feed the poor of the realm, cost_months: 1, min_cost: 300, piety: 30, cooldown: 365, modifier: almsgiving, description: A great distribution of grain and silver in every town. }
+  tournament: { name: Hold a tournament, cost_months: 1, min_cost: 400, prestige: 40, cooldown: 1095, modifier: tournament, description: Knights from far and wide joust for honour before the court. }
+  pilgrimage: { name: Go on pilgrimage, cost: 400, piety: 60, prestige: 15, days: 240, modifier: on_pilgrimage, description: The ruler travels to a holy site of the faith and leaves the realm to the council. }
+  seize_church_lands: { name: Seize church lands, income_months: 4, piety: -120, prestige: -10, cooldown: 1825, description: Take the abbeys' manors for the crown. The treasury fills; the clergy will not forget. }
+  absolution: { name: Seek absolution, cost_months: 3, min_cost: 500, piety: 10, description: Make peace with the Holy See, with gifts to match the offence. }
+# A pilgrim's road is dangerous: extra monthly chance of death (basis points) while away.
+pilgrimage_risk: 80
+
+# What happens to a realm's standing without anyone choosing it.
+events:
+  default: { prestige: -60 }
+  empty_treasury: { prestige: -5 }
+  # A new house keeps this share (%) of the old house's prestige and piety.
+  dynasty_change_keep: 40
+
+# Catholic rulers with piety below `below` may be excommunicated by a sitting pope (monthly chance in basis points).
+excommunication: { faith: catholic, below: 0, chance: 300, prestige: -40, modifier: excommunicated, vacancy: papal_vacancy }
+
+# Finishing a religious building raises the builder's standing.
+buildings:
+  church: { piety: 15 }
+  cathedral: { piety: 60, prestige: 40 }

@@ -1,3 +1,4 @@
+import { changeStanding } from './standing';
 import { STRATA, type Content } from './content';
 import { addModifier, indexModifiers, removeModifiers, statValue, type ModifierIndex } from './modifiers';
 import type { GameState, Ledger, Loan } from './state';
@@ -43,6 +44,9 @@ export const LEDGER: { key: string; label: string; kind: 'income' | 'expense' | 
   { key: 'loans_taken', label: 'Loans taken', kind: 'oneOff' },
   { key: 'loans_repaid', label: 'Loans repaid', kind: 'oneOff' },
   { key: 'embezzlement', label: 'Embezzled by the regent', kind: 'oneOff' },
+  { key: 'deeds', label: 'Alms, feasts and pilgrimages', kind: 'oneOff' },
+  { key: 'church_lands', label: 'Church lands seized', kind: 'oneOff' },
+  { key: 'gifts', label: 'Gifts for absolution', kind: 'oneOff' },
 ];
 
 /** Something a realm or the player should hear about. realm 0 = everyone. */
@@ -211,7 +215,10 @@ export function settleMonth(state: GameState, ctx: EconomyContext): Notice[] {
     }
   }
   state.economy.forEach((ec, id) => {
-    if (ec && ec.treasury < 0 && state.realms[id]) addModifier(state, ctx.content, 'empty_treasury', { kind: 'realm', id });
+    if (ec && ec.treasury < 0 && state.realms[id]) {
+      addModifier(state, ctx.content, 'empty_treasury', { kind: 'realm', id });
+      changeStanding(state, ctx.content, id, ctx.content.faith.events.emptyTreasury, 'Unpaid officials and soldiers');
+    }
   });
   growPeople(state, ctx);
   return notices;
@@ -261,6 +268,7 @@ export function creditRating(state: GameState, ctx: EconomyContext, realm: numbe
     { label: 'Yearly surplus', value: income },
     { label: 'Debts against income', value: -debtPenalty },
     { label: 'Recent defaults', value: -recent * c.defaultPenalty },
+    { label: 'Renown of the house', value: Math.max(-10, Math.min(10, Math.trunc((state.standing?.[realm]?.prestige ?? 0) / 100))) },
   ].filter((x, i) => i === 0 || x.value !== 0);
   const value = Math.max(0, Math.min(100, lines.reduce((a, x) => a + x.value, 0)));
   return { value, lines, grossYear, debt };
@@ -338,6 +346,7 @@ export function defaultLoan(state: GameState, ctx: EconomyContext, loan: Loan): 
   if (!bs.refused.includes(loan.realm)) bs.refused.push(loan.realm);
   bs.losses += loan.principal;
   addModifier(state, content, 'defaulted', { kind: 'realm', id: loan.realm });
+  changeStanding(state, content, loan.realm, content.faith.events.default, `Defaulted on ${bank?.name ?? 'a lender'}`);
   notices.push({ realm: loan.realm, text: `${state.realms[loan.realm]?.name ?? 'A realm'} defaulted on ${ducats(loan.principal)} ducats owed to ${bank?.name ?? 'a lender'}.` });
   if (loan.pledge) {
     removeModifiers(state, 'revenues_pledged', { kind: 'province', id: loan.pledge });
@@ -404,6 +413,8 @@ export function finishBuildings(state: GameState, ctx: EconomyContext): { change
       addModifier(state, ctx.content, def.modifier, { kind: 'province', id: c.province });
       changed = true;
       notices.push({ realm: c.realm, text: `${def.name} finished.` });
+      const gain = ctx.content.faith.buildings[c.building];
+      if (gain) changeStanding(state, ctx.content, c.realm, gain, `Built a ${def.name.toLowerCase()}`);
     }
   }
   if (state.construction.some((x) => x.done <= state.day)) state.construction = state.construction.filter((x) => x.done > state.day);

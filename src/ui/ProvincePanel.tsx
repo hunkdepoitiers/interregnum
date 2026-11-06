@@ -123,6 +123,9 @@ export function ProvincePanel() {
             <Section title="The People">
               {culture && <Row label="Culture">{culture.name} <span class="muted">({culture.groupName})</span></Row>}
               {religion && <Row label="Religion"><span class="swatch" style={{ background: religion.color }} aria-hidden="true" />{religion.name}</Row>}
+              {report?.holySites.map((h) => (
+                <Row key={`${h.religion}-${h.name}`} label="Holy site"><span title={`Whoever holds this province and follows ${pe?.content.religions[h.religion - 1]?.name ?? 'the faith'} gains piety each month.`}>{h.name} <span class="muted">({pe?.content.religions[h.religion - 1]?.name})</span></span></Row>
+              ))}
               {ec && <Row label="Population">{ec.people.toLocaleString('en')}</Row>}
               {ec && STRATA.map((st, i) => (ec.strata[i] ? <div class="row sub-row" key={st}><dt>{STRATUM_LABEL[st]}</dt><dd>{ec.strata[i]!.toLocaleString('en')}</dd></div> : null))}
               <StatRow stat="unrest" scope="province" id={p.id} />

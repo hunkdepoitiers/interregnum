@@ -208,6 +208,9 @@ ul.columns li { break-inside: avoid; }
 .small { font-size: 13px; }
 p.small { margin: 3px 0; }
 button.small-btn { padding: 0 8px; font-size: 14px; }
+.deeds { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.deeds-log { font-size: 14px; margin: 4px 0; }
+.has-tip { cursor: help; border-bottom: 1px dotted var(--ink-soft); }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 .realm-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 2px; }
 table.ledger { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }

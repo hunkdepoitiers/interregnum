@@ -4,7 +4,7 @@ import type { Character, Court, Dynasty, Scenario, ScenarioRealm } from './scena
 
 export type { Character, Court, Dynasty };
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 /** Speed 1 (slowest) .. 5 (fastest). */
 export type Speed = 1 | 2 | 3 | 4 | 5;
@@ -71,6 +71,18 @@ export interface Construction {
   done: number;
 }
 
+/** A realm's prestige and piety: the standing of its ruling house (data/content/faith.yaml). Whole points. */
+export interface RealmStanding {
+  prestige: number;
+  piety: number;
+  /** Recent deeds and what they brought, oldest first. */
+  log: { day: number; label: string; prestige: number; piety: number }[];
+  /** Deed key → day it may be done again. */
+  cooldowns: Record<string, number>;
+  /** The ruler away on pilgrimage, and the day they come home. */
+  pilgrimage: { ruler: number; until: number } | null;
+}
+
 export interface GameState {
   saveVersion: number;
   seed: number;
@@ -107,6 +119,8 @@ export interface GameState {
   dynasties: (Dynasty | null)[];
   /** Indexed like realms. */
   courts: (Court | null)[];
+  /** Indexed like realms. */
+  standing: (RealmStanding | null)[];
 }
 
 export function provincesFromScenario(scenario: Scenario): ProvinceState[] {
@@ -166,5 +180,6 @@ export function newGame(seed: number, scenario: Scenario, bankCapitals: number[]
     nextModifierId: modifiers.length + 1,
     ...economyFromScenario(scenario, realms.length, bankCapitals),
     ...charactersFromScenario(scenario),
+    standing: realms.map((r) => (r ? { prestige: 0, piety: 0, log: [], cooldowns: {}, pilgrimage: null } : null)),
   };
 }

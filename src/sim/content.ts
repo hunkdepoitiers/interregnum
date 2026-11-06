@@ -238,6 +238,66 @@ export function emptyCharacters(): CharactersDef {
   };
 }
 
+/** A deed a ruler may do for prestige or piety. Costs in hundredths of a ducat. */
+export interface DeedDef {
+  key: string;
+  name: string;
+  description: string;
+  /** Fixed cost, plus `costMonths` months of the realm's gross income; never under `minCost`. */
+  cost: number;
+  costMonths: number;
+  minCost: number;
+  /** Months of gross income the deed brings in (seizing church lands). */
+  incomeMonths: number;
+  prestige: number;
+  piety: number;
+  /** Days before it may be done again; 0 = any time. */
+  cooldown: number;
+  /** Days it takes (a pilgrimage); 0 = at once. */
+  days: number;
+  modifier: string | null;
+}
+
+export interface Standing {
+  prestige: number;
+  piety: number;
+}
+
+/**
+ * Faiths, prestige and piety (data/content/faith.yaml). Prestige and piety are whole points. Tiers are sorted by
+ * `min`; a realm is in the last tier whose min it reaches.
+ */
+export interface FaithDef {
+  prestigeTiers: { min: number; name: string; modifier: string | null }[];
+  pietyTiers: { min: number; modifier: string | null }[];
+  /** Piety tier names by religion family; `christian` is the fallback. */
+  pietyNames: Record<string, string[]>;
+  start: { prestige: Record<'empire' | 'kingdom' | 'duchy' | 'county', number>; piety: number; pietyGovernment: Record<string, number>; piousTrait: number };
+  /** Piety a month per holy site held, while below the top piety tier. */
+  holySitePiety: number;
+  /** By religion id - 1: the head of faith (realm id, 0 = none) and the holy sites. */
+  faiths: { head: number; holySites: { name: string; province: number }[] }[];
+  deeds: Record<string, DeedDef>;
+  /** Extra monthly chance of death in basis points while on pilgrimage. */
+  pilgrimageRisk: number;
+  events: { default: Standing; emptyTreasury: Standing; dynastyChangeKeep: number };
+  /** Religion id whose head may excommunicate; 0 = none. */
+  excommunication: { religion: number; below: number; chance: number; prestige: number; modifier: string; vacancy: string | null };
+  /** Standing gained on finishing a building, by building key. */
+  buildings: Record<string, Standing>;
+}
+
+/** Faith with no tiers, sites or deeds: for content built without data/content/faith.yaml. */
+export function emptyFaith(): FaithDef {
+  return {
+    prestigeTiers: [{ min: -1000000, name: 'Known', modifier: null }], pietyTiers: [{ min: -1000000, modifier: null }],
+    pietyNames: { christian: ['Faithful'] }, start: { prestige: { empire: 0, kingdom: 0, duchy: 0, county: 0 }, piety: 0, pietyGovernment: {}, piousTrait: 0 },
+    holySitePiety: 0, faiths: [], deeds: {}, pilgrimageRisk: 0,
+    events: { default: { prestige: 0, piety: 0 }, emptyTreasury: { prestige: 0, piety: 0 }, dynastyChangeKeep: 100 },
+    excommunication: { religion: 0, below: 0, chance: 0, prestige: 0, modifier: '', vacancy: null }, buildings: {},
+  };
+}
+
 export interface Content {
   stats: Record<string, StatDef>;
   modifiers: Record<string, ModifierDef>;
@@ -249,4 +309,5 @@ export interface Content {
   goods: GoodDef[];
   economy: EconomyDef;
   characters: CharactersDef;
+  faith: FaithDef;
 }

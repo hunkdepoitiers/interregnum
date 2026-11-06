@@ -6,12 +6,15 @@ import {
   cannotBuild, computeLedgers, creditRating, ensureEconomy, ledgerNet, loanOffers, provinceEconomy, startEconomy,
   type EconomyContext, type Notice,
 } from '../sim/economy';
+import { cannotDeed, deedCost, deedIncome, excommunicationThreat, holySitesAt, realmFaith, startFaith, tiersOf } from '../sim/faith';
+import { hasModifier } from '../sim/modifiers';
 import { deserialize, serialize } from '../sim/save';
+import { ensureStanding } from '../sim/standing';
 import type { Scenario } from '../sim/scenario';
 import { newGame, type GameState, type Speed } from '../sim/state';
 import { tick } from '../sim/tick';
 import type {
-  CharacterRef, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker,
+  CharacterRef, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, StandingReport, ToWorker,
 } from './protocol';
 
 /** Milliseconds per game day (speed 5 ≈ 100 days per second, if the tick keeps up). */
@@ -93,6 +96,27 @@ function characterReport(s: GameState, ctx: EconomyContext, id: number): Charact
   };
 }
 
+function standingReport(s: GameState, ctx: EconomyContext, realm: number): StandingReport | null {
+  const st = s.standing[realm];
+  const tiers = tiersOf(s, ctx, realm);
+  if (!st || !tiers) return null;
+  const f = ctx.content.faith;
+  const religion = realmFaith(s, ctx, realm);
+  const faith = f.faiths[religion - 1];
+  const site = (p: number) => s.provinces[p]?.owner === realm && s.provinces[p]?.controller === realm;
+  return {
+    prestige: st.prestige, piety: st.piety, ...tiers, religion, head: faith?.head ?? 0,
+    holySites: (faith?.holySites ?? []).map((h) => ({ ...h, held: site(h.province) })),
+    log: st.log, pilgrimage: st.pilgrimage?.until ?? null,
+    excommunicated: hasModifier(s, f.excommunication.modifier, { kind: 'realm', id: realm }),
+    excommunicationChance: excommunicationThreat(s, ctx, realm).chance,
+    deeds: Object.values(f.deeds).map((d) => ({
+      key: d.key, name: d.name, description: d.description, cost: deedCost(s, d, realm), income: deedIncome(s, d, realm),
+      prestige: d.prestige, piety: d.piety, days: d.days, why: cannotDeed(s, ctx, realm, d.key),
+    })),
+  };
+}
+
 function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport | ProvinceReport | CharacterReport | null {
   if (q.kind === 'character') return characterReport(s, ctx, q.id);
   if (q.kind === 'realm') {
@@ -113,6 +137,7 @@ function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport
       construction: s.construction.filter((c) => c.realm === q.id),
       people,
       court: courtReport(s, ctx, q.id),
+      standing: standingReport(s, ctx, q.id),
     };
   }
   const p = s.provinces[q.id];
@@ -124,6 +149,7 @@ function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport
     buildings: s.buildings[q.id] ?? [],
     construction: s.construction.filter((c) => c.province === q.id),
     canBuild,
+    holySites: holySitesAt(ctx, q.id),
   };
 }
 
@@ -153,6 +179,7 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
     state = newGame(msg.seed, scenario, content.economy.banks.map((b) => b.capital));
     startCharacters(state, economy);
     startEconomy(state, economy);
+    startFaith(state, economy);
     postWorld(state);
   } else if (!state || !scenario || !economy) {
     return; // nothing to act on before init
@@ -170,6 +197,7 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
     try {
       state = deserialize(msg.text, { scenario, economy });
       ensureEconomy(state);
+      ensureStanding(state);
       state.paused = true;
       postWorld(state);
       post({ type: 'loaded', requestId: msg.requestId, error: null });

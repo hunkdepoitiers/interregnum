@@ -8,6 +8,7 @@ import type { Content } from '../src/sim/content';
 import { computeLedgers, ducats, LEDGER, startEconomy, type EconomyContext } from '../src/sim/economy';
 import type { Scenario } from '../src/sim/scenario';
 import { ageOf, startCharacters } from '../src/sim/characters';
+import { startFaith, tiersOf } from '../src/sim/faith';
 import { newGame } from '../src/sim/state';
 import { tick } from '../src/sim/tick';
 
@@ -21,6 +22,7 @@ const ctx: EconomyContext = {
 const state = newGame(1314, scenario, content.economy.banks.map((b) => b.capital));
 startCharacters(state, ctx);
 startEconomy(state, ctx);
+startFaith(state, ctx);
 
 const keys = process.argv.slice(3);
 const watched = (keys.length ? keys : ['france', 'england', 'castile', 'venice', 'golden_horde', 'mamluks', 'yuan', 'delhi', 'papal_states', 'scotland'])
@@ -36,7 +38,9 @@ function report(label: string) {
     const court = state.courts[id];
     const ruler = court ? state.characters[court.ruler] : null;
     const who = ruler ? `${ruler.name} ${state.dynasties[ruler.dynasty]?.name ?? ''} (${ageOf(ruler, state.day)})${court?.regent ? ' regency' : ''}${court?.claimant ? ' +claimant' : ''}` : '';
-    console.log(`  ${state.realms[id]!.name.padEnd(28)} treasury ${ducats(state.economy[id]!.treasury).padStart(12)}  month +${ducats(inc).padStart(8)} ${ducats(exp).padStart(8)}  ${who}`);
+    const st = state.standing[id]!;
+    const t = tiersOf(state, ctx, id)!;
+    console.log(`  ${state.realms[id]!.name.padEnd(28)} treasury ${ducats(state.economy[id]!.treasury).padStart(12)}  month +${ducats(inc).padStart(8)} ${ducats(exp).padStart(8)}  P ${String(st.prestige).padStart(5)} ${t.prestigeName.padEnd(11)} F ${String(st.piety).padStart(5)} ${t.pietyName.padEnd(10)} ${who}`);
   }
 }
 
@@ -58,6 +62,8 @@ for (let y = 1; y <= years; y++) {
   }
   if (y % (years > 20 ? 10 : 1) === 0 || y === years) report(`Year ${y}, ${people()} million people`);
 }
+const ex = state.modifiers.filter((m) => m.def === 'excommunicated').length;
+console.log(`excommunicated now: ${ex}; prestige range ${Math.min(...state.standing.filter(Boolean).map((x) => x!.prestige))}..${Math.max(...state.standing.filter(Boolean).map((x) => x!.prestige))}, piety range ${Math.min(...state.standing.filter(Boolean).map((x) => x!.piety))}..${Math.max(...state.standing.filter(Boolean).map((x) => x!.piety))}`);
 tally.newHouses = state.modifiers.filter((m) => m.def === 'dynasty_change').length;
 const living = state.characters.filter((c) => c && c.died === null).length;
 console.log(`

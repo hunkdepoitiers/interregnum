@@ -53,6 +53,28 @@ export interface CharacterReport {
   siblings: CharacterRef[];
 }
 
+/** A realm's prestige, piety and faith, and the deeds it may do. */
+export interface StandingReport {
+  prestige: number;
+  piety: number;
+  prestigeTier: number;
+  prestigeName: string;
+  pietyTier: number;
+  pietyName: string;
+  /** Religion id (0 = none) and its head of faith's realm (0 = none). */
+  religion: number;
+  head: number;
+  holySites: { name: string; province: number; held: boolean }[];
+  log: { day: number; label: string; prestige: number; piety: number }[];
+  /** Day the ruler comes home from pilgrimage; null = at home. */
+  pilgrimage: number | null;
+  excommunicated: boolean;
+  /** Monthly chance (basis points) of excommunication now; 0 = none. */
+  excommunicationChance: number;
+  /** Every deed with its price now and why it cannot be done (null = it can). */
+  deeds: { key: string; name: string; description: string; cost: number; income: number; prestige: number; piety: number; days: number; why: string | null }[];
+}
+
 export interface RealmReport {
   treasury: number;
   /** Last month's settled ledger, and this month's as it stands (one-offs so far included). */
@@ -67,6 +89,7 @@ export interface RealmReport {
   construction: Construction[];
   people: number;
   court: CourtReport | null;
+  standing: StandingReport | null;
 }
 
 export interface ProvinceReport {
@@ -75,6 +98,8 @@ export interface ProvinceReport {
   construction: Construction[];
   /** For the player's realm: per building key, why it cannot be built now (null = it can). */
   canBuild: Record<string, string | null>;
+  /** Holy sites here, by religion id. */
+  holySites: { name: string; religion: number }[];
 }
 
 export type ToWorker =

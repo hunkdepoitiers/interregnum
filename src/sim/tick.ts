@@ -1,5 +1,6 @@
 import { dayToDate } from './calendar';
 import { monthlyCharacters } from './characters';
+import { monthlyFaith } from './faith';
 import { finishBuildings, settleMonth, type EconomyContext, type Notice } from './economy';
 import { expireModifiers } from './modifiers';
 import type { GameState } from './state';
@@ -28,7 +29,7 @@ export function tick(state: GameState, economy?: EconomyContext): TickResult {
   if (economy) {
     const built = finishBuildings(state, economy);
     notices.push(...built.notices);
-    if (monthStart) notices.push(...monthlyCharacters(state, economy), ...settleMonth(state, economy));
+    if (monthStart) notices.push(...monthlyFaith(state, economy), ...monthlyCharacters(state, economy), ...settleMonth(state, economy));
     modifiersChanged ||= built.changed || state.nextModifierId !== before;
   }
   return { day: state.day, monthStart, yearStart: monthStart && date.month === 1, modifiersChanged, notices };

@@ -5,7 +5,7 @@ import type { Realm } from '../sim/state';
 import { mapData, selectedRealm, selectProvince, selectRealm } from './App';
 import { dayToDate, formatDate } from '../sim/calendar';
 import { SKILL_NAMES } from '../sim/characters';
-import type { CourtReport } from '../worker/protocol';
+import type { CourtReport, StandingReport } from '../worker/protocol';
 import { CharLink, Medallion } from './CharacterPanel';
 import { Row, Section } from './folio';
 import { content } from './StatList';
@@ -76,6 +76,7 @@ export function RealmPanel() {
           {report && <Row label="People">{report.people.toLocaleString('en')}</Row>}
         </Section>
         {report?.court && <Crown court={report.court} />}
+        {report?.standing && <Standing realm={realm.id} s={report.standing} mine={status.value.player === realm.id} />}
         <Section title="Treasury">
           {report && <Row label="Treasury"><span class={report.treasury < 0 ? 'warn' : ''}>{money(report.treasury)} ducats</span></Row>}
           {report && <Row label="This month">{signedMoney(ledgerNet(report.projected))}</Row>}
@@ -162,3 +163,85 @@ function Crown({ court }: { court: CourtReport }) {
     </>
   );
 }
+
+const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`);
+
+/** A tier modifier's effects as text, for tooltips. */
+function effectsText(key: string | null): string {
+  const c = content.value;
+  const def = key ? c?.modifiers[key] : undefined;
+  if (!def || !c) return 'No effects.';
+  return def.effects.map((e) => {
+    const label = c.stats[e.stat]?.label ?? e.stat;
+    const v = e.value / 100;
+    return e.op === 'pct' ? `${label} ${signed(v)}%` : `${label} ${signed(v)}${c.stats[e.stat]?.format === 'percent' ? '%' : ''}`;
+  }).join(', ');
+}
+
+/** Tooltip for a currency: every tier with its threshold and effects, the current one marked, and recent deeds. */
+function tierTitle(kind: 'prestige' | 'piety', s: StandingReport, names: string[]): string {
+  const f = content.value?.faith;
+  if (!f) return '';
+  const tiers = kind === 'prestige' ? f.prestigeTiers : f.pietyTiers;
+  const current = kind === 'prestige' ? s.prestigeTier : s.pietyTier;
+  const lines = tiers.map((t, i) => `${i === current ? '▶ ' : '   '}${names[i] ?? ''}${i > 0 ? ` (from ${t.min})` : ''}: ${effectsText(t.modifier)}`);
+  const deeds = s.log.filter((l) => l[kind] !== 0).slice(-6).reverse().map((l) => `${formatDate(dayToDate(l.day))}: ${l.label} ${signed(l[kind])}`);
+  return [...lines, ...(deeds.length ? ['', 'Recent:', ...deeds] : [])].join('\n');
+}
+
+/** Prestige, piety, faith, holy sites, the record of deeds, and the deeds the player may do. */
+function Standing({ realm, s, mine }: { realm: number; s: StandingReport; mine: boolean }) {
+  const c = content.value;
+  const religion = c?.religions[s.religion - 1];
+  const prestigeNames = c?.faith.prestigeTiers.map((t) => t.name) ?? [];
+  const fam = religion?.family ?? 'christian';
+  const pietyNames = c?.faith.pietyNames[fam] ?? c?.faith.pietyNames.christian ?? [];
+  const held = s.holySites.filter((h) => h.held);
+  return (
+    <section class="folio-sec">
+      <h3><span class="initial">F</span>aith and Renown</h3>
+      <dl class="rows">
+        <Row label="Prestige"><span class="has-tip" title={tierTitle('prestige', s, prestigeNames)}><strong>{s.prestige}</strong> <span class="muted">{s.prestigeName}</span></span></Row>
+        <Row label="Piety"><span class="has-tip" title={tierTitle('piety', s, pietyNames)}><strong>{s.piety}</strong> <span class="muted">{s.pietyName}</span></span></Row>
+        {religion && <Row label="Faith"><span class="swatch" style={{ background: religion.color }} aria-hidden="true" />{religion.name}</Row>}
+        {s.head > 0 && s.head !== realm && <Row label="Head of faith"><RealmLink id={s.head} /></Row>}
+        {s.head === realm && <Row label="Head of faith"><span>This realm</span></Row>}
+        {s.holySites.length > 0 && (
+          <Row label="Holy sites">
+            <span title={s.holySites.map((h) => `${h.held ? '✔' : '✘'} ${h.name}`).join('\n')}>{held.length} of {s.holySites.length} held{held.length > 0 ? ` (+${held.length * (c?.faith.holySitePiety ?? 0)} piety a month)` : ''}</span>
+          </Row>
+        )}
+        {s.excommunicated && <Row label="The Church"><span class="warn">Excommunicated</span></Row>}
+        {!s.excommunicated && s.excommunicationChance > 0 && <Row label="The Church"><span class="warn" title="Piety below zero angers the Pope.">{s.excommunicationChance / 100}% a month to be excommunicated</span></Row>}
+        {s.pilgrimage !== null && <Row label="Pilgrimage"><span>Home by {formatDate(dayToDate(s.pilgrimage))}</span></Row>}
+      </dl>
+      {s.log.length > 0 && (
+        <ul class="plain deeds-log">
+          {s.log.slice(-4).reverse().map((l) => (
+            <li key={`${l.day}-${l.label}`}>
+              <span class="muted">{formatDate(dayToDate(l.day))}</span> {l.label}
+              {l.prestige !== 0 && <span class={l.prestige < 0 ? 'warn' : ''}> {signed(l.prestige)} prestige</span>}
+              {l.piety !== 0 && <span class={l.piety < 0 ? 'warn' : ''}> {signed(l.piety)} piety</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+      {mine && (
+        <div class="deeds">
+          {s.deeds.filter((d) => d.key !== 'absolution' || s.excommunicated).map((d) => {
+            const gains = [d.prestige && `${signed(d.prestige)} prestige`, d.piety && `${signed(d.piety)} piety`].filter(Boolean).join(', ');
+            const price = d.income ? `brings in ${money(d.income)} ducats` : `costs ${money(d.cost)} ducats`;
+            const when = d.days ? ` on the ruler's return after ${d.days} days` : '';
+            return (
+              <button key={d.key} class="small-btn" disabled={!!d.why} title={`${d.description}\n${price[0]!.toUpperCase()}${price.slice(1)}; ${gains}${when}.${d.why ? `\n${d.why}` : ''}`}
+                onClick={() => command({ type: 'deed', realm, deed: d.key })}>
+                {d.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+

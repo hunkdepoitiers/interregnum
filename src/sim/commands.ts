@@ -1,4 +1,6 @@
 import type { Content } from './content';
+import { doDeed } from './faith';
+import { ensureStanding } from './standing';
 import { ensureEconomy, repayLoan, repudiate, setTaxLaw, startBuilding, takeLoan, type EconomyContext, type Notice } from './economy';
 import { addModifier, removeModifiers, type ModifierTarget } from './modifiers';
 import type { GameState, Realm, Speed } from './state';
@@ -24,7 +26,9 @@ export type Command =
   | { type: 'takeLoan'; realm: number; bank: number; amount: number; months: number; pledge: number }
   | { type: 'repayLoan'; realm: number; loan: number }
   /** Refuse every debt. */
-  | { type: 'repudiate'; realm: number };
+  | { type: 'repudiate'; realm: number }
+  /** A deed for prestige or piety (data/content/faith.yaml deeds). */
+  | { type: 'deed'; realm: number; deed: string };
 
 /**
  * Returns true if ownership, control or modifiers changed. Invalid commands are ignored. Economy commands need the
@@ -58,6 +62,7 @@ export function applyCommand(state: GameState, cmd: Command, content?: Content, 
     case 'addRealm':
       state.realms.push({ ...cmd.realm, id: state.realms.length });
       ensureEconomy(state);
+      ensureStanding(state);
       return true;
     case 'setController': {
       const p = state.provinces[cmd.province];
@@ -83,6 +88,12 @@ export function applyCommand(state: GameState, cmd: Command, content?: Content, 
       const n = repudiate(state, ctx, cmd.realm);
       notices.push(...n);
       return n.length > 0;
+    }
+    case 'deed': {
+      if (!ctx) return false;
+      const before = state.nextModifierId + state.modifiers.length;
+      notices.push(...doDeed(state, ctx, cmd.realm, cmd.deed));
+      return state.nextModifierId + state.modifiers.length !== before;
     }
   }
 }

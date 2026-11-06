@@ -1,3 +1,4 @@
+import { dynastyChangeStanding } from './faith';
 import type { Content } from './content';
 import { add as addToLedger, type EconomyContext, type Notice } from './economy';
 import { addModifier, removeModifiers } from './modifiers';
@@ -282,7 +283,10 @@ function succeed(state: GameState, ctx: EconomyContext, realm: number, notices: 
   removeModifiers(state, 'regency', { kind: 'realm', id: realm });
   addModifier(state, content, 'new_reign', { kind: 'realm', id: realm });
   const dynastic = court.law !== 'theocracy' && court.law !== 'republic';
-  if (dynastic && dead && dead.dynasty !== next.dynasty) addModifier(state, content, 'dynasty_change', { kind: 'realm', id: realm });
+  if (dynastic && dead && dead.dynasty !== next.dynasty) {
+    addModifier(state, content, 'dynasty_change', { kind: 'realm', id: realm });
+    dynastyChangeStanding(state, ctx, realm);
+  }
   if (ageOf(next, state.day) < content.characters.majority) setRegent(state, ctx, realm, court, dead);
   // A grown man of the old house who was passed over may press his claim.
   if (dynastic && dead && (court.regent || court.law === 'open' || court.law === 'elective')) {

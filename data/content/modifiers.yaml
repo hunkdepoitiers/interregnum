@@ -21,7 +21,8 @@
 
 - key: papal_vacancy
   label: Vacant See
-  description: No pope has been elected since Clement V died in April 1314.
+  description: No pope has been elected since Clement V died in April 1314. John XXII will be chosen in August 1316.
+  days: 645
   effects:
     - { stat: legitimacy, add: -20 }
 
@@ -199,3 +200,122 @@
     - { stat: legitimacy, add: -10 }
     - { stat: unrest, add: 1 }
 
+
+# ---------- Prestige tiers (data/content/faith.yaml)
+- key: prestige_disgraced
+  label: Disgraced
+  description: The ruling house is a byword for shame. Few follow it gladly.
+  effects:
+    - { stat: legitimacy, add: -15 }
+    - { stat: levy_size, add: -2 }
+    - { stat: unrest, add: 1 }
+
+- key: prestige_obscure
+  label: Obscure
+  description: Few outside the realm know the ruling house.
+  effects:
+    - { stat: legitimacy, add: -5 }
+
+- key: prestige_respected
+  label: Respected
+  description: The ruling house is respected among its peers.
+  effects:
+    - { stat: legitimacy, add: 5 }
+
+- key: prestige_renowned
+  label: Renowned
+  description: Knights seek the ruling house's service; its word carries weight.
+  effects:
+    - { stat: legitimacy, add: 10 }
+    - { stat: levy_size, add: 1 }
+
+- key: prestige_illustrious
+  label: Illustrious
+  description: The ruling house is among the most famous in the world.
+  effects:
+    - { stat: legitimacy, add: 15 }
+    - { stat: levy_size, add: 2 }
+    - { stat: tax_efficiency, add: 2 }
+
+- key: prestige_legendary
+  label: Legendary
+  description: Songs are sung of the ruling house from one end of the world to the other.
+  effects:
+    - { stat: legitimacy, add: 20 }
+    - { stat: levy_size, add: 3 }
+    - { stat: tax_efficiency, add: 4 }
+
+# ---------- Piety tiers (names per faith family in faith.yaml)
+- key: piety_0
+  label: Impious Ruler
+  description: The clergy preach against the ruler, and the faithful listen.
+  effects:
+    - { stat: legitimacy, add: -10 }
+    - { stat: unrest, add: 2 }
+
+- key: piety_1
+  label: Lukewarm Ruler
+  description: The ruler's faith is doubted.
+  effects:
+    - { stat: unrest, add: 0.5 }
+
+- key: piety_3
+  label: Devout Ruler
+  description: The clergy praise the ruler from the pulpit.
+  effects:
+    - { stat: legitimacy, add: 5 }
+    - { stat: unrest, add: -0.5 }
+
+- key: piety_4
+  label: Pious Ruler
+  description: The ruler is known for faith and good works.
+  effects:
+    - { stat: legitimacy, add: 10 }
+    - { stat: unrest, add: -1 }
+    - { stat: tithe_share, add: 2 }
+
+- key: piety_5
+  label: Saintly Ruler
+  description: The people whisper that the ruler is a saint.
+  effects:
+    - { stat: legitimacy, add: 15 }
+    - { stat: unrest, add: -2 }
+    - { stat: tithe_share, add: 4 }
+
+# ---------- Deeds and the Church
+- key: almsgiving
+  label: Almsgiving
+  description: The ruler fed the poor of the realm.
+  days: 365
+  effects:
+    - { stat: unrest, add: -2 }
+
+- key: tournament
+  label: Great Tournament
+  description: The realm still talks of the ruler's tournament.
+  days: 730
+  effects:
+    - { stat: legitimacy, add: 5 }
+
+- key: on_pilgrimage
+  label: Ruler on Pilgrimage
+  description: The ruler is away on pilgrimage; the council governs.
+  effects:
+    - { stat: tax_efficiency, add: -5 }
+    - { stat: legitimacy, add: -5 }
+
+- key: excommunicated
+  label: Excommunicated
+  description: The Pope has cast the ruler out of the Church. Priests may refuse the sacraments, and vassals their oaths.
+  effects:
+    - { stat: tithe_share, pct: -100 }
+    - { stat: legitimacy, add: -20 }
+    - { stat: unrest, add: 3 }
+
+- key: building_cathedral
+  label: Cathedral
+  description: A great cathedral, the pride of the province and a goal of pilgrims.
+  effects:
+    - { stat: unrest, add: -3 }
+    - { stat: development, add: 1 }
+    - { stat: trade_efficiency, add: 2 }
