@@ -35,8 +35,13 @@ function explainHere(c: Content, stat: string, target: ModifierTarget): Explaine
   const w = world.value;
   if (!w) return null;
   const provinces: ProvinceState[] = [];
-  if (target.kind === 'province') provinces[target.id] = { id: target.id, owner: w.owner[target.id] ?? 0, controller: 0 };
-  return explain({ modifiers: w.modifiers, provinces }, c, stat, target);
+  const provinceBase: Record<string, number[]> = {};
+  if (target.kind === 'province') {
+    provinces[target.id] = { id: target.id, owner: w.owner[target.id] ?? 0, controller: 0 };
+    provinceBase.development = [];
+    provinceBase.development[target.id] = w.development[target.id] ?? 0;
+  }
+  return explain({ modifiers: w.modifiers, provinces, provinceBase }, c, stat, target);
 }
 
 /** The breakdown shown when hovering a stat: base, every modifier line, and any cap that applied. */

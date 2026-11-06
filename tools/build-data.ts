@@ -17,6 +17,8 @@ import { compileScenario } from './data-lib';
 import { compilePeoples } from './peoples-lib';
 import { compileTitles } from './titles-lib';
 import { compileGoods } from './goods-lib';
+import { compileEconomy, compilePopulation } from './economy-lib';
+import { economySourceSchema, populationSourceSchema } from '../src/content/economy';
 
 function load<T>(file: string, schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: { issues: { path: PropertyKey[]; message: string }[] } } }): T {
   const r = schema.safeParse(parse(readFileSync(file, 'utf8')));
@@ -90,6 +92,14 @@ const goods = compileGoods(load('data/content/trade_goods.yaml', goodsSourceSche
 errors.push(...goods.errors);
 content.goods = goods.goods;
 scenario.good = goods.good;
+const ctxAll = { projection: map.projection, towns, idAt };
+const economy = compileEconomy(load('data/content/economy.yaml', economySourceSchema), content, map.provinces, ctxAll);
+errors.push(...economy.errors);
+content.economy = economy.economy;
+scenario.tradeCentre = economy.tradeCentre;
+const population = compilePopulation(load('data/scenario/1314-population.yaml', populationSourceSchema), map.provinces, ctxAll, new Set(scenario.realms.map((r) => r.capital)));
+scenario.pops = population.pops;
+scenario.development = population.development;
 for (const w of warnings) console.warn(`warning: ${w}`);
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
@@ -99,4 +109,4 @@ writeFileSync('public/generated/scenario.json', JSON.stringify(scenario));
 writeFileSync('public/generated/scenario-edits.json', JSON.stringify(edits));
 writeFileSync('public/generated/content.json', JSON.stringify(content));
 const owned = scenario.owner.filter(Boolean).length;
-console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${titles.titles.counties.length}/${titles.titles.duchies.length}/${titles.titles.kingdoms.length}/${titles.titles.empires.length}/${titles.titles.hegemonies.length} counties/duchies/kingdoms/empires/hegemonies, ${goods.goods.length} trade goods, ${warnings.length} warnings`);
+console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${titles.titles.counties.length}/${titles.titles.duchies.length}/${titles.titles.kingdoms.length}/${titles.titles.empires.length}/${titles.titles.hegemonies.length} counties/duchies/kingdoms/empires/hegemonies, ${goods.goods.length} trade goods, ${Math.round(population.pops.reduce((a, b) => a + b, 0) / 1e6)} million people, ${economy.economy.banks.length} banks, ${warnings.length} warnings`);

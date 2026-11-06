@@ -2,7 +2,7 @@
 # scenario, events, laws, buildings or the debug console. effects: { stat, add } adds in the stat's unit;
 # { stat, pct } multiplies by (1 + pct/100). stacking: replace (default; adding it again refreshes it) | stack.
 # days: lasts that long, else until removed. A realm modifier with province-stat effects reaches all its provinces.
-# Values are placeholders until the economy (M4): GUESS.
+# Values are tuned for play: GUESS.
 
 - key: capital
   label: Capital
@@ -80,3 +80,98 @@
   effects:
     - { stat: development, pct: 10 }
     - { stat: tax_efficiency, add: 5 }
+
+# ---------- Government
+- key: church_state
+  label: Church State
+  description: The tithes of the realm flow to its own treasury.
+  effects:
+    - { stat: tithe_share, add: 90 }
+
+- key: merchant_government
+  label: Merchant Government
+  description: The great families rule through trade, and tax land lightly.
+  effects:
+    - { stat: trade_efficiency, add: 15 }
+    - { stat: tax_rate, add: -5 }
+
+# ---------- Tax law
+- key: tax_law_low
+  label: Light Taxes
+  description: The crown asks little of its subjects.
+  effects:
+    - { stat: tax_rate, add: -8 }
+    - { stat: unrest, add: -1 }
+
+- key: tax_law_high
+  label: Heavy Taxes
+  description: Every hearth pays more, and the people grumble.
+  effects:
+    - { stat: tax_rate, add: 10 }
+    - { stat: unrest, add: 3 }
+
+# ---------- Buildings
+- key: building_market
+  label: Market
+  description: A chartered market draws merchants and their tolls.
+  effects:
+    - { stat: trade_efficiency, add: 15 }
+    - { stat: development, add: 1 }
+
+- key: building_workshop
+  label: Workshops
+  description: Weavers' and smiths' workshops raise what the province makes.
+  effects:
+    - { stat: production, add: 20 }
+
+- key: building_mill
+  label: Mills
+  description: Water mills grind grain and full cloth.
+  effects:
+    - { stat: production, add: 10 }
+    - { stat: development, add: 0.5 }
+
+- key: building_granary
+  label: Granary
+  description: Stores against lean years and passing armies.
+  effects:
+    - { stat: supply_limit, add: 2 }
+
+- key: building_church
+  label: Church
+  description: A stone church calms the people.
+  effects:
+    - { stat: unrest, add: -2 }
+    - { stat: development, add: 0.5 }
+
+# ---------- Debt
+- key: defaulted
+  label: Defaulted on Debts
+  description: The crown would not pay what it owed. Lenders and subjects remember.
+  days: 3650
+  effects:
+    - { stat: legitimacy, add: -15 }
+    - { stat: tax_efficiency, add: -5 }
+
+- key: revenues_seized
+  label: Revenues Seized
+  description: A lender's agents collect this province's dues against an unpaid loan.
+  days: 1825
+  effects:
+    - { stat: tax_efficiency, add: -50 }
+
+- key: revenues_pledged
+  label: Revenues Pledged
+  description: The province's dues stand surety for a loan.
+  effects:
+    - { stat: tax_efficiency, add: -5 }
+
+- key: empty_treasury
+  label: Empty Treasury
+  description: The treasury is in debt; officials and soldiers go unpaid.
+  days: 31
+  effects:
+    - { stat: legitimacy, add: -5 }
+    - { stat: unrest, add: 2 }
+    - { stat: tax_efficiency, add: -10 }
+

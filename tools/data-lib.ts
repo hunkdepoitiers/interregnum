@@ -44,7 +44,7 @@ function insidePolygon([x, y]: Pt, poly: Pt[]): boolean {
  * Finds the land province at a place: the one under it, else (water, mountains, no id map) among those whose box
  * holds the point the one with the nearest centre. Problems go to `errors`.
  */
-function placeFinder(land: MapProvince[], byId: Map<number, MapProvince>, ctx: MapContext, errors: string[]) {
+export function placeFinder(land: MapProvince[], byId: Map<number, MapProvince>, ctx: MapContext, errors: string[]) {
   const toPixel = ([lat, lon]: Pt): Pt => lonLatToPixel(ctx.projection, lon, lat);
   return (place: Place, where: string): MapProvince | null => {
     let latLon: Pt | undefined;
@@ -297,6 +297,11 @@ export function compileScenario(src: ScenarioSource, provinces: MapProvince[], c
       modifiers.push({ def, target, end: d.days });
     };
     if (content.modifiers.capital) for (const r of realms) if (r.capital) put('capital', { kind: 'province', id: r.capital }, `Realm ${r.key} capital`);
+    // Governments that keep the church's tithes or live by trade.
+    for (const r of realms) {
+      const def = r.government === 'theocracy' || r.government === 'holy_order' ? 'church_state' : r.government === 'merchant_republic' ? 'merchant_government' : null;
+      if (def && content.modifiers[def]) put(def, { kind: 'realm', id: r.id }, `Realm ${r.key} government`);
+    }
     for (const [realmKey, def] of src.modifiers) {
       const id = realmId.get(realmKey);
       if (!id) errors.push(`modifiers: unknown realm ${realmKey}`);

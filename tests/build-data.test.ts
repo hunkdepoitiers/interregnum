@@ -188,7 +188,7 @@ describe('compileTitles', () => {
 describe('compileGoods', () => {
   it('takes the first matching rule, then famous places on top', () => {
     const src = goodsSourceSchema.parse({
-      goods: [{ key: 'grain', name: 'Grain', color: '#ffff00' }, { key: 'fur', name: 'Fur', color: '#000000' }, { key: 'wine', name: 'Wine', color: '#880000' }],
+      goods: [{ key: 'grain', name: 'Grain', price: 2, color: '#ffff00' }, { key: 'fur', name: 'Fur', price: 4, color: '#000000' }, { key: 'wine', name: 'Wine', price: 3, color: '#880000' }],
       rules: [{ good: 'fur', region: [[70, -175, 90, -165]] }, { good: 'grain' }],
       places: [['wine', 'ccity']],
     });

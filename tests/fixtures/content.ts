@@ -1,4 +1,4 @@
-import type { Content } from '../../src/sim/content';
+import { emptyEconomy, type Content } from '../../src/sim/content';
 
 // Fixed-point hundredths throughout: 500 = 5, 1000 as pct = +10%.
 export const content: Content = {
@@ -18,4 +18,5 @@ export const content: Content = {
   religions: [],
   titles: { counties: [], duchies: [], kingdoms: [], empires: [], hegemonies: [] },
   goods: [],
+  economy: emptyEconomy(),
 };

@@ -1,4 +1,8 @@
-import { world } from '../bridge/client';
+import { command, status, world } from '../bridge/client';
+import { STRATA } from '../sim/content';
+import { content } from './StatList';
+import type { ProvinceReport } from '../worker/protocol';
+import { money, useReport } from './economy';
 import type { MapData, MapProvince } from '../content/map';
 import { hasRealms, mapData, peoples, selected, selectProvince } from './App';
 import { Pending, Row, Section } from './folio';
@@ -12,10 +16,14 @@ const KIND_LABEL = {
 };
 
 /** Stats this panel places in its own sections; any other province stat goes under "Other". */
-const PLACED = ['development', 'supply_limit', 'unrest', 'tax_efficiency'];
+const PLACED = ['development', 'supply_limit', 'unrest', 'tax_efficiency', 'trade_efficiency', 'production'];
+
+const STRATUM_LABEL: Record<(typeof STRATA)[number], string> = {
+  peasants: 'Peasants', burghers: 'Burghers', nobles: 'Nobles', clergy: 'Clergy', nomads: 'Nomads',
+};
 
 /** When a field that has no simulation yet arrives (docs/ROADMAP.md). */
-const ECONOMY = 'the economy (M4)';
+const EVENTS = 'events (M10)';
 const ARMIES = 'armies (M7)';
 const SIEGES = 'sieges (M8)';
 
@@ -62,6 +70,7 @@ function DeJure({ id }: { id: number }) {
 export function ProvincePanel() {
   const map = mapData.value;
   const p = map?.provinces.find((q) => q.id === selected.value);
+  const report = useReport(p?.kind === 'land' ? { kind: 'province', id: p.id } : null);
   if (!map || !p) return null;
   const w = world.value;
   const owner = w?.owner[p.id] ?? 0;
@@ -72,6 +81,8 @@ export function ProvincePanel() {
   const culture = pe && pe.culture[p.id] ? pe.content.cultures[pe.culture[p.id]! - 1] : undefined;
   const religion = pe && pe.religion[p.id] ? pe.content.religions[pe.religion[p.id]! - 1] : undefined;
   const good = pe && pe.good[p.id] ? pe.content.goods[pe.good[p.id]! - 1] : undefined;
+  const ec = report?.economy;
+  const perMonth = (h: number) => <>{money(h)} <span class="muted">a month</span></>;
 
   return (
     <aside class="side-panel folio panel" aria-label="Province">
@@ -106,24 +117,29 @@ export function ProvincePanel() {
               <StatRow stat="development" scope="province" id={p.id} />
               <StatRow stat="supply_limit" scope="province" id={p.id} />
               <Pending label="Control" when={ARMIES} />
-              <Pending label="Prosperity" when={ECONOMY} />
+              <Pending label="Prosperity" when={EVENTS} />
               <Pending label="Fortifications" when={SIEGES} />
-              <Pending label="Buildings" when={ECONOMY} />
             </Section>
             <Section title="The People">
               {culture && <Row label="Culture">{culture.name} <span class="muted">({culture.groupName})</span></Row>}
               {religion && <Row label="Religion"><span class="swatch" style={{ background: religion.color }} aria-hidden="true" />{religion.name}</Row>}
-              <Pending label="Population" when={ECONOMY} />
+              {ec && <Row label="Population">{ec.people.toLocaleString('en')}</Row>}
+              {ec && STRATA.map((st, i) => (ec.strata[i] ? <div class="row sub-row" key={st}><dt>{STRATUM_LABEL[st]}</dt><dd>{ec.strata[i]!.toLocaleString('en')}</dd></div> : null))}
               <StatRow stat="unrest" scope="province" id={p.id} />
-              <Pending label="Estates" when={ECONOMY} />
             </Section>
             <Section title="Wealth">
               {good && <Row label="Produces"><span class="swatch" style={{ background: good.color }} aria-hidden="true" />{good.name}</Row>}
+              {ec && <Row label="Wealth">{perMonth(ec.wealthLand + ec.wealthUrban)}</Row>}
               <StatRow stat="tax_efficiency" scope="province" id={p.id} />
-              <Pending label="Tax income" when={ECONOMY} />
-              <Pending label="Trade value" when={ECONOMY} />
-              <Pending label="Trade power" when={ECONOMY} />
+              {ec && <Row label="Taxes">{perMonth(ec.landTax + ec.urbanTax)}</Row>}
+              {ec && ec.tithe > 0 && <Row label="Crown's tithe">{perMonth(ec.tithe)}</Row>}
+              <StatRow stat="production" scope="province" id={p.id} />
+              {ec && <Row label="Trade value">{perMonth(ec.tradeValue)}</Row>}
+              <StatRow stat="trade_efficiency" scope="province" id={p.id} />
+              {ec && <Row label="Trade income">{perMonth(ec.trade)}</Row>}
+              {ec && !ec.paying && owner > 0 && <p class="warn small">Occupied: nothing reaches the owner.</p>}
             </Section>
+            {report && <Buildings id={p.id} owner={owner} report={report} />}
             <Section title="Arms">
               <Pending label="Manpower" when={ARMIES} />
               {p.coastal && <Pending label="Sailors" when={ARMIES} />}
@@ -142,5 +158,39 @@ export function ProvincePanel() {
         <p class="colophon">{p.key} · #{p.id}</p>
       </div>
     </aside>
+  );
+}
+
+function Buildings({ id, owner, report }: { id: number; owner: number; report: ProvinceReport }) {
+  const defs = content.value?.economy.buildings ?? [];
+  const player = status.value.player;
+  const day = status.value.day;
+  const name = (k: string) => defs.find((b) => b.key === k)?.name ?? k;
+  const mine = player > 0 && owner === player;
+  const open = mine ? defs.filter((b) => !report.buildings.includes(b.key) && !report.construction.some((c) => c.building === b.key)) : [];
+  if (!report.buildings.length && !report.construction.length && !open.length) return null;
+  return (
+    <Section title="Buildings">
+      {report.buildings.map((b) => <Row key={b} label={name(b)}><span class="muted">standing</span></Row>)}
+      {report.construction.map((c) => <Row key={c.building} label={name(c.building)}><span class="muted">{Math.max(0, c.done - day)} days to finish</span></Row>)}
+      {open.map((b) => {
+        const why = report.canBuild[b.key] ?? null;
+        return (
+          <div class="row build-row" key={b.key}>
+            <dt title={b.description}>{b.name}</dt>
+            <dd>
+              <button
+                class="small-btn"
+                disabled={!!why}
+                title={why ?? `${b.description} Costs ${money(b.cost)} ducats, takes ${b.days} days, then ${money(b.upkeep)} a month.`}
+                onClick={() => command({ type: 'build', realm: player, province: id, building: b.key })}
+              >
+                Build · {money(b.cost)}
+              </button>
+            </dd>
+          </div>
+        );
+      })}
+    </Section>
   );
 }

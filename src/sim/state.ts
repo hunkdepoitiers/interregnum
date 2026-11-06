@@ -2,7 +2,7 @@ import type { Modifier } from './modifiers';
 import { createRng, type RngState } from './rng';
 import type { Scenario, ScenarioRealm } from './scenario';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 /** Speed 1 (slowest) .. 5 (fastest). */
 export type Speed = 1 | 2 | 3 | 4 | 5;
@@ -16,6 +16,57 @@ export interface ProvinceState {
   owner: number;
   /** Realm whose troops hold it; differs from owner while occupied. */
   controller: number;
+}
+
+/** One month's money, by ledger category (src/sim/economy.ts); income positive, spending negative, hundredths. */
+export type Ledger = Record<string, number>;
+
+/** A realm's money. Indexed like realms. */
+export interface RealmEconomy {
+  /** Hundredths of a ducat; may go below zero. */
+  treasury: number;
+  /** Key into Content.economy.taxLaws. */
+  taxLaw: string;
+  /** Day the tax law last changed (−Infinity is not JSON, so a far past day). */
+  lawChanged: number;
+  /** Days on which the realm defaulted. */
+  defaults: number[];
+  /** Last month's settled ledger. */
+  ledger: Ledger;
+  /** One-off money moved this month so far (buildings, loans), shown with the next settled ledger. */
+  oneOff: Ledger;
+}
+
+export interface BankState {
+  /** Hundredths of a ducat it can still lend. */
+  capital: number;
+  /** What it has lost to defaults. */
+  losses: number;
+  collapsed: boolean;
+  /** Realms that defaulted on it and get no more loans. */
+  refused: number[];
+}
+
+export interface Loan {
+  id: number;
+  /** Index into Content.economy.banks. */
+  bank: number;
+  realm: number;
+  principal: number;
+  /** Yearly interest, hundredths of a percent. */
+  rate: number;
+  start: number;
+  due: number;
+  /** Province whose revenues stand surety; 0 = none. */
+  pledge: number;
+}
+
+export interface Construction {
+  province: number;
+  /** Key into Content.economy.buildings. */
+  building: string;
+  realm: number;
+  done: number;
 }
 
 export interface GameState {
@@ -33,6 +84,21 @@ export interface GameState {
   /** Every modifier in force, on provinces and realms (see modifiers.ts). */
   modifiers: Modifier[];
   nextModifierId: number;
+  /** Realm the human plays; 0 = watching. */
+  player: number;
+  /** People by stratum: STRATA.length numbers per province id (sim/content.ts). */
+  pops: number[];
+  /** Per-stat, per-province base values that replace the stat's own base (development). Hundredths. */
+  provinceBase: Record<string, number[]>;
+  /** Indexed like realms; null for index 0. */
+  economy: (RealmEconomy | null)[];
+  /** Indexed like Content.economy.banks. */
+  banks: BankState[];
+  loans: Loan[];
+  nextLoanId: number;
+  /** Finished buildings by province id. */
+  buildings: Record<string, string[]>;
+  construction: Construction[];
 }
 
 export function provincesFromScenario(scenario: Scenario): ProvinceState[] {
@@ -48,8 +114,25 @@ export function modifiersFromScenario(scenario: Scenario): Modifier[] {
   return (scenario.modifiers ?? []).map((m, i) => ({ id: i + 1, def: m.def, target: { ...m.target }, start: 0, end: m.end }));
 }
 
-export function newGame(seed: number, scenario: Scenario): GameState {
+/** The economy at the start: people and development from the scenario, empty treasuries (newGame fills them). */
+export function economyFromScenario(scenario: Scenario, realmCount: number, bankCapitals: number[]) {
+  return {
+    player: 0,
+    pops: scenario.pops ? [...scenario.pops] : new Array<number>(scenario.owner.length * 5).fill(0),
+    provinceBase: { development: (scenario.development ?? []).map((d) => d * 100) },
+    economy: Array.from({ length: realmCount }, (_, i): RealmEconomy | null =>
+      i === 0 ? null : { treasury: 0, taxLaw: 'normal', lawChanged: -100000, defaults: [], ledger: {}, oneOff: {} }),
+    banks: bankCapitals.map((capital): BankState => ({ capital, losses: 0, collapsed: false, refused: [] })),
+    loans: [] as Loan[],
+    nextLoanId: 1,
+    buildings: {} as Record<string, string[]>,
+    construction: [] as Construction[],
+  };
+}
+
+export function newGame(seed: number, scenario: Scenario, bankCapitals: number[] = []): GameState {
   const modifiers = modifiersFromScenario(scenario);
+  const realms = realmsFromScenario(scenario);
   return {
     saveVersion: SAVE_VERSION,
     seed: seed >>> 0,
@@ -57,9 +140,10 @@ export function newGame(seed: number, scenario: Scenario): GameState {
     day: 0,
     speed: 2,
     paused: true,
-    realms: realmsFromScenario(scenario),
+    realms,
     provinces: provincesFromScenario(scenario),
     modifiers,
     nextModifierId: modifiers.length + 1,
+    ...economyFromScenario(scenario, realms.length, bankCapitals),
   };
 }

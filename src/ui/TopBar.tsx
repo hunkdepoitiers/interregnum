@@ -1,5 +1,6 @@
 import { useEffect } from 'preact/hooks';
-import { command, status } from '../bridge/client';
+import { command, status, world } from '../bridge/client';
+import { money, signedMoney, treasuryOpen } from './economy';
 import { dayToDate, formatDate } from '../sim/calendar';
 import type { Speed } from '../sim/state';
 
@@ -46,6 +47,15 @@ export function TopBar() {
         ))}
       </span>
       {status.value.paused && <span class="paused-label">Paused</span>}
+      {status.value.player > 0 && status.value.treasury !== null && (
+        <button
+          class={`purse${status.value.treasury < 0 ? ' in-debt' : ''}`}
+          title={`Treasury of ${world.value?.realms[status.value.player]?.name ?? 'your realm'}; last month's balance after it`}
+          onClick={() => (treasuryOpen.value = treasuryOpen.value ? 0 : status.value.player)}
+        >
+          {money(status.value.treasury)} ducats <span class="net">{signedMoney(status.value.net ?? 0)}</span>
+        </button>
+      )}
     </header>
   );
 }

@@ -42,4 +42,10 @@ export interface Scenario {
   county?: number[];
   /** Per province id: its trade good (Content.goods, 1-based; 0 = none). */
   good?: number[];
+  /** Starting people: 5 numbers per province id in STRATA order (sim/content.ts); missing = nobody. */
+  pops?: number[];
+  /** Per province id: starting development in whole points. */
+  development?: number[];
+  /** Per province id: entrepôt trade value, hundredths of a ducat a month (0 = none). */
+  tradeCentre?: number[];
 }

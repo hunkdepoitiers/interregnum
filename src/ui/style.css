@@ -66,6 +66,7 @@ button.on { background: var(--rubric); color: var(--rubric-ink); border-color: #
   padding: 7px 16px;
   white-space: nowrap;
 }
+.app:has(.side-panel) .topbar { left: calc(50% + 191px); }
 .topbar .date { font: 21px var(--display); min-width: 11ch; text-align: center; font-variant-numeric: tabular-nums; }
 .topbar .playpause { width: 40px; }
 .speeds { display: inline-flex; gap: 3px; }
@@ -196,6 +197,37 @@ ul.columns { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 12
 ul.columns li { break-inside: avoid; }
 .modifiers li { font-size: 15px; }
 
+/* ---------- The economy */
+.topbar .purse { font: 16px var(--display); padding: 3px 10px; }
+.topbar .purse .net { color: var(--ink-soft); font-size: 14px; margin-left: 4px; }
+.topbar .purse.in-debt { color: var(--rubric); border-color: var(--rubric); }
+.treasury-panel { top: 64px; right: 10px; bottom: 64px; width: 400px; display: flex; flex-direction: column; overflow: hidden; padding: 6px; }
+.treasury-panel .close { position: absolute; top: 6px; right: 6px; z-index: 2; width: 26px; height: 26px; padding: 0; line-height: 1; font-size: 18px; }
+.row.sub-row { padding-left: 16px; font-size: 14px; }
+.row.sub-row dt { font-style: italic; }
+.small { font-size: 13px; }
+p.small { margin: 3px 0; }
+button.small-btn { padding: 0 8px; font-size: 14px; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.realm-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 2px; }
+table.ledger { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+table.ledger th { font: 13px var(--display); color: var(--ink-soft); text-align: right; font-weight: normal; }
+table.ledger td { padding: 1px 0; }
+table.ledger td:not(:first-child) { text-align: right; width: 26%; }
+table.ledger tr.income td:not(:first-child) { color: var(--good); }
+table.ledger tr.expense td:not(:first-child) { color: var(--rubric); }
+table.ledger tr.oneOff td:first-child { font-style: italic; }
+table.ledger tr.total td { border-top: 1px solid var(--gilt); font-weight: 600; }
+ul.loans li { padding: 4px 0; border-bottom: 1px dotted rgba(184, 137, 47, 0.6); }
+.borrow { display: grid; gap: 5px; }
+.borrow label { display: grid; grid-template-columns: 64px 1fr; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-soft); }
+.borrow label.check { grid-template-columns: auto 1fr; color: var(--ink); }
+.borrow select, .borrow input[type='number'] { font: inherit; font-size: 14px; padding: 2px 4px; border: 1px solid var(--gilt); background: #fbf4e4; min-width: 0; }
+label.law { display: flex; gap: 8px; align-items: flex-start; padding: 3px 4px; margin: 0 -4px; border-radius: 2px; cursor: pointer; }
+label.law.on { background: rgba(184, 137, 47, 0.18); }
+.danger { margin: 14px 0 4px; text-align: center; }
+.danger button { border-color: var(--rubric); color: var(--rubric); }
+
 /* ---------- Bottom bars */
 .mapmodes { bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; padding: 7px; }
 .mapmodes button { font: 15px var(--display); padding: 3px 9px; white-space: nowrap; }
@@ -279,7 +311,7 @@ ul.columns li { break-inside: avoid; }
 
 /* ---------- Narrow screens: the side panel becomes a bottom sheet */
 @media (max-width: 760px) {
-  .topbar { top: 8px; gap: 6px; padding: 4px 8px; }
+  .topbar, .app:has(.side-panel) .topbar { top: 8px; left: 50%; gap: 6px; padding: 4px 8px; }
   .topbar .date { font-size: 16px; }
   .paused-label { display: none; }
   .side-panel { top: auto; bottom: 108px; left: 8px; right: 8px; width: auto; height: 46%; }
@@ -287,5 +319,6 @@ ul.columns li { break-inside: avoid; }
   .save-menu { left: 8px; right: 8px; justify-content: center; }
   .credits { right: auto; left: 8px; bottom: 150px; font-size: 10px; }
   .editor-panel { top: auto; bottom: 108px; left: 8px; right: 8px; width: auto; max-height: 45%; }
+  .treasury-panel { top: 56px; left: 8px; right: 8px; bottom: 108px; width: auto; z-index: 3; }
   .stat-tip { width: calc(100% - 16px); }
 }

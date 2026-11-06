@@ -7,7 +7,7 @@ const box = z.tuple([z.number(), z.number(), z.number(), z.number()]);
 
 /** Shape of data/content/trade_goods.yaml. */
 export const goodsSourceSchema = z.object({
-  goods: z.array(z.object({ key, name: z.string().min(1), color: z.string().regex(/^#[0-9a-f]{6}$/i) })).min(1),
+  goods: z.array(z.object({ key, name: z.string().min(1), price: z.number().positive(), color: z.string().regex(/^#[0-9a-f]{6}$/i) })).min(1),
   rules: z.array(z.object({
     good: key,
     terrain: z.array(z.enum(terrains)).optional(),

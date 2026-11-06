@@ -72,16 +72,37 @@ export function hasModifier(state: Pick<GameState, 'modifiers'>, def: string, ta
   return state.modifiers.some((m) => m.def === def && sameTarget(m.target, target));
 }
 
+/** Modifiers grouped by target ("province:12", "realm:3"), for many stat lookups in one pass (the monthly economy). */
+export type ModifierIndex = Map<string, Modifier[]>;
+
+const targetKey = (t: ModifierTarget) => `${t.kind}:${t.id}`;
+
+export function indexModifiers(modifiers: Modifier[]): ModifierIndex {
+  const index: ModifierIndex = new Map();
+  for (const m of modifiers) {
+    const k = targetKey(m.target);
+    const list = index.get(k);
+    if (list) list.push(m);
+    else index.set(k, [m]);
+  }
+  return index;
+}
+
+/** What explain() reads: modifiers, owners, and per-province base values that replace a stat's own base. */
+export type StatSource = Pick<GameState, 'modifiers' | 'provinces'> & { provinceBase?: Record<string, number[]> };
+
 /** The value of a stat on a target, with every line that makes it up. */
-export function explain(
-  state: Pick<GameState, 'modifiers' | 'provinces'>, content: Content, stat: string, target: ModifierTarget,
-): Explained {
+export function explain(state: StatSource, content: Content, stat: string, target: ModifierTarget, index?: ModifierIndex): Explained {
   const s = content.stats[stat];
   if (!s) throw new Error(`Unknown stat ${stat}`);
   if (s.scope !== target.kind) throw new Error(`Stat ${stat} belongs to a ${s.scope}, not a ${target.kind}`);
   const owner = target.kind === 'province' ? state.provinces[target.id]?.owner ?? 0 : 0;
+  const base = target.kind === 'province' ? state.provinceBase?.[stat]?.[target.id] ?? s.base : s.base;
+  const candidates = index
+    ? [...(index.get(targetKey(target)) ?? []), ...(owner ? index.get(`realm:${owner}`) ?? [] : [])]
+    : state.modifiers;
   const lines: ExplainLine[] = [];
-  for (const m of state.modifiers) {
+  for (const m of candidates) {
     const own = sameTarget(m.target, target);
     const inherited = !own && owner !== 0 && m.target.kind === 'realm' && m.target.id === owner;
     if (!own && !inherited) continue;
@@ -95,12 +116,10 @@ export function explain(
     if (l.op === 'add') add += l.value;
     else pct += l.value;
   }
-  const raw = Math.trunc(((s.base + add) * (10000 + pct)) / 10000);
-  return { stat, value: Math.min(s.max, Math.max(s.min, raw)), base: s.base, raw, min: s.min, max: s.max, lines };
+  const raw = Math.trunc(((base + add) * (10000 + pct)) / 10000);
+  return { stat, value: Math.min(s.max, Math.max(s.min, raw)), base, raw, min: s.min, max: s.max, lines };
 }
 
-export function statValue(
-  state: Pick<GameState, 'modifiers' | 'provinces'>, content: Content, stat: string, target: ModifierTarget,
-): number {
-  return explain(state, content, stat, target).value;
+export function statValue(state: StatSource, content: Content, stat: string, target: ModifierTarget, index?: ModifierIndex): number {
+  return explain(state, content, stat, target, index).value;
 }

@@ -1,5 +1,6 @@
+import { startEconomy, type EconomyContext } from './economy';
 import type { Scenario } from './scenario';
-import { modifiersFromScenario, provincesFromScenario, realmsFromScenario, SAVE_VERSION, type GameState } from './state';
+import { economyFromScenario, modifiersFromScenario, provincesFromScenario, realmsFromScenario, SAVE_VERSION, type GameState } from './state';
 
 /** Plain-text save envelope. Compression and storage live in src/platform. */
 export interface SaveFile {
@@ -11,6 +12,8 @@ export interface SaveFile {
 /** What a migration may need besides the old state, e.g. start-date data for fields older saves lack. */
 export interface MigrationContext {
   scenario: Scenario;
+  /** Content and trade goods, for steps that must compute money (v4 fills the treasuries). */
+  economy?: EconomyContext;
 }
 
 type Migration = (state: Record<string, unknown>, ctx: MigrationContext) => Record<string, unknown>;
@@ -23,6 +26,13 @@ export const migrations: Record<number, Migration> = {
   2: (s, { scenario }) => {
     const modifiers = modifiersFromScenario(scenario);
     return { ...s, modifiers, nextModifierId: modifiers.length + 1 };
+  },
+  // v4 added the economy: the start's people and development, and treasuries filled as for a new game.
+  3: (s, { scenario, economy }) => {
+    const realms = s.realms as unknown[];
+    const next = { ...s, ...economyFromScenario(scenario, realms.length, economy?.content.economy.banks.map((b) => b.capital) ?? []) };
+    if (economy) startEconomy(next as unknown as GameState, economy);
+    return next;
   },
 };
 
@@ -82,6 +92,10 @@ function validate(s: GameState): void {
     Array.isArray(s.provinces) &&
     s.provinces.every((p, i) => p?.id === i && realmRef(p.owner) && realmRef(p.controller)) &&
     Array.isArray(s.modifiers) && Number.isInteger(s.nextModifierId) &&
+    realmRef(s.player) && Array.isArray(s.pops) && Array.isArray(s.economy) && s.economy[0] === null &&
+    s.economy.slice(1).every((e) => Number.isInteger(e?.treasury)) && Array.isArray(s.banks) && Array.isArray(s.loans) &&
+    s.loans.every((l) => Number.isInteger(l?.principal) && realmRef(l.realm) && s.banks[l.bank] !== undefined) &&
+    Array.isArray(s.construction) && typeof s.buildings === 'object' && s.buildings !== null &&
     s.modifiers.every((m) =>
       Number.isInteger(m?.id) && m.id < s.nextModifierId && typeof m.def === 'string' && Number.isInteger(m.start) &&
       (m.end === null || Number.isInteger(m.end)) &&

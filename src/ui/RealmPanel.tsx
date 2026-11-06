@@ -1,4 +1,6 @@
-import { world } from '../bridge/client';
+import { command, status, world } from '../bridge/client';
+import { ledgerNet } from '../sim/economy';
+import { money, signedMoney, treasuryOpen, useReport } from './economy';
 import type { Realm } from '../sim/state';
 import { mapData, selectedRealm, selectProvince, selectRealm } from './App';
 import { Pending, Row, Section } from './folio';
@@ -33,6 +35,7 @@ export function RealmPanel() {
   const w = world.value;
   const map = mapData.value;
   const realm = w?.realms[selectedRealm.value];
+  const report = useReport(realm ? { kind: 'realm', id: realm.id } : null);
   if (!w || !map || !realm) return null;
 
   const owned = map.provinces.filter((p) => w.owner[p.id] === realm.id).sort((a, b) => a.name.localeCompare(b.name));
@@ -65,9 +68,21 @@ export function RealmPanel() {
             {occupiedByOthers > 0 && <span class="warn"> ({occupiedByOthers} occupied by enemies)</span>}
           </Row>
           {heldAbroad > 0 && <Row label="Occupying">{heldAbroad} foreign provinces</Row>}
+          {report && <Row label="People">{report.people.toLocaleString('en')}</Row>}
           <Pending label="Ruler" when="characters (M5)" />
-          <Pending label="Treasury" when="the economy (M4)" />
         </Section>
+        <Section title="Treasury">
+          {report && <Row label="Treasury"><span class={report.treasury < 0 ? 'warn' : ''}>{money(report.treasury)} ducats</span></Row>}
+          {report && <Row label="This month">{signedMoney(ledgerNet(report.projected))}</Row>}
+          {report && <Row label="Debts">{money(report.credit.debt)} ducats</Row>}
+          {report && <Row label="Credit">{report.credit.value} <span class="muted">of 100</span></Row>}
+        </Section>
+        <div class="realm-actions">
+          {status.value.player === realm.id
+            ? <span class="muted">You rule this realm.</span>
+            : <button onClick={() => command({ type: 'setPlayer', realm: realm.id })}>Play as this realm</button>}
+          <button onClick={() => (treasuryOpen.value = realm.id)}>Treasury</button>
+        </div>
         <section class="folio-sec">
           <h3><span class="initial">S</span>tanding</h3>
           <StatList scope="realm" id={realm.id} />

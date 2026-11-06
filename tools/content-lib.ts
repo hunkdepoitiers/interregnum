@@ -1,5 +1,5 @@
 import type { ConditionSource, ModifiersSource, StatsSource } from '../src/content/content';
-import { SCALE, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
+import { emptyEconomy, SCALE, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
 import type { Action, Condition } from '../src/sim/script';
 
 const fixed = (v: number) => Math.round(v * SCALE);
@@ -9,7 +9,7 @@ export function compileContent(stats: StatsSource, modifiers: ModifiersSource): 
   const errors: string[] = [];
   const content: Content = {
     stats: {}, modifiers: {}, cultures: [], religions: [],
-    titles: { counties: [], duchies: [], kingdoms: [], empires: [], hegemonies: [] }, goods: [],
+    titles: { counties: [], duchies: [], kingdoms: [], empires: [], hegemonies: [] }, goods: [], economy: emptyEconomy(),
   };
   for (const scope of ['province', 'realm'] as const) {
     for (const s of stats[scope]) {

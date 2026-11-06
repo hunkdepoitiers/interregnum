@@ -24,6 +24,7 @@ describe('computeLabels', () => {
     owner: new Uint16Array([0, 1, 1, 1, 1]),
     controller: new Uint16Array([0, 1, 1, 1, 1]),
     modifiers: [],
+    development: new Uint16Array(5),
   };
 
   it('labels the largest connected piece along its long axis', () => {

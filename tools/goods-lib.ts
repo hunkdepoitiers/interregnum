@@ -1,3 +1,4 @@
+import { SCALE } from '../src/sim/content';
 import { pixelToLonLat, type MapProvince } from '../src/content/map';
 import type { GoodsSource } from '../src/content/goods';
 import type { GoodDef } from '../src/sim/content';
@@ -41,5 +42,5 @@ export function compileGoods(src: GoodsSource, provinces: MapProvince[], ctx: Ma
   }
   const placed = paintRegions(src.places.map(([, place]) => ({ area: [], add: [place] })), [], provinces, ctx, errors, (i) => `places ${src.places[i]![0]}`);
   placed.forEach((i, pid) => { if (i) good[pid] = goodId.get(src.places[i - 1]![0]) ?? good[pid]!; });
-  return { goods: src.goods.map((g) => ({ ...g, color: g.color.toLowerCase() })), good, errors };
+  return { goods: src.goods.map((g) => ({ ...g, price: Math.round(g.price * SCALE), color: g.color.toLowerCase() })), good, errors };
 }

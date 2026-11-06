@@ -1,6 +1,6 @@
 import { computed, effect, signal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
-import { command, startGame, world } from '../bridge/client';
+import { command, setNoticeHandler, startGame, world } from '../bridge/client';
 import type { MapData, RiverData } from '../content/map';
 import type { EditsSource, Scenario } from '../content/scenario';
 import type { Content } from '../sim/content';
@@ -16,6 +16,7 @@ import { RealmPanel } from './RealmPanel';
 import { content } from './StatList';
 import { SaveMenu } from './SaveMenu';
 import { TopBar } from './TopBar';
+import { TreasuryPanel } from './TreasuryPanel';
 
 export const mapData = signal<MapData | null>(null);
 export const mapMode = signal<MapMode>('political');
@@ -63,6 +64,8 @@ export function selectRealm(id: number, center = false) {
   const capital = realm && mapData.value?.provinces.find((q) => q.id === realm.capital);
   if (center && capital) view?.centerOn(capital.centroid[0], capital.centroid[1]);
 }
+
+setNoticeHandler((notices) => showToast(notices.map((n) => n.text).join(' ')));
 
 export function showToast(text: string) {
   toast.value = text;
@@ -153,6 +156,7 @@ export function App() {
       <TopBar />
       <ProvincePanel />
       <RealmPanel />
+      <TreasuryPanel />
       <MapModeBar />
       <EditorPanel />
       <DebugConsole />
