@@ -3,7 +3,12 @@ import { ledgerNet } from '../sim/economy';
 import { money, signedMoney, treasuryOpen, useReport } from './economy';
 import type { Realm } from '../sim/state';
 import { mapData, selectedRealm, selectProvince, selectRealm } from './App';
-import { Pending, Row, Section } from './folio';
+import { dayToDate, formatDate } from '../sim/calendar';
+import { SKILL_NAMES } from '../sim/characters';
+import type { CourtReport } from '../worker/protocol';
+import { CharLink, Medallion } from './CharacterPanel';
+import { Row, Section } from './folio';
+import { content } from './StatList';
 import { CoatOfArms } from './heraldry';
 import { ModifierList, StatList } from './StatList';
 
@@ -69,8 +74,8 @@ export function RealmPanel() {
           </Row>
           {heldAbroad > 0 && <Row label="Occupying">{heldAbroad} foreign provinces</Row>}
           {report && <Row label="People">{report.people.toLocaleString('en')}</Row>}
-          <Pending label="Ruler" when="characters (M5)" />
         </Section>
+        {report?.court && <Crown court={report.court} />}
         <Section title="Treasury">
           {report && <Row label="Treasury"><span class={report.treasury < 0 ? 'warn' : ''}>{money(report.treasury)} ducats</span></Row>}
           {report && <Row label="This month">{signedMoney(ledgerNet(report.projected))}</Row>}
@@ -109,5 +114,51 @@ export function RealmPanel() {
         </section>
       </div>
     </aside>
+  );
+}
+
+const SEAT_LABEL: Record<string, string> = { chancellor: 'Chancellor', treasurer: 'Treasurer', marshal: 'Marshal', chaplain: 'Court chaplain' };
+
+/** The ruler, the line of succession and the council. */
+function Crown({ court }: { court: CourtReport }) {
+  const c = content.value;
+  const law = c?.characters.laws.find((l) => l.key === court.law);
+  const traitName = (k: string) => c?.characters.traits.find((t) => t.key === k)?.name ?? k;
+  const elected = court.law === 'republic' || court.law === 'theocracy';
+  return (
+    <>
+      <section class="folio-sec">
+        <h3><span class="initial">T</span>he Crown</h3>
+        {court.ruler && (
+          <div class="ruler-line">
+            <Medallion who={court.ruler} size={48} crowned />
+            <div>
+              <CharLink who={court.ruler} />
+              <div class="sub">{court.ruler.house ? `House ${court.ruler.house}` : 'Of no great house'} · since {formatDate(dayToDate(court.since))}</div>
+              <div class="skills-line">
+                {SKILL_NAMES.map((n, i) => <span key={n} title={n}>{n[0]} <strong>{court.rulerSkills[i]}</strong></span>)}
+              </div>
+              {court.rulerTraits.length > 0 && <div class="sub">{court.rulerTraits.map(traitName).join(', ')}</div>}
+            </div>
+          </div>
+        )}
+        <dl class="rows">
+          {court.regent && <Row label="Regent"><CharLink who={court.regent} /></Row>}
+          <Row label="Heir">{court.heir ? <CharLink who={court.heir} /> : <span class="muted">{elected ? 'elected on the ruler’s death' : 'none of the blood'}</span>}</Row>
+          {court.claimant && <Row label="Claimant"><CharLink who={court.claimant} /></Row>}
+          <Row label="Succession"><span title={law?.description}>{law?.name ?? court.law}</span></Row>
+        </dl>
+      </section>
+      <section class="folio-sec">
+        <h3><span class="initial">C</span>ouncil</h3>
+        <dl class="rows">
+          {court.council.map((seat) => (
+            <Row key={seat.role} label={SEAT_LABEL[seat.role] ?? seat.role}>
+              <CharLink who={seat.who} /> {seat.who && <span class="muted small" title={SKILL_NAMES[seat.skill]}>{SKILL_NAMES[seat.skill]![0]} {seat.value}</span>}
+            </Row>
+          ))}
+        </dl>
+      </section>
+    </>
   );
 }

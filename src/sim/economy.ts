@@ -17,6 +17,11 @@ export interface EconomyContext {
   goods: number[];
   /** Per province id: entrepôt trade value, hundredths a month (scenario.tradeCentre). */
   centres?: number[];
+  /** Per realm id - 1: its seat's name, for new houses (scenario.seats). */
+  seats?: string[];
+  /** Per province id: culture and religion ids, for the people born and made there. */
+  culture?: number[];
+  religion?: number[];
 }
 
 /** Ledger categories in display order. Income is positive, spending negative. */
@@ -33,9 +38,11 @@ export const LEDGER: { key: string; label: string; kind: 'income' | 'expense' | 
   { key: 'interest', label: 'Loan interest', kind: 'expense' },
   { key: 'dues_to_overlord', label: 'Dues to the overlord', kind: 'expense' },
   { key: 'largesse', label: 'Largesse and display', kind: 'expense' },
+  { key: 'council', label: 'Council salaries', kind: 'expense' },
   { key: 'construction', label: 'Building works', kind: 'oneOff' },
   { key: 'loans_taken', label: 'Loans taken', kind: 'oneOff' },
   { key: 'loans_repaid', label: 'Loans repaid', kind: 'oneOff' },
+  { key: 'embezzlement', label: 'Embezzled by the regent', kind: 'oneOff' },
 ];
 
 /** Something a realm or the player should hear about. realm 0 = everyone. */
@@ -48,7 +55,7 @@ const S = STRATA.length;
 /** Most of its raised income (%) a realm spends on its court, and on administration. */
 const COURT_CAP = 10;
 const ADMIN_CAP = 15;
-const add = (l: Ledger, k: string, v: number) => { if (v) l[k] = (l[k] ?? 0) + v; };
+export const add = (l: Ledger, k: string, v: number) => { if (v) l[k] = (l[k] ?? 0) + v; };
 const sum = (l: Ledger) => Object.values(l).reduce((a, b) => a + b, 0);
 export const ducats = (h: number) => `${(Math.trunc(h) / 100).toLocaleString('en', { maximumFractionDigits: 0 })}`;
 
@@ -145,6 +152,8 @@ export function computeLedgers(state: GameState, ctx: EconomyContext): Ledger[] 
     add(l, 'court', -Math.min(e.court[r.rank], Math.trunc((gross * COURT_CAP) / 100)));
     add(l, 'administration', -Math.min(e.adminPerProvince * provinces[id]!, Math.trunc((gross * ADMIN_CAP) / 100)));
     add(l, 'retinue', -Math.trunc((Math.trunc((people[id]! * e.retinuePerThousand) / 1000) * levy) / 1000));
+    const seats = state.courts?.[id]?.council.filter((c) => state.characters[c]?.died === null).length ?? 0;
+    add(l, 'council', -seats * content.characters.salary);
   });
   for (const loan of state.loans) if (ledgers[loan.realm]) add(ledgers[loan.realm]!, 'interest', -Math.trunc((loan.principal * loan.rate) / 120000));
   state.economy.forEach((ec, id) => {

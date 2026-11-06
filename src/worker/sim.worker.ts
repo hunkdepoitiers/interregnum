@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { ageOf, childrenOf, healthOf, heirOf, skillBreakdown, skillsOf, startCharacters } from '../sim/characters';
 import { applyCommand } from '../sim/commands';
 import type { Content } from '../sim/content';
 import {
@@ -9,7 +10,9 @@ import { deserialize, serialize } from '../sim/save';
 import type { Scenario } from '../sim/scenario';
 import { newGame, type GameState, type Speed } from '../sim/state';
 import { tick } from '../sim/tick';
-import type { EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker } from './protocol';
+import type {
+  CharacterRef, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker,
+} from './protocol';
 
 /** Milliseconds per game day (speed 5 ≈ 100 days per second, if the tick keeps up). */
 const DAY_MS: Record<Speed, number> = { 1: 1000, 2: 400, 3: 150, 4: 50, 5: 10 };
@@ -44,7 +47,54 @@ function postNotices(s: GameState, notices: Notice[]) {
   if (mine.length) post({ type: 'notices', notices: mine });
 }
 
-function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport | ProvinceReport | null {
+function ref(s: GameState, id: number): CharacterRef | null {
+  const c = id ? s.characters[id] : null;
+  if (!c) return null;
+  return { id, name: c.name, house: s.dynasties[c.dynasty]?.name ?? '', age: ageOf(c, c.died ?? s.day), female: c.female, alive: c.died === null };
+}
+
+function courtReport(s: GameState, ctx: EconomyContext, realm: number): CourtReport | null {
+  const court = s.courts[realm];
+  if (!court) return null;
+  const ruler = s.characters[court.ruler];
+  const ch = ctx.content.characters;
+  return {
+    ruler: ref(s, court.ruler), regent: ref(s, court.regent), heir: ref(s, heirOf(s, ctx.content, realm)), claimant: ref(s, court.claimant),
+    law: court.law, since: court.since,
+    rulerSkills: ruler ? skillsOf(ctx.content, ruler, s.day) : [0, 0, 0], rulerTraits: ruler?.traits ?? [],
+    council: ch.council.map((seat, i) => {
+      const c = s.characters[court.council[i] ?? 0];
+      return { role: seat.role, skill: seat.skill, who: ref(s, court.council[i] ?? 0), value: c ? skillsOf(ctx.content, c, s.day)[seat.skill]! : 0 };
+    }),
+  };
+}
+
+function characterReport(s: GameState, ctx: EconomyContext, id: number): CharacterReport | null {
+  const c = s.characters[id];
+  if (!c) return null;
+  const roles: { realm: number; role: string }[] = [];
+  s.courts.forEach((court, realm) => {
+    if (!court) return;
+    if (court.ruler === id) roles.push({ realm, role: 'ruler' });
+    if (court.regent === id) roles.push({ realm, role: 'regent' });
+    if (court.claimant === id) roles.push({ realm, role: 'claimant' });
+    const seat = court.council.indexOf(id);
+    if (seat >= 0) roles.push({ realm, role: ctx.content.characters.council[seat]?.role ?? 'councillor' });
+    if (c.died === null && heirOf(s, ctx.content, realm) === id) roles.push({ realm, role: 'heir' });
+  });
+  const refs = (list: { id: number }[]) => list.map((x) => ref(s, x.id)).filter((x): x is CharacterRef => !!x);
+  const parent = c.father || c.mother;
+  const siblings = parent ? childrenOf(s, parent).filter((x) => x.id !== id) : [];
+  const day = c.died ?? s.day;
+  return {
+    ref: ref(s, id)!, born: c.born, died: c.died, skills: skillsOf(ctx.content, c, day), breakdown: skillBreakdown(ctx.content, c, day),
+    traits: c.traits, education: c.education, health: healthOf(ctx.content, c), religion: c.religion, culture: c.culture, roles,
+    father: ref(s, c.father), mother: ref(s, c.mother), spouse: ref(s, c.spouse), children: refs(childrenOf(s, id)), siblings: refs(siblings),
+  };
+}
+
+function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport | ProvinceReport | CharacterReport | null {
+  if (q.kind === 'character') return characterReport(s, ctx, q.id);
   if (q.kind === 'realm') {
     const ec = s.economy[q.id];
     if (!ec || !s.realms[q.id]) return null;
@@ -62,6 +112,7 @@ function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport
       lawWait: Math.max(0, ec.lawChanged + ctx.content.economy.lawCooldownDays - s.day),
       construction: s.construction.filter((c) => c.realm === q.id),
       people,
+      court: courtReport(s, ctx, q.id),
     };
   }
   const p = s.provinces[q.id];
@@ -95,8 +146,12 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
   if (msg.type === 'init') {
     scenario = msg.scenario;
     content = msg.content;
-    economy = { content, goods: scenario.good ?? [], centres: scenario.tradeCentre ?? [] };
+    economy = {
+      content, goods: scenario.good ?? [], centres: scenario.tradeCentre ?? [], seats: scenario.seats ?? [],
+      culture: scenario.culture ?? [], religion: scenario.religion ?? [],
+    };
     state = newGame(msg.seed, scenario, content.economy.banks.map((b) => b.capital));
+    startCharacters(state, economy);
     startEconomy(state, economy);
     postWorld(state);
   } else if (!state || !scenario || !economy) {

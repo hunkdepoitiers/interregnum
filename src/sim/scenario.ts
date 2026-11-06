@@ -22,6 +22,50 @@ export interface ScenarioRealm {
   scripted: boolean;
 }
 
+/** A person. Days are game days (0 = 1 November 1314; earlier births are negative). */
+export interface Character {
+  id: number;
+  name: string;
+  /** Dynasty id; 0 = lowborn. */
+  dynasty: number;
+  female: boolean;
+  born: number;
+  died: number | null;
+  father: number;
+  mother: number;
+  spouse: number;
+  /** Content.cultures / religions ids. */
+  culture: number;
+  religion: number;
+  /** Talent in [eminence, statecraft, warcraft] before traits, education and age. */
+  skills: number[];
+  /** focus: the skill index; tier 0-3. Null until educated. */
+  education: { focus: number; tier: number } | null;
+  traits: string[];
+  /** 0-100. */
+  health: number;
+}
+
+export interface Dynasty {
+  id: number;
+  name: string;
+}
+
+/** Who rules a realm and how it passes on. Character ids; 0 = none. */
+export interface Court {
+  ruler: number;
+  /** Governs while the ruler is a child. */
+  regent: number;
+  /** Key into Content.characters.laws. */
+  law: string;
+  /** One seat per Content.characters.council role. */
+  council: number[];
+  /** A rival with a claim on the throne; 0 = none. */
+  claimant: number;
+  /** Day the reign began. */
+  since: number;
+}
+
 /** A modifier in force at the start: def key, what it sits on, and the day it ends (null = never). */
 export interface ScenarioModifier {
   def: string;
@@ -48,4 +92,10 @@ export interface Scenario {
   development?: number[];
   /** Per province id: entrepôt trade value, hundredths of a ducat a month (0 = none). */
   tradeCentre?: number[];
+  /** Starting people (ids from 1, in order), their houses (ids from 1), and each realm's court (realm id - 1). */
+  characters?: Character[];
+  dynasties?: Dynasty[];
+  courts?: (Court | null)[];
+  /** Per realm id - 1: the name of its seat, for houses founded there ("of Paris"). */
+  seats?: string[];
 }

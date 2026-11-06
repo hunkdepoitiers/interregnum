@@ -168,8 +168,9 @@ describe('save', () => {
       1: (s: Record<string, unknown>) => ({ ...s, b: true }),
       2: (s: Record<string, unknown>) => ({ ...s, c: true }),
       3: (s: Record<string, unknown>) => ({ ...s, d: true }),
+      4: (s: Record<string, unknown>) => ({ ...s, e: true }),
     };
-    expect(migrate({ saveVersion: 0 }, 0, ctx, table)).toEqual({ saveVersion: SAVE_VERSION, a: true, b: true, c: true, d: true });
+    expect(migrate({ saveVersion: 0 }, 0, ctx, table)).toEqual({ saveVersion: SAVE_VERSION, a: true, b: true, c: true, d: true, e: true });
     expect(() => migrate({}, -1, ctx, table)).toThrow(/No migration from save version -1/);
   });
 });

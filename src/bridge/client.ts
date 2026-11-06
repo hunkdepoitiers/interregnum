@@ -4,7 +4,7 @@ import type { Content } from '../sim/content';
 import type { Scenario } from '../sim/scenario';
 import type { Speed } from '../sim/state';
 import type { Notice } from '../sim/economy';
-import type { EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker, WorldView } from '../worker/protocol';
+import type { CharacterReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker, WorldView } from '../worker/protocol';
 
 /**
  * Main-thread handle on the simulation worker. The UI reads this signal and never touches sim state.
@@ -65,7 +65,8 @@ export function command(cmd: Command) {
 /** Asks the worker about a realm's or a province's money. */
 export async function query(q: { kind: 'realm'; id: number }): Promise<RealmReport | null>;
 export async function query(q: { kind: 'province'; id: number }): Promise<ProvinceReport | null>;
-export async function query(q: EconomyQuery): Promise<RealmReport | ProvinceReport | null> {
+export async function query(q: { kind: 'character'; id: number }): Promise<CharacterReport | null>;
+export async function query(q: EconomyQuery): Promise<RealmReport | ProvinceReport | CharacterReport | null> {
   const msg = await request((requestId) => ({ type: 'query', requestId, query: q }));
   return msg.type === 'queryResult' ? msg.result : null;
 }

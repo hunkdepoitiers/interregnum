@@ -1,4 +1,5 @@
 import { dayToDate } from './calendar';
+import { monthlyCharacters } from './characters';
 import { finishBuildings, settleMonth, type EconomyContext, type Notice } from './economy';
 import { expireModifiers } from './modifiers';
 import type { GameState } from './state';
@@ -9,7 +10,7 @@ export interface TickResult {
   yearStart: boolean;
   /** Some modifier came or went today. */
   modifiersChanged: boolean;
-  /** What realms should hear about (loans repaid or defaulted, buildings finished, banks failing). */
+  /** What realms should hear about (deaths and successions, loans repaid or defaulted, buildings, banks failing). */
   notices: Notice[];
 }
 
@@ -27,7 +28,7 @@ export function tick(state: GameState, economy?: EconomyContext): TickResult {
   if (economy) {
     const built = finishBuildings(state, economy);
     notices.push(...built.notices);
-    if (monthStart) notices.push(...settleMonth(state, economy));
+    if (monthStart) notices.push(...monthlyCharacters(state, economy), ...settleMonth(state, economy));
     modifiersChanged ||= built.changed || state.nextModifierId !== before;
   }
   return { day: state.day, monthStart, yearStart: monthStart && date.month === 1, modifiersChanged, notices };

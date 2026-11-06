@@ -228,6 +228,27 @@ label.law.on { background: rgba(184, 137, 47, 0.18); }
 .danger { margin: 14px 0 4px; text-align: center; }
 .danger button { border-color: var(--rubric); color: var(--rubric); }
 
+/* ---------- Characters */
+.medallion {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--gilt-light);
+  font-family: var(--display);
+  border: 2px solid var(--gilt);
+  box-shadow: 0 0 0 2px var(--vellum), 0 0 0 3px rgba(155, 42, 28, 0.55), 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+.medallion.dead { filter: grayscale(0.85); opacity: 0.8; }
+.medallion .crown { position: absolute; top: 0.08em; font-size: 0.3em; color: var(--gilt-light); text-shadow: 0 1px 1px #000; }
+.ruler-line { display: flex; gap: 10px; align-items: center; padding: 6px 0 4px; }
+.skills-line { display: flex; gap: 12px; font-size: 14px; color: var(--ink-soft); }
+.skills-line strong { color: var(--ink); }
+.traits { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+.trait { padding: 0 7px; border: 1px solid var(--gilt); border-radius: 9px; font-size: 14px; background: rgba(184, 137, 47, 0.12); cursor: help; }
+
 /* ---------- Bottom bars */
 .mapmodes { bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 3px; padding: 7px; }
 .mapmodes button { font: 15px var(--display); padding: 3px 9px; white-space: nowrap; }

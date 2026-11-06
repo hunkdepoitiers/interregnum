@@ -18,6 +18,8 @@ import { compilePeoples } from './peoples-lib';
 import { compileTitles } from './titles-lib';
 import { compileGoods } from './goods-lib';
 import { compileEconomy, compilePopulation } from './economy-lib';
+import { compileCharacters, compileRulers } from './characters-lib';
+import { charactersSourceSchema, namesSourceSchema, rulersSourceSchema } from '../src/content/characters';
 import { economySourceSchema, populationSourceSchema } from '../src/content/economy';
 
 function load<T>(file: string, schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: { issues: { path: PropertyKey[]; message: string }[] } } }): T {
@@ -100,6 +102,16 @@ scenario.tradeCentre = economy.tradeCentre;
 const population = compilePopulation(load('data/scenario/1314-population.yaml', populationSourceSchema), map.provinces, ctxAll, new Set(scenario.realms.map((r) => r.capital)));
 scenario.pops = population.pops;
 scenario.development = population.development;
+const characters = compileCharacters(load('data/content/characters.yaml', charactersSourceSchema), load('data/content/names.yaml', namesSourceSchema), content);
+errors.push(...characters.errors);
+content.characters = characters.characters;
+const rulers = compileRulers(load('data/scenario/1314-rulers.yaml', rulersSourceSchema), scenario.realms, content, scenario.culture ?? [], scenario.religion ?? []);
+errors.push(...rulers.errors);
+scenario.characters = rulers.characters;
+scenario.dynasties = rulers.dynasties;
+scenario.courts = rulers.courts;
+const provinceName = new Map(map.provinces.map((p) => [p.id, p.name]));
+scenario.seats = scenario.realms.map((r) => provinceName.get(r.capital) ?? r.name);
 for (const w of warnings) console.warn(`warning: ${w}`);
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
@@ -109,4 +121,4 @@ writeFileSync('public/generated/scenario.json', JSON.stringify(scenario));
 writeFileSync('public/generated/scenario-edits.json', JSON.stringify(edits));
 writeFileSync('public/generated/content.json', JSON.stringify(content));
 const owned = scenario.owner.filter(Boolean).length;
-console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${titles.titles.counties.length}/${titles.titles.duchies.length}/${titles.titles.kingdoms.length}/${titles.titles.empires.length}/${titles.titles.hegemonies.length} counties/duchies/kingdoms/empires/hegemonies, ${goods.goods.length} trade goods, ${Math.round(population.pops.reduce((a, b) => a + b, 0) / 1e6)} million people, ${economy.economy.banks.length} banks, ${warnings.length} warnings`);
+console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${titles.titles.counties.length}/${titles.titles.duchies.length}/${titles.titles.kingdoms.length}/${titles.titles.empires.length}/${titles.titles.hegemonies.length} counties/duchies/kingdoms/empires/hegemonies, ${goods.goods.length} trade goods, ${Math.round(population.pops.reduce((a, b) => a + b, 0) / 1e6)} million people, ${economy.economy.banks.length} banks, ${rulers.courts.filter(Boolean).length} historical rulers, ${warnings.length} warnings`);

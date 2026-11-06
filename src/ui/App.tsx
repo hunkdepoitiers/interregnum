@@ -9,6 +9,7 @@ import { computeLabels } from '../render/labels';
 import { LABEL_FONT, loadIdTiles, MapView } from '../render/map-view';
 import { editing, paint, restoreEdits, setBaseEdits } from './editor';
 import { EditorPanel } from './EditorPanel';
+import { CharacterPanel, selectedCharacter } from './CharacterPanel';
 import { DebugConsole } from './DebugConsole';
 import { MapModeBar } from './MapModeBar';
 import { ProvincePanel } from './ProvincePanel';
@@ -47,6 +48,7 @@ effect(() => {
 });
 
 export function selectProvince(id: number, center = false) {
+  if (id) selectedCharacter.value = 0;
   selected.value = id;
   selectedRealm.value = 0;
   view?.setSelected(id);
@@ -56,6 +58,7 @@ export function selectProvince(id: number, center = false) {
 }
 
 export function selectRealm(id: number, center = false) {
+  if (id) selectedCharacter.value = 0;
   selected.value = 0;
   selectedRealm.value = id;
   view?.setSelected(0);
@@ -156,6 +159,7 @@ export function App() {
       <TopBar />
       <ProvincePanel />
       <RealmPanel />
+      <CharacterPanel />
       <TreasuryPanel />
       <MapModeBar />
       <EditorPanel />

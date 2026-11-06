@@ -1,0 +1,136 @@
+# Given names for generated characters, by naming tradition; `groups` maps culture groups
+# (data/scenario/1314-peoples.yaml) to a tradition. Generated houses are called after their seat ("of Vierzon").
+
+traditions:
+  latin_west:
+    male: [Henry, John, Robert, William, Charles, Louis, Philip, Guy, Hugh, Peter, Raymond, Bernard, Geoffrey, Amaury, Thibaut, Gaucher, Enguerrand, Odo]
+    female: [Joan, Margaret, Isabella, Blanche, Mahaut, Beatrice, Agnes, Alice, Eleanor, Catherine, Marie, Yolande, Constance]
+  iberian:
+    male: [Alfonso, Sancho, Fernando, Pedro, Juan, Diego, Rodrigo, Jaime, Ramon, Gonzalo, Garcia, Afonso, Dinis, Nuno]
+    female: [Juana, Maria, Leonor, Blanca, Urraca, Sancha, Teresa, Constanza, Beatriz, Ines, Violante]
+  italian:
+    male: [Matteo, Giovanni, Guido, Francesco, Lodovico, Azzo, Cangrande, Manfredi, Ugolino, Niccolo, Galeazzo, Obizzo, Alberto]
+    female: [Beatrice, Caterina, Margherita, Isabella, Giovanna, Bianca, Costanza, Agnese, Lucia, Taddea]
+  german:
+    male: [Henry, Otto, Frederick, Rudolf, Albert, Louis, Conrad, Ulrich, Eberhard, Gerhard, Waldemar, Wenceslas, Bernhard, John]
+    female: [Elisabeth, Agnes, Mechthild, Anna, Margaret, Kunigunde, Adelheid, Sophia, Gertrude, Jutta, Beatrix]
+  english:
+    male: [Edward, Thomas, Henry, John, Richard, Hugh, Roger, Humphrey, Ralph, Walter, Aymer, Gilbert]
+    female: [Eleanor, Isabella, Joan, Margaret, Elizabeth, Matilda, Alice, Maud, Philippa]
+  celtic:
+    male: [Brian, Domnall, Aed, Conchobar, Tadhg, Cathal, Muirchertach, Llywelyn, Owain, Gruffudd, Dafydd, Rhys]
+    female: [Mór, Gormlaith, Sadb, Finnguala, Gwenllian, Angharad, Nest, Efa]
+  norse:
+    male: [Magnus, Haakon, Erik, Birger, Valdemar, Knut, Christopher, Olaf, Sigurd, Gudbrand, Holmger]
+    female: [Ingeborg, Margrete, Kristina, Ragnhild, Sigrid, Ingrid, Helvig, Rikissa]
+  slavic_west:
+    male: [Wladyslaw, Boleslaw, Kazimierz, Przemysl, Wenceslas, Bolko, Henryk, Ziemowit, Trojden, Leszek, Mieszko]
+    female: [Jadwiga, Elzbieta, Anna, Agnieszka, Kunegunda, Eufemia, Salomea, Ryksa]
+  slavic_east:
+    male: [Mikhail, Yury, Ivan, Dmitry, Vasily, Alexander, Konstantin, Andrei, Fyodor, Gleb, Roman, Yaroslav, Lev]
+    female: [Anna, Maria, Yevdokia, Olga, Agrafena, Feodora, Uliana, Yelena, Anastasia]
+  slavic_south:
+    male: [Stefan, Uros, Dragutin, Konstantin, Mihail, Ivan, Todor, Shishman, Vukan, Radoslav, Djuradj]
+    female: [Jelena, Simonida, Ana, Teodora, Marija, Jelisaveta, Kera, Desislava]
+  baltic_finnic:
+    male: [Gediminas, Vytenis, Algirdas, Kestutis, Narimantas, Jaunutis, Traidenis, Lubartas, Karijotas]
+    female: [Jewna, Aldona, Danute, Ona, Birute, Elzbieta, Eufemija]
+  magyar:
+    male: [Andrew, Ladislaus, Stephen, Bela, Matthew, Amade, Kopasz, Ugrin, Nicholas, Peter, Dominic]
+    female: [Elizabeth, Maria, Anne, Clara, Agnes, Catherine, Fennena]
+  greek:
+    male: [Andronikos, Michael, Ioannes, Manuel, Theodore, Alexios, Konstantinos, Nikephoros, Demetrios, Thomas, Georgios]
+    female: [Irene, Anna, Maria, Theodora, Eudokia, Helena, Zoe, Simonis, Anna]
+  caucasian:
+    male: [Giorgi, Davit, Bagrat, Vakhtang, Demetre, Konstantine, Leon, Hethum, Oshin, Toros, Smbat]
+    female: [Tamar, Rusudan, Natela, Zabel, Rita, Keran, Isabel]
+  turkic:
+    male: [Osman, Orhan, Umur, Mehmed, Ali, Ibrahim, Saruhan, Yakub, Musa, Hamza, Karaman, Suleiman, Ilyas]
+    female: [Malhun, Rabia, Nilufer, Hafsa, Asporca, Fatma, Selcuk, Ayse]
+  steppe:
+    male: [Uzbeg, Tini Beg, Janibeg, Toqta, Esen Buqa, Kebek, Tarmashirin, Qutluq, Nogai, Berdi Beg, Tolu, Ilbasan]
+    female: [Taydula, Bayalun, Kelmish, Tolunay, Qutlugh, Sarai, Altun]
+  mongol:
+    male: [Ayurbarwada, Shidebala, Temur, Kaishan, Toghon, Yesun, Arigh, Chinkim, Bayan, Toghta, Khutughtu]
+    female: [Dagi, Babusha, Khutulun, Bulughan, Sorghaghtani, Chabi, Nambui]
+  persian:
+    male: [Muhammad, Ali, Hasan, Husayn, Mubariz, Ghiyath, Rukn, Shams, Sharaf, Kaykhusraw, Nusrat, Abu Said]
+    female: [Fatima, Khadija, Kurdujin, Turkan, Padishah, Zubayda, Sati]
+  arabic:
+    male: [Muhammad, Ahmad, Ali, Umar, Yusuf, Ismail, Abd Allah, Hasan, Abu Bakr, Qalawun, Dawud, Sulayman, Khalil]
+    female: [Fatima, Aisha, Zaynab, Khadija, Maryam, Tughay, Ardukin, Sitt al-Mulk]
+  berber:
+    male: [Uthman, Yaqub, Yusuf, Abu Said, Abu Hammu, Abu Tashufin, Zakariya, Abu Yahya, Abd al-Haqq, Abu Inan]
+    female: [Fatima, Zaynab, Aisha, Hawwa, Tamima, Shams al-Duha]
+  african:
+    male: [Musa, Maghan, Suleyman, Sakura, Mari Djata, Ibrahim, Idris, Dunama, Kaday, Abdullah, Amda Seyon, Newaya]
+    female: [Kassi, Inari, Bendjou, Aminatu, Jan Zaraf, Mariam, Sabla]
+  indian:
+    male: [Pratapa, Ballala, Harapala, Ramachandra, Hammira, Ratnasimha, Kumarapala, Narasimha, Bhanudeva, Vira, Rudra, Jayasimha]
+    female: [Rudrama, Padmini, Kamala, Devaladevi, Lakshmi, Mallika, Sita, Chandravati]
+  sultanate:
+    male: [Ala al-Din, Khizr, Mubarak, Ghiyas al-Din, Muhammad, Shihab al-Din, Nasir al-Din, Firuz, Ilyas, Bahram, Tughluq]
+    female: [Malika-i-Jahan, Jhatyapali, Devaldevi, Khudavandzada, Razia]
+  tibetan:
+    male: [Sonam, Tashi, Drakpa, Kunga, Changchub, Wangchuk, Gyaltsen, Lodro, Dorje, Namkha]
+    female: [Dolma, Pema, Yangchen, Lhamo, Drolkar, Kunzang]
+  chinese:
+    male: [Wen, Jian, Ming, Rui, Jun, Kang, Yong, De, Zhi, Hong, Shun, Guang]
+    female: [Hua, Lan, Mei, Xiu, Yun, Jing, Lian, Fang]
+  japanese_korean:
+    male: [Takauji, Tokimune, Sadatoki, Moritoki, Yoshisada, Masashige, Hanazono, Wang Gi, Wang Do, Wang Jeong]
+    female: [Kenshi, Sadako, Kishi, Shoshi, Ishi, Princess Gyeonghwa, Lady Deoknyeong]
+  southeast_asian:
+    male: [Jayanegara, Kertarajasa, Lo Thai, Ram Khamhaeng, Mangrai, Chey Chettha, Indravarman, Tran Minh, Che Nang, Athinkhaya, Thihathu]
+    female: [Gayatri, Tribhuwana, Rajadewi, Dara Jingga, Huyen Tran, Saw Omma, Indradevi]
+  americas:
+    male: [Acamapichtli, Tenoch, Huitzilihuitl, Capac, Sinchi Roca, Lloque, Mayta, Ah Xupan, Kukulcan, Tutul]
+    female: [Ilancueitl, Tezcatlan, Chimpu, Mama Ocllo, Ixchel, Mama Cura]
+  generic:
+    male: [Ardan, Bera, Calo, Dovan, Eskel, Faro, Galen, Haro, Ivo, Joran]
+    female: [Ada, Bria, Cela, Dara, Ena, Fia, Gala, Hela, Ina, Jora]
+
+# Culture group → tradition (groups not listed use generic).
+groups:
+  iberian: iberian
+  frankish: latin_west
+  occitan: latin_west
+  italian: italian
+  german: german
+  low_german: german
+  anglo: english
+  norse: norse
+  celtic: celtic
+  west_slavic: slavic_west
+  east_slavic: slavic_east
+  south_slavic: slavic_south
+  baltic: baltic_finnic
+  finno_ugric: magyar
+  volga: steppe
+  balkan: slavic_south
+  caucasian: caucasian
+  greek: greek
+  turkic: turkic
+  kipchak: steppe
+  mongolic: mongol
+  iranian: persian
+  arabic: arabic
+  berber: berber
+  east_african: african
+  west_african: african
+  bantu: african
+  indo_aryan: indian
+  dravidian: indian
+  tibetan: tibetan
+  tibeto_burman: southeast_asian
+  chinese: chinese
+  east_asian: japanese_korean
+  tungusic: mongol
+  southeast_asian: southeast_asian
+  austronesian: southeast_asian
+  siberian: steppe
+  american: americas
+  oceanian: generic
+# Muslim rulers of Indo-Aryan lands take sultanate names.
+religion_overrides:
+  - { group: indo_aryan, family: islamic, tradition: sultanate }

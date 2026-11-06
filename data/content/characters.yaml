@@ -1,0 +1,79 @@
+# Characters, skills and succession (M5). Read by tools/build-data.ts (characters-lib).
+# Skills are Eminence, Statecraft and Warcraft, 0-20. A ruler's skills reach the realm through scaled modifiers:
+# each point above `pivot` adds the effect once (below it, takes it away). Councillors work the same way at
+# `council_share` percent strength. All numbers are tuned for play: GUESS.
+
+skills:
+  pivot: 10
+  ruler:
+    eminence: [{ stat: legitimacy, add: 1 }]
+    statecraft: [{ stat: tax_efficiency, add: 0.5 }]
+    warcraft: [{ stat: levy_size, add: 0.25 }]
+  council:
+    chancellor: { skill: eminence, effects: [{ stat: legitimacy, add: 0.5 }] }
+    treasurer: { skill: statecraft, effects: [{ stat: tax_efficiency, add: 0.4 }] }
+    marshal: { skill: warcraft, effects: [{ stat: levy_size, add: 0.2 }] }
+    chaplain: { skill: eminence, effects: [{ stat: unrest, add: -0.1 }] }
+  # A councillor's monthly salary (ducats).
+  salary: 5
+
+# Education: at 6 a child takes the focus of its best skill; at 16 the tier is rolled: guardian's skill in that
+# focus + a d10, divided by `per_tier`, capped at 3. Each tier adds `bonus` points to the focus skill.
+education: { start: 6, end: 16, per_tier: 7, bonus: [0, 1, 3, 5] }
+# A child's skills: average of its parents' ± up to `variance`.
+inheritance_variance: 3
+majority: 16
+
+# Monthly chance of death by age, in basis points (100 = 1%), scaled by (150 − health) / 100.
+mortality:
+  - [0, 120]
+  - [1, 30]
+  - [5, 8]
+  - [15, 14]
+  - [40, 28]
+  - [50, 55]
+  - [60, 110]
+  - [70, 240]
+  - [80, 500]
+# Monthly chance (basis points) that a married couple has a child while the wife is fertile; less after `late`.
+fertility: { chance: 250, late_chance: 80, from: 16, late: 35, until: 43 }
+# Monthly chance (basis points) that an unmarried ruler or heir of age marries.
+marriage: { chance: 400, age: 16 }
+health: { base: 70 }
+
+# Succession laws. Realms take theirs from their government unless data/scenario/1314-rulers.yaml says otherwise.
+laws:
+  - { key: agnatic, name: Agnatic primogeniture, description: The eldest son and his line inherit; women never. }
+  - { key: cognatic, name: Male-preference primogeniture, description: Sons before daughters, the eldest first. }
+  - { key: open, name: Open succession, description: The ablest grown son takes the throne, whoever he is. }
+  - { key: elective, name: Elective, description: The magnates choose the ablest grown man of the dynasty. }
+  - { key: republic, name: Republican election, description: The councils elect an elder from the great families. }
+  - { key: theocracy, name: Election by the clergy, description: The chapter elects one of its own; rulers do not marry. }
+government_laws:
+  feudal_monarchy: cognatic
+  merchant_republic: republic
+  theocracy: theocracy
+  holy_order: theocracy
+  steppe_horde: open
+  iqta_sultanate: open
+  beylik: open
+
+# Traits: skill changes, health, a chance to pass to children (congenital), and effects on the realm while the
+# bearer rules. `chance` is the share (%) of generated characters who have it.
+traits:
+  - { key: genius, name: Genius, skills: [3, 3, 3], congenital: 20, chance: 2, description: A mind that sees what others miss. }
+  - { key: slow, name: Slow, skills: [-2, -2, -2], congenital: 20, chance: 3, description: Thinks long and grasps little. }
+  - { key: strong, name: Strong, skills: [0, 0, 2], health: 15, congenital: 15, chance: 5, description: Broad of shoulder and hard to kill. }
+  - { key: sickly, name: Sickly, health: -30, chance: 4, description: Never quite well. }
+  - { key: brave, name: Brave, skills: [1, 0, 2], chance: 10, description: First into the breach., ruler: [{ stat: levy_size, add: 1 }] }
+  - { key: craven, name: Craven, skills: [-1, 0, -2], chance: 5, description: Last into the breach. }
+  - { key: just, name: Just, skills: [1, 1, 0], chance: 8, description: Gives every man his due., ruler: [{ stat: legitimacy, add: 5 }] }
+  - { key: cruel, name: Cruel, skills: [-1, 0, 1], chance: 6, description: Rules by fear., ruler: [{ stat: unrest, add: 1 }, { stat: legitimacy, add: -3 }] }
+  - { key: pious, name: Pious, skills: [1, 0, 0], chance: 10, description: Devoted to God above all., ruler: [{ stat: legitimacy, add: 3 }] }
+  - { key: greedy, name: Greedy, skills: [0, 1, 0], chance: 8, description: Never has enough., ruler: [{ stat: tax_efficiency, add: 3 }, { stat: unrest, add: 0.5 }] }
+  - { key: generous, name: Generous, skills: [2, -1, 0], chance: 6, description: An open hand to all., ruler: [{ stat: legitimacy, add: 3 }, { stat: tax_efficiency, add: -2 }] }
+  - { key: diligent, name: Diligent, skills: [0, 2, 1], chance: 8, description: Works from matins to compline., ruler: [{ stat: tax_efficiency, add: 2 }] }
+  - { key: lazy, name: Lazy, skills: [0, -2, -1], chance: 6, description: Leaves the work to others., ruler: [{ stat: tax_efficiency, add: -2 }] }
+  - { key: ambitious, name: Ambitious, skills: [1, 1, 1], chance: 7, description: Wants more, and means to have it. }
+  - { key: wroth, name: Wrathful, skills: [-1, 0, 1], chance: 6, description: Quick to anger and slow to forgive. }
+  - { key: patient, name: Patient, skills: [0, 2, 0], chance: 6, description: Waits for the right moment. }

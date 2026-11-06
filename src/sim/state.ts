@@ -1,8 +1,10 @@
 import type { Modifier } from './modifiers';
 import { createRng, type RngState } from './rng';
-import type { Scenario, ScenarioRealm } from './scenario';
+import type { Character, Court, Dynasty, Scenario, ScenarioRealm } from './scenario';
 
-export const SAVE_VERSION = 4;
+export type { Character, Court, Dynasty };
+
+export const SAVE_VERSION = 5;
 
 /** Speed 1 (slowest) .. 5 (fastest). */
 export type Speed = 1 | 2 | 3 | 4 | 5;
@@ -99,6 +101,12 @@ export interface GameState {
   /** Finished buildings by province id. */
   buildings: Record<string, string[]>;
   construction: Construction[];
+  /** Indexed by character id; index 0 is unused. The dead stay, for family trees. */
+  characters: (Character | null)[];
+  /** Indexed by dynasty id; index 0 (no dynasty, lowborn) is unused. */
+  dynasties: (Dynasty | null)[];
+  /** Indexed like realms. */
+  courts: (Court | null)[];
 }
 
 export function provincesFromScenario(scenario: Scenario): ProvinceState[] {
@@ -130,6 +138,18 @@ export function economyFromScenario(scenario: Scenario, realmCount: number, bank
   };
 }
 
+/** The scenario's people, houses and courts, copied so the game never edits the scenario. */
+export function charactersFromScenario(scenario: Scenario) {
+  return {
+    characters: [null, ...(scenario.characters ?? []).map((c) => ({ ...c, skills: [...c.skills], traits: [...c.traits], education: c.education ? { ...c.education } : null }))],
+    dynasties: [null, ...(scenario.dynasties ?? []).map((d) => ({ ...d }))],
+    courts: [null, ...scenario.realms.map((r) => {
+      const c = scenario.courts?.[r.id - 1];
+      return c ? { ...c, council: [...c.council] } : null;
+    })],
+  };
+}
+
 export function newGame(seed: number, scenario: Scenario, bankCapitals: number[] = []): GameState {
   const modifiers = modifiersFromScenario(scenario);
   const realms = realmsFromScenario(scenario);
@@ -145,5 +165,6 @@ export function newGame(seed: number, scenario: Scenario, bankCapitals: number[]
     modifiers,
     nextModifierId: modifiers.length + 1,
     ...economyFromScenario(scenario, realms.length, bankCapitals),
+    ...charactersFromScenario(scenario),
   };
 }

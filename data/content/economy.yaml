@@ -25,7 +25,7 @@ administration_per_province: 4
 # Household troops and garrisons, per thousand people, scaled by levy size / 10 %.
 retinue_per_thousand: 0.6
 # Monthly population growth (%), lowered by unrest: growth × (1 − unrest / 20).
-growth: 0.08
+growth: 0.035
 # A realm starts with this many months of its net income in the treasury.
 start_treasury_months: 6
 # Rulers spend what they hold on their households, feasts, gifts and display: this share (%) of a positive

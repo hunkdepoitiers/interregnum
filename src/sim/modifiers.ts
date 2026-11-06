@@ -20,6 +20,8 @@ export interface Modifier {
   start: number;
   /** Day it expires on; null = until removed. */
   end: number | null;
+  /** Every effect counts this many times (a ruler's skill above the pivot, say); missing = once. */
+  scale?: number;
 }
 
 export interface ExplainLine {
@@ -45,11 +47,12 @@ export interface Explained {
 const sameTarget = (a: ModifierTarget, b: ModifierTarget) => a.kind === b.kind && a.id === b.id;
 
 /** Adds a modifier from its definition; returns null for an unknown key. */
-export function addModifier(state: GameState, content: Content, def: string, target: ModifierTarget): Modifier | null {
+export function addModifier(state: GameState, content: Content, def: string, target: ModifierTarget, scale?: number): Modifier | null {
   const d = content.modifiers[def];
   if (!d) return null;
   if (d.stacking === 'replace') removeModifiers(state, def, target);
   const m: Modifier = { id: state.nextModifierId++, def, target, start: state.day, end: d.days === null ? null : state.day + d.days };
+  if (scale !== undefined && scale !== 1) m.scale = scale;
   state.modifiers.push(m);
   return m;
 }
@@ -108,7 +111,7 @@ export function explain(state: StatSource, content: Content, stat: string, targe
     if (!own && !inherited) continue;
     const d = content.modifiers[m.def];
     if (!d) continue;
-    for (const e of d.effects) if (e.stat === stat) lines.push({ label: d.label, op: e.op, value: e.value, inherited, modifierId: m.id });
+    for (const e of d.effects) if (e.stat === stat) lines.push({ label: d.label, op: e.op, value: e.value * (m.scale ?? 1), inherited, modifierId: m.id });
   }
   let add = 0;
   let pct = 0;

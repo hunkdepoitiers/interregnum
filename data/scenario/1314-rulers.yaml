@@ -1,0 +1,136 @@
+# Rulers on 1 November 1314 and their close family, read by tools/build-data.ts (characters-lib). Realms not
+# listed get a generated ruler, spouse and children from their culture's names (data/content/names.yaml).
+# A ruler: name, born (year), dynasty (key in `dynasties`), optional female, law (succession law; else from the
+# government), traits, skills [eminence, statecraft, warcraft] (else rolled), spouse [name, born], children and
+# siblings [[name, m|f, born]], regent [name, m|f, born] for a child ruler. same_as: the ruler of another realm
+# (personal unions). Birth years are often approximate, and skills and traits are judgements: GUESS.
+
+dynasties:
+  capet: Capet
+  plantagenet: Plantagenet
+  bruce: Bruce
+  ivrea: Ivrea
+  burgundy_pt: Burgundy
+  barcelona: Barcelona
+  nasrid: Nasrid
+  marinid: Marinid
+  zayyanid: Zayyanid
+  hafsid: Hafsid
+  luxembourg: Luxembourg
+  piast: Piast
+  anjou: Anjou
+  gediminid: Gediminid
+  bjalbo: Bjälbo
+  estridsen: Estridsen
+  sverre: Sverre
+  visconti: Visconti
+  palaiologos: Palaiologos
+  nemanjic: Nemanjić
+  terter: Terter
+  borjigin: Borjigin
+  khalji: Khalji
+  qalawunid: Qalawunid
+  rurikid: Rurikid
+  ottoman: Osmanoğlu
+  hethumid: Hethumid
+  lusignan: Lusignan
+  wittelsbach: Wittelsbach
+  habsburg: Habsburg
+  reginar: Reginar
+  dampierre: Dampierre
+  capet_burgundy: Capet of Burgundy
+  dreux: Dreux
+  savoy: Savoy
+  ascania: Ascania
+  keita: Keita
+  solomonic: Solomonic
+  yamato: Yamato
+  wang: Wang
+  tran: Trần
+  rajasa: Rajasa
+  phra_ruang: Phra Ruang
+  kakatiya: Kakatiya
+  hoysala: Hoysala
+  rasulid: Rasulid
+  komnenos: Komnenos
+  bagrationi: Bagrationi
+  karamanid: Karamanid
+  orseolo: Soranzo
+  ilkhan: Borjigin of Hülegü
+  chagatayid: Borjigin of Chagatai
+  jochid: Borjigin of Jochi
+  della_scala: della Scala
+  gonzaga: Bonacolsi
+  este: Este
+  kartid: Kart
+  injuid: Injuid
+  orsini: Orsini
+  tocco: Orsini of Cephalonia
+  sanudo: Sanudo
+
+rulers:
+  france: { name: Louis X, born: 1289, dynasty: capet, law: agnatic, traits: [wroth, lazy], skills: [8, 7, 9], spouse: [Margaret of Burgundy, 1290], children: [[Joan, f, 1312]], siblings: [[Philip, m, 1293], [Charles, m, 1294]] }
+  navarre: { same_as: france, law: cognatic }
+  england: { name: Edward II, born: 1284, dynasty: plantagenet, traits: [lazy, generous], skills: [6, 6, 7], spouse: [Isabella of France, 1295], children: [[Edward, m, 1312]], siblings: [[Thomas, m, 1300], [Edmund, m, 1301]] }
+  scotland: { name: Robert I, born: 1274, dynasty: bruce, traits: [brave, patient], skills: [14, 11, 17], spouse: [Elizabeth de Burgh, 1289], children: [[Marjorie, f, 1296]], siblings: [[Edward, m, 1280]] }
+  castile: { name: Alfonso XI, born: 1311, dynasty: ivrea, skills: [12, 11, 14], regent: [María de Molina, f, 1264], siblings: [[Eleanor, f, 1307]] }
+  portugal: { name: Denis, born: 1261, dynasty: burgundy_pt, traits: [diligent, just], skills: [13, 16, 10], spouse: [Elizabeth of Aragon, 1271], children: [[Afonso, m, 1291]] }
+  aragon: { name: James II, born: 1267, dynasty: barcelona, traits: [patient, diligent], skills: [14, 15, 11], children: [[James, m, 1296], [Alfonso, m, 1299], [John, m, 1301], [Peter, m, 1305], [Ramon Berenguer, m, 1308]] }
+  majorca: { name: Sancho, born: 1274, dynasty: barcelona, traits: [sickly], skills: [9, 10, 8], spouse: [Maria of Naples, 1290] }
+  trinacria: { name: Frederick III, born: 1272, dynasty: barcelona, traits: [brave, ambitious], skills: [12, 10, 14], spouse: [Eleanor of Anjou, 1289], children: [[Peter, m, 1305], [Manfred, m, 1306]] }
+  granada: { name: Ismail I, born: 1279, dynasty: nasrid, skills: [10, 11, 12], spouse: [Alwa, 1290], children: [[Muhammad, m, 1314]] }
+  marinids: { name: Abu Said Uthman II, born: 1276, dynasty: marinid, traits: [pious], skills: [11, 12, 10], children: [[Abu al-Hasan, m, 1297]] }
+  zayyanids: { name: Abu Hammu I, born: 1270, dynasty: zayyanid, traits: [cruel], skills: [9, 11, 12], children: [[Abu Tashufin, m, 1292]] }
+  hafsids: { name: Abu Yahya Zakariya, born: 1253, dynasty: hafsid, traits: [pious], skills: [11, 10, 8], children: [[Abu Darba, m, 1283]] }
+  bohemia: { name: John, born: 1296, dynasty: luxembourg, traits: [brave, ambitious], skills: [12, 8, 15], spouse: [Elisabeth of Bohemia, 1292], children: [[Margaret, f, 1313]] }
+  poland: { name: Wladyslaw I, born: 1261, dynasty: piast, traits: [patient, brave], skills: [13, 12, 14], spouse: [Jadwiga of Kalisz, 1266], children: [[Elisabeth, f, 1305], [Casimir, m, 1310]] }
+  hungary: { name: Charles I, born: 1288, dynasty: anjou, traits: [patient, diligent], skills: [13, 15, 12], spouse: [Maria of Bytom, 1295] }
+  naples: { name: Robert, born: 1276, dynasty: anjou, traits: [genius, pious], skills: [15, 15, 7], spouse: [Sancha of Majorca, 1285], children: [[Charles, m, 1298]] }
+  lithuania: { name: Gediminas, born: 1275, dynasty: gediminid, traits: [ambitious, patient], skills: [15, 14, 14], spouse: [Jewna, 1280], children: [[Narimantas, m, 1294], [Algirdas, m, 1296], [Kestutis, m, 1297], [Jaunutis, m, 1300], [Aldona, f, 1309]] }
+  sweden: { name: Birger, born: 1280, dynasty: bjalbo, traits: [cruel, ambitious], skills: [8, 9, 9], spouse: [Martha of Denmark, 1277], children: [[Magnus, m, 1300]] }
+  denmark: { name: Eric VI, born: 1274, dynasty: estridsen, traits: [ambitious, generous], skills: [12, 7, 11], spouse: [Ingeborg of Sweden, 1277], siblings: [[Christopher, m, 1276]] }
+  norway: { name: Haakon V, born: 1270, dynasty: sverre, traits: [diligent], skills: [12, 13, 11], spouse: [Euphemia of Rügen, 1280], children: [[Ingeborg, f, 1301]] }
+  papal_states: { name: Jacques Duèse, born: 1244, dynasty: capet, traits: [diligent, greedy], skills: [13, 16, 5] }
+  venice: { name: Giovanni Soranzo, born: 1240, dynasty: orseolo, traits: [patient], skills: [14, 15, 9] }
+  milan: { name: Matteo I, born: 1250, dynasty: visconti, traits: [ambitious, patient], skills: [14, 13, 12], children: [[Galeazzo, m, 1277], [Marco, m, 1280], [Luchino, m, 1287], [Giovanni, m, 1290]] }
+  verona: { name: Cangrande I, born: 1291, dynasty: della_scala, traits: [brave, ambitious], skills: [14, 11, 16] }
+  byzantium: { name: Andronikos II, born: 1259, dynasty: palaiologos, traits: [pious, lazy], skills: [11, 8, 5], spouse: [Irene of Montferrat, 1274], children: [[Michael, m, 1277], [Constantine, m, 1278], [Theodore, m, 1291]] }
+  serbia: { name: Stefan Milutin, born: 1253, dynasty: nemanjic, traits: [ambitious, pious], skills: [13, 12, 13], spouse: [Simonida, 1294], children: [[Stefan, m, 1285]] }
+  bulgaria: { name: Theodore Svetoslav, born: 1270, dynasty: terter, skills: [12, 11, 12], spouse: [Euphrosyne, 1285], children: [[George, m, 1300]] }
+  golden_horde: { name: Uzbeg, born: 1282, dynasty: jochid, traits: [pious, ambitious], skills: [14, 12, 14], spouse: [Taydula, 1290], children: [[Tini Beg, m, 1308], [Janibeg, m, 1314]] }
+  yuan: { name: Ayurbarwada, born: 1285, dynasty: borjigin, traits: [diligent, just], skills: [14, 14, 8], spouse: [Radnashiri, 1287], children: [[Shidebala, m, 1303]] }
+  chagatai: { name: Esen Buqa, born: 1285, dynasty: chagatayid, skills: [11, 9, 13], siblings: [[Kebek, m, 1288], [Tarmashirin, m, 1292]] }
+  ilkhanate: { name: Oljeitu, born: 1280, dynasty: ilkhan, traits: [pious], skills: [12, 13, 10], spouse: [Hajji Khatun, 1285], children: [[Abu Said, m, 1305]] }
+  delhi: { name: Ala al-Din Khalji, born: 1266, dynasty: khalji, traits: [cruel, ambitious, sickly], skills: [12, 15, 17], spouse: [Malika-i-Jahan, 1270], children: [[Khizr Khan, m, 1297], [Mubarak, m, 1299], [Shihab al-Din, m, 1309]] }
+  mamluks: { name: al-Nasir Muhammad, born: 1285, dynasty: qalawunid, traits: [patient, greedy], skills: [13, 16, 11], spouse: [Tughay, 1295], law: open }
+  tver: { name: Mikhail, born: 1271, dynasty: rurikid, traits: [pious, brave], skills: [12, 10, 12], spouse: [Anna of Kashin, 1280], children: [[Dmitry, m, 1299], [Alexander, m, 1301], [Konstantin, m, 1306], [Vasily, m, 1310]] }
+  moscow: { name: Yury, born: 1281, dynasty: rurikid, traits: [ambitious, cruel], skills: [11, 10, 11], spouse: [Konchaka, 1295], siblings: [[Ivan, m, 1288]] }
+  ottomans: { name: Osman, born: 1258, dynasty: ottoman, traits: [ambitious, brave], skills: [13, 11, 15], spouse: [Malhun, 1260], children: [[Orhan, m, 1281], [Alaeddin, m, 1290]] }
+  cilicia: { name: Oshin, born: 1282, dynasty: hethumid, skills: [10, 10, 10], spouse: [Isabella of Korikos, 1285], children: [[Leo, m, 1309]] }
+  cyprus: { name: Henry II, born: 1270, dynasty: lusignan, traits: [sickly, pious], skills: [10, 11, 5], siblings: [[Guy, m, 1275]] }
+  bavaria: { name: Louis IV, born: 1282, dynasty: wittelsbach, traits: [ambitious], skills: [13, 11, 12], spouse: [Beatrix of Swidnica, 1290], children: [[Matilda, f, 1313]], siblings: [[Rudolf, m, 1274]] }
+  habsburg: { name: Frederick the Fair, born: 1289, dynasty: habsburg, traits: [just, brave], skills: [12, 10, 12], spouse: [Isabella of Aragon, 1305], siblings: [[Leopold, m, 1290], [Albert, m, 1298], [Henry, m, 1299], [Otto, m, 1301]] }
+  brabant: { name: John III, born: 1300, dynasty: reginar, skills: [11, 10, 10], regent: [Godfrey of Brabant, m, 1270] }
+  flanders: { name: Robert III, born: 1249, dynasty: dampierre, traits: [brave, wroth], skills: [11, 8, 13], children: [[Louis, m, 1272], [Robert, m, 1278]] }
+  burgundy: { name: Hugh V, born: 1294, dynasty: capet_burgundy, skills: [9, 9, 9], siblings: [[Odo, m, 1295], [Joan, f, 1293]] }
+  brittany: { name: John III, born: 1286, dynasty: dreux, skills: [10, 10, 9], spouse: [Isabella of Castile, 1283], siblings: [[Guy, m, 1287], [John, m, 1294]] }
+  savoy: { name: Amadeus V, born: 1249, dynasty: savoy, traits: [patient, diligent], skills: [13, 13, 12], spouse: [Mary of Brabant, 1278], children: [[Edward, m, 1284], [Aymon, m, 1291]] }
+  brandenburg: { name: Waldemar, born: 1280, dynasty: ascania, traits: [ambitious], skills: [12, 11, 13], spouse: [Agnes of Brandenburg, 1297] }
+  mali: { name: Musa, born: 1280, dynasty: keita, traits: [pious, generous], skills: [16, 14, 11], spouse: [Inari Kanuté, 1285], children: [[Maghan, m, 1305]] }
+  ethiopia: { name: Amda Seyon, born: 1290, dynasty: solomonic, traits: [brave, ambitious], skills: [12, 11, 16], spouse: [Jan Mangesa, 1295], children: [[Newaya Krestos, m, 1310]] }
+  japan: { name: Hanazono, born: 1297, dynasty: yamato, traits: [pious, diligent], skills: [12, 10, 4] }
+  goryeo: { name: Chungsuk, born: 1294, dynasty: wang, skills: [9, 9, 8], spouse: [Princess Pokguk, 1295] }
+  dai_viet: { name: Trần Minh Tông, born: 1300, dynasty: tran, skills: [11, 12, 9], regent: [Trần Anh Tông, m, 1276] }
+  majapahit: { name: Jayanegara, born: 1294, dynasty: rajasa, traits: [cruel], skills: [8, 8, 9], siblings: [[Tribhuwana, f, 1300], [Rajadewi, f, 1302]] }
+  sukhothai: { name: Lo Thai, born: 1290, dynasty: phra_ruang, traits: [pious], skills: [10, 9, 8], children: [[Ngua Nam Thom, m, 1310]] }
+  kakatiya: { name: Prataparudra, born: 1270, dynasty: kakatiya, skills: [11, 12, 12], children: [[Virabhadra, m, 1295]] }
+  hoysala: { name: Veera Ballala III, born: 1270, dynasty: hoysala, traits: [brave], skills: [11, 11, 13], children: [[Virupaksha, m, 1300]] }
+  rasulids: { name: al-Mu'ayyad Dawud, born: 1265, dynasty: rasulid, traits: [pious, diligent], skills: [13, 13, 9], children: [[al-Mujahid Ali, m, 1306]] }
+  trebizond: { name: Alexios II, born: 1282, dynasty: komnenos, skills: [10, 11, 10], spouse: [Djiadjak Jaqeli, 1290], children: [[Andronikos, m, 1300], [Basil, m, 1305]] }
+  georgia_west: { name: George V, born: 1286, dynasty: bagrationi, traits: [ambitious, diligent], skills: [15, 14, 13], children: [[David, m, 1310]] }
+  karaman: { name: Yahshi, born: 1270, dynasty: karamanid, skills: [10, 9, 12], children: [[Musa, m, 1295], [Ibrahim, m, 1300]] }
+  kartids: { name: Ghiyath al-Din Kart, born: 1275, dynasty: kartid, skills: [11, 12, 11], children: [[Muizz al-Din, m, 1311]] }
+  mantua: { name: Rinaldo Bonacolsi, born: 1270, dynasty: gonzaga, skills: [10, 10, 10] }
+  epirus: { name: Thomas I Komnenos Doukas, born: 1285, dynasty: komnenos, skills: [9, 9, 9], spouse: [Anna Palaiologina, 1296] }
+  cephalonia: { name: John I Orsini, born: 1280, dynasty: tocco, skills: [9, 10, 10] }
+  archipelago: { name: William I Sanudo, born: 1280, dynasty: sanudo, skills: [10, 10, 10], children: [[Nicholas, m, 1305]] }

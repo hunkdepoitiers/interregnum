@@ -171,6 +171,52 @@ export interface EconomyDef {
   };
 }
 
+export interface TraitDef {
+  key: string;
+  name: string;
+  description: string;
+  /** Added to [eminence, statecraft, warcraft]. */
+  skills: number[];
+  health: number;
+  /** Chance (%) a child of a bearer has it too; 0 = not inherited. */
+  congenital: number;
+  /** Share (%) of generated characters with it. */
+  chance: number;
+  /** Modifier on the realm while the bearer rules (trait_<key>); null = none. */
+  rulerModifier: string | null;
+}
+
+export interface SuccessionLawDef {
+  key: string;
+  name: string;
+  description: string;
+}
+
+/** Characters' constants (data/content/characters.yaml, names.yaml). */
+export interface CharactersDef {
+  /** Skill points above this raise a ruler's or councillor's modifiers; below, lower them. */
+  pivot: number;
+  /** Council seats in order: the skill (0 eminence, 1 statecraft, 2 warcraft) and the modifier it scales. */
+  council: { role: string; skill: number; modifier: string }[];
+  /** Monthly salary per councillor, hundredths of a ducat. */
+  salary: number;
+  education: { start: number; end: number; perTier: number; bonus: number[] };
+  variance: number;
+  majority: number;
+  /** [age, monthly chance of death in basis points], by age from. */
+  mortality: number[][];
+  fertility: { chance: number; lateChance: number; from: number; late: number; until: number };
+  marriage: { chance: number; age: number };
+  healthBase: number;
+  laws: SuccessionLawDef[];
+  governmentLaws: Record<string, string>;
+  traits: TraitDef[];
+  /** Given names by tradition; culture group → tradition; Indo-Aryan Muslims and the like take an override. */
+  names: Record<string, { male: string[]; female: string[] }>;
+  nameGroups: Record<string, string>;
+  nameOverrides: { group: string; family: string; tradition: string }[];
+}
+
 /** An economy where nothing costs or pays anything: for content built without data/content/economy.yaml. */
 export function emptyEconomy(): EconomyDef {
   return {
@@ -179,6 +225,16 @@ export function emptyEconomy(): EconomyDef {
     startTreasuryMonths: 0, largesse: 0, taxLaws: [{ key: 'normal', name: 'Customary taxes', description: '', modifier: null }],
     lawCooldownDays: 365, buildings: [], banks: [],
     credit: { base: 50, incomePerPoint: 100000, incomeCap: 25, debtRatioPenalty: 30, defaultPenalty: 35, defaultMemoryDays: 7300, rateSpread: 5, terms: [12] },
+  };
+}
+
+/** Characters that never die, marry or rule anything: for content built without data/content/characters.yaml. */
+export function emptyCharacters(): CharactersDef {
+  return {
+    pivot: 10, council: [], salary: 0, education: { start: 6, end: 16, perTier: 7, bonus: [0, 1, 3, 5] }, variance: 0, majority: 16,
+    mortality: [[0, 0]], fertility: { chance: 0, lateChance: 0, from: 16, late: 35, until: 43 }, marriage: { chance: 0, age: 16 },
+    healthBase: 70, laws: [{ key: 'cognatic', name: 'Primogeniture', description: '' }], governmentLaws: {}, traits: [],
+    names: { generic: { male: ['John'], female: ['Joan'] } }, nameGroups: {}, nameOverrides: [],
   };
 }
 
@@ -192,4 +248,5 @@ export interface Content {
   /** Trade good id i is goods[i - 1]; 0 = none. */
   goods: GoodDef[];
   economy: EconomyDef;
+  characters: CharactersDef;
 }

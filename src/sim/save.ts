@@ -1,6 +1,7 @@
+import { startCharacters } from './characters';
 import { startEconomy, type EconomyContext } from './economy';
 import type { Scenario } from './scenario';
-import { economyFromScenario, modifiersFromScenario, provincesFromScenario, realmsFromScenario, SAVE_VERSION, type GameState } from './state';
+import { charactersFromScenario, economyFromScenario, modifiersFromScenario, provincesFromScenario, realmsFromScenario, SAVE_VERSION, type GameState } from './state';
 
 /** Plain-text save envelope. Compression and storage live in src/platform. */
 export interface SaveFile {
@@ -32,6 +33,12 @@ export const migrations: Record<number, Migration> = {
     const realms = s.realms as unknown[];
     const next = { ...s, ...economyFromScenario(scenario, realms.length, economy?.content.economy.banks.map((b) => b.capital) ?? []) };
     if (economy) startEconomy(next as unknown as GameState, economy);
+    return next;
+  },
+  // v5 added characters: the start's rulers and families, aged from 1314 to the save's date.
+  4: (s, { scenario, economy }) => {
+    const next = { ...s, ...charactersFromScenario(scenario) };
+    if (economy) startCharacters(next as unknown as GameState, economy);
     return next;
   },
 };
@@ -96,6 +103,8 @@ function validate(s: GameState): void {
     s.economy.slice(1).every((e) => Number.isInteger(e?.treasury)) && Array.isArray(s.banks) && Array.isArray(s.loans) &&
     s.loans.every((l) => Number.isInteger(l?.principal) && realmRef(l.realm) && s.banks[l.bank] !== undefined) &&
     Array.isArray(s.construction) && typeof s.buildings === 'object' && s.buildings !== null &&
+    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) &&
+    s.courts.every((c) => c === null || (Number.isInteger(c.ruler) && Array.isArray(c.council))) &&
     s.modifiers.every((m) =>
       Number.isInteger(m?.id) && m.id < s.nextModifierId && typeof m.def === 'string' && Number.isInteger(m.start) &&
       (m.end === null || Number.isInteger(m.end)) &&
