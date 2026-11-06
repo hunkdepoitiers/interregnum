@@ -1,5 +1,6 @@
 import type { Content } from './content';
 import { doDeed } from './faith';
+import { declareWar, disband, hireMenAtArms, makePeace, mergeArmies, moveArmy, raiseLevies, splitArmy } from './military';
 import { ensureStanding } from './standing';
 import { ensureEconomy, repayLoan, repudiate, setTaxLaw, startBuilding, takeLoan, type EconomyContext, type Notice } from './economy';
 import { addModifier, removeModifiers, type ModifierTarget } from './modifiers';
@@ -28,14 +29,24 @@ export type Command =
   /** Refuse every debt. */
   | { type: 'repudiate'; realm: number }
   /** A deed for prestige or piety (data/content/faith.yaml deeds). */
-  | { type: 'deed'; realm: number; deed: string };
+  | { type: 'deed'; realm: number; deed: string }
+  /** Debug for now: war between two realms (and their vassals), and white peace. */
+  | { type: 'declareWar'; attacker: number; defender: number }
+  | { type: 'makePeace'; war: number }
+  | { type: 'raiseLevies'; realm: number }
+  /** men: whole men, hired in thousands. */
+  | { type: 'hireMenAtArms'; realm: number; men: number }
+  | { type: 'moveArmy'; realm: number; army: number; to: number }
+  | { type: 'disband'; realm: number; army: number }
+  | { type: 'splitArmy'; realm: number; army: number }
+  | { type: 'mergeArmies'; realm: number; army: number };
 
 /**
  * Returns true if ownership, control or modifiers changed. Invalid commands are ignored. Economy commands need the
  * trade goods too (goods) and report what happened in `notices`.
  */
-export function applyCommand(state: GameState, cmd: Command, content?: Content, goods: number[] = [], notices: Notice[] = []): boolean {
-  const ctx: EconomyContext | null = content ? { content, goods } : null;
+export function applyCommand(state: GameState, cmd: Command, content?: Content, goods: number[] = [], notices: Notice[] = [], full?: EconomyContext): boolean {
+  const ctx: EconomyContext | null = full ?? (content ? { content, goods } : null);
   switch (cmd.type) {
     case 'setSpeed':
       state.speed = cmd.speed;
@@ -89,6 +100,28 @@ export function applyCommand(state: GameState, cmd: Command, content?: Content, 
       notices.push(...n);
       return n.length > 0;
     }
+    case 'declareWar':
+      return !!declareWar(state, cmd.attacker, cmd.defender);
+    case 'makePeace':
+      return makePeace(state, cmd.war);
+    case 'raiseLevies':
+      if (ctx) raiseLevies(state, ctx, cmd.realm);
+      return false;
+    case 'hireMenAtArms':
+      if (ctx) hireMenAtArms(state, ctx, cmd.realm, cmd.men);
+      return false;
+    case 'moveArmy':
+      if (ctx) moveArmy(state, ctx, cmd.realm, cmd.army, cmd.to);
+      return false;
+    case 'disband':
+      disband(state, cmd.realm, cmd.army);
+      return false;
+    case 'splitArmy':
+      splitArmy(state, cmd.realm, cmd.army);
+      return false;
+    case 'mergeArmies':
+      mergeArmies(state, cmd.realm, cmd.army);
+      return false;
     case 'deed': {
       if (!ctx) return false;
       const before = state.nextModifierId + state.modifiers.length;

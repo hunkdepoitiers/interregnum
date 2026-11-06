@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyCommand } from '../src/sim/commands';
-import { emptyCharacters, emptyFaith, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
+import { emptyCharacters, emptyFaith, emptyMilitary, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
 import {
   computeLedgers, creditRating, ledgerNet, loanOffers, provinceEconomy, settleMonth, startEconomy, takeLoan,
   type EconomyContext,
@@ -52,7 +52,7 @@ const content: Content = {
     ],
     credit: { base: 55, incomePerPoint: 200000, incomeCap: 25, debtRatioPenalty: 30, defaultPenalty: 35, defaultMemoryDays: 7300, rateSpread: 5, terms: [12, 24] },
   },
-  characters: emptyCharacters(), faith: emptyFaith(),
+  characters: emptyCharacters(), faith: emptyFaith(), military: emptyMilitary(),
 };
 
 /** Realm 1 (a kingdom) holds provinces 1 and 2; realm 2, its vassal, holds province 3. All make grain. */

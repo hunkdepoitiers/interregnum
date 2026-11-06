@@ -1,7 +1,7 @@
 import { changeStanding } from './standing';
 import { STRATA, type Content } from './content';
 import { addModifier, indexModifiers, removeModifiers, statValue, type ModifierIndex } from './modifiers';
-import type { GameState, Ledger, Loan } from './state';
+import type { Army, GameState, Ledger, Loan } from './state';
 
 /**
  * The economy (DESIGN.md §5.2). Money is in hundredths of a ducat and every step truncates, so a run is the same on
@@ -23,6 +23,12 @@ export interface EconomyContext {
   /** Per province id: culture and religion ids, for the people born and made there. */
   culture?: number[];
   religion?: number[];
+  /** The march graph and province centroids (scenario.graph, pos, kmPerPx), for armies. */
+  graph?: { start: number[]; to: number[]; days: number[] };
+  pos?: number[];
+  kmPerPx?: number;
+  /** Per province id: terrain key ('' for none). */
+  terrain?: string[];
 }
 
 /** Ledger categories in display order. Income is positive, spending negative. */
@@ -40,7 +46,9 @@ export const LEDGER: { key: string; label: string; kind: 'income' | 'expense' | 
   { key: 'dues_to_overlord', label: 'Dues to the overlord', kind: 'expense' },
   { key: 'largesse', label: 'Largesse and display', kind: 'expense' },
   { key: 'council', label: 'Council salaries', kind: 'expense' },
+  { key: 'armies', label: 'Army wages', kind: 'expense' },
   { key: 'construction', label: 'Building works', kind: 'oneOff' },
+  { key: 'recruitment', label: 'Men-at-arms hired', kind: 'oneOff' },
   { key: 'loans_taken', label: 'Loans taken', kind: 'oneOff' },
   { key: 'loans_repaid', label: 'Loans repaid', kind: 'oneOff' },
   { key: 'embezzlement', label: 'Embezzled by the regent', kind: 'oneOff' },
@@ -52,7 +60,9 @@ export const LEDGER: { key: string; label: string; kind: 'income' | 'expense' | 
 /** Something a realm or the player should hear about. realm 0 = everyone. */
 export interface Notice {
   realm: number;
+  /** May name `{province}`, which the UI replaces with the province's name. */
   text: string;
+  province?: number;
 }
 
 const S = STRATA.length;
@@ -159,6 +169,7 @@ export function computeLedgers(state: GameState, ctx: EconomyContext): Ledger[] 
     const seats = state.courts?.[id]?.council.filter((c) => state.characters[c]?.died === null).length ?? 0;
     add(l, 'council', -seats * content.characters.salary);
   });
+  for (const a of state.armies ?? []) if (ledgers[a.realm]) add(ledgers[a.realm]!, 'armies', -armyWage(content, a, state.day));
   for (const loan of state.loans) if (ledgers[loan.realm]) add(ledgers[loan.realm]!, 'interest', -Math.trunc((loan.principal * loan.rate) / 120000));
   state.economy.forEach((ec, id) => {
     if (ec && ec.treasury > 0 && ledgers[id]) add(ledgers[id]!, 'largesse', -Math.trunc((ec.treasury * e.largesse) / 10000));
@@ -173,6 +184,13 @@ export function computeLedgers(state: GameState, ctx: EconomyContext): Ledger[] 
     add(ledgers[r.overlord]!, 'vassal_dues', dues);
   });
   return ledgers;
+}
+
+/** An army's monthly wages: levies cost little until their service is up, then more; men-at-arms always. */
+export function armyWage(content: Content, a: Army, day: number): number {
+  const m = content.military;
+  const levyWage = day - a.raised > m.levy.serviceDays ? m.levy.lateWage : m.levy.wage;
+  return Math.trunc((a.levies * levyWage + a.menAtArms * m.menAtArms.wage) / 1000);
 }
 
 export const ledgerNet = sum;

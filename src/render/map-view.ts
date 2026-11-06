@@ -199,6 +199,22 @@ const MIN_LABEL_PX = 9;
 const MAX_LABEL_PX = 110;
 export const LABEL_FONT = '"IM Fell English SC", "Iowan Old Style", Palatino, Georgia, serif';
 
+/** An army as the map draws it: a banner in its realm's colour with its strength, at a point in map pixels. */
+export interface ArmyMarker {
+  id: number;
+  x: number;
+  y: number;
+  color: number;
+  label: string;
+  selected: boolean;
+  fighting: boolean;
+  /** Map pixels of the march still ahead, drawn for the selected army. */
+  path: [number, number][];
+}
+
+const BANNER_W = 34;
+const BANNER_H = 17;
+
 export class MapView {
   readonly app = new Application();
   private readonly world = new Container();
@@ -208,6 +224,14 @@ export class MapView {
 
   onHover: (id: number, clientX: number, clientY: number) => void = () => {};
   onClick: (id: number) => void = () => {};
+  /** A click on an army's banner (instead of the province under it). */
+  onArmyClick: (id: number) => void = () => {};
+  /** A right click on a province (orders for the selected army). */
+  onContextClick: (id: number) => void = () => {};
+  private readonly armyLayer = new Container();
+  private readonly armyGraphics = new Graphics();
+  private readonly armyTexts: Text[] = [];
+  private armies: ArmyMarker[] = [];
   /** Map editor brush: left click or drag paints (Shift erases, Alt picks the realm under the cursor); clicks no longer select. */
   paintMode = false;
   onPaint: (id: number, x: number, y: number, how: 'paint' | 'erase' | 'pick') => void = () => {};
@@ -254,6 +278,8 @@ export class MapView {
     this.app.stage.addChild(this.world);
     this.labelLayer.eventMode = 'none';
     this.app.stage.addChild(this.labelLayer);
+    this.armyLayer.addChild(this.armyGraphics);
+    this.app.stage.addChild(this.armyLayer);
     this.app.ticker.add(() => this.sharpenSomeLabels());
 
     void this.decodeTiles();
@@ -350,6 +376,66 @@ export class MapView {
       entry.text.rotation = label.angle;
     }
     this.layoutLabels();
+  }
+
+  setArmies(markers: ArmyMarker[]) {
+    this.armies = markers;
+    this.layoutArmies();
+  }
+
+  private toScreen(x: number, y: number): [number, number] {
+    const s = this.world.scale.x;
+    return [this.world.x + x * s, this.world.y + y * s];
+  }
+
+  /** Banners stay the same size on screen at every zoom; several in one place stack upward. */
+  private layoutArmies() {
+    const g = this.armyGraphics;
+    g.clear();
+    const seen = new Map<string, number>();
+    this.armies.forEach((a, i) => {
+      const [sx, sy0] = this.toScreen(a.x, a.y);
+      const key = `${Math.round(a.x)},${Math.round(a.y)}`;
+      const stack = seen.get(key) ?? 0;
+      seen.set(key, stack + 1);
+      const sy = sy0 - stack * (BANNER_H + 3);
+      if (a.selected && a.path.length) {
+        g.moveTo(sx, sy);
+        for (const [px, py] of a.path) { const [qx, qy] = this.toScreen(px, py); g.lineTo(qx, qy); }
+        g.stroke({ width: 3, color: 0x7a1c12, alpha: 0.85, cap: 'round', join: 'round' });
+      }
+      g.rect(sx - BANNER_W / 2, sy - BANNER_H / 2, BANNER_W, BANNER_H).fill({ color: a.color })
+        .stroke({ width: a.selected ? 3 : 1.5, color: a.selected ? 0xf4d06f : a.fighting ? 0xc0281c : 0x2a1e12 });
+      let t = this.armyTexts[i];
+      if (!t) {
+        t = new Text({ text: '', style: new TextStyle({ fontFamily: LABEL_FONT, fontSize: 12, fill: 0xffffff, stroke: { color: 0x1a120a, width: 3 } }) });
+        t.anchor.set(0.5);
+        this.armyTexts.push(t);
+        this.armyLayer.addChild(t);
+      }
+      t.text = a.label;
+      t.position.set(sx, sy);
+      t.visible = true;
+    });
+    for (let i = this.armies.length; i < this.armyTexts.length; i++) this.armyTexts[i]!.visible = false;
+  }
+
+  /** The army whose banner is under a point on the page, or 0. */
+  private armyAtClient(clientX: number, clientY: number): number {
+    const rect = this.app.canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    const seen = new Map<string, number>();
+    let hit = 0;
+    for (const a of this.armies) {
+      const [sx, sy0] = this.toScreen(a.x, a.y);
+      const key = `${Math.round(a.x)},${Math.round(a.y)}`;
+      const stack = seen.get(key) ?? 0;
+      seen.set(key, stack + 1);
+      const sy = sy0 - stack * (BANNER_H + 3);
+      if (Math.abs(x - sx) <= BANNER_W / 2 + 2 && Math.abs(y - sy) <= BANNER_H / 2 + 2) hit = a.id;
+    }
+    return hit;
   }
 
   private labelTimer: ReturnType<typeof setTimeout> | undefined;
@@ -492,6 +578,7 @@ export class MapView {
     this.world.x = mw <= width ? (width - mw) / 2 : Math.min(0, Math.max(width - mw, this.world.x));
     this.world.y = mh <= height ? (height - mh) / 2 : Math.min(0, Math.max(height - mh, this.world.y));
     this.layoutLabels();
+    this.layoutArmies();
   }
 
   private bindInput() {
@@ -529,7 +616,14 @@ export class MapView {
       this.onHover(this.idAtClient(e.clientX, e.clientY), e.clientX, e.clientY);
     });
     canvas.addEventListener('pointerup', (e) => {
-      if (drag && !drag.moved && !this.paintMode) this.onClick(this.idAtClient(e.clientX, e.clientY));
+      if (drag && !drag.moved && !this.paintMode) {
+        if (e.button === 2) this.onContextClick(this.idAtClient(e.clientX, e.clientY));
+        else {
+          const army = this.armyAtClient(e.clientX, e.clientY);
+          if (army) this.onArmyClick(army);
+          else this.onClick(this.idAtClient(e.clientX, e.clientY));
+        }
+      }
       drag = null;
       painting = false;
     });

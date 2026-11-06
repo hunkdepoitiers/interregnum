@@ -22,6 +22,8 @@ import { compileCharacters, compileRulers } from './characters-lib';
 import { charactersSourceSchema, namesSourceSchema, rulersSourceSchema } from '../src/content/characters';
 import { economySourceSchema, populationSourceSchema } from '../src/content/economy';
 import { faithSourceSchema } from '../src/content/faith';
+import { militarySourceSchema } from '../src/content/military';
+import { compileGraph, compileMilitary } from './military-lib';
 import { compileFaith } from './faith-lib';
 
 function load<T>(file: string, schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: { issues: { path: PropertyKey[]; message: string }[] } } }): T {
@@ -115,6 +117,9 @@ scenario.courts = rulers.courts;
 const faith = compileFaith(load('data/content/faith.yaml', faithSourceSchema), content, scenario.realms, map.provinces, ctxAll);
 errors.push(...faith.errors);
 content.faith = faith.faith;
+const militarySrc = load('data/content/military.yaml', militarySourceSchema);
+content.military = compileMilitary(militarySrc);
+Object.assign(scenario, compileGraph(militarySrc, map.provinces, ctxAll));
 const provinceName = new Map(map.provinces.map((p) => [p.id, p.name]));
 scenario.seats = scenario.realms.map((r) => provinceName.get(r.capital) ?? r.name);
 for (const w of warnings) console.warn(`warning: ${w}`);
@@ -126,4 +131,4 @@ writeFileSync('public/generated/scenario.json', JSON.stringify(scenario));
 writeFileSync('public/generated/scenario-edits.json', JSON.stringify(edits));
 writeFileSync('public/generated/content.json', JSON.stringify(content));
 const owned = scenario.owner.filter(Boolean).length;
-console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${titles.titles.counties.length}/${titles.titles.duchies.length}/${titles.titles.kingdoms.length}/${titles.titles.empires.length}/${titles.titles.hegemonies.length} counties/duchies/kingdoms/empires/hegemonies, ${goods.goods.length} trade goods, ${Math.round(population.pops.reduce((a, b) => a + b, 0) / 1e6)} million people, ${economy.economy.banks.length} banks, ${rulers.courts.filter(Boolean).length} historical rulers, ${faith.faith.faiths.reduce((n, f) => n + f.holySites.length, 0)} holy sites, ${warnings.length} warnings`);
+console.log(`build-data: ${scenario.realms.length} realms, ${owned} owned and ${unowned} unowned land provinces, ${edits.overrides.length} edits, ${scenario.modifiers?.length ?? 0} starting modifiers, ${Object.keys(content.stats).length} stats, ${Object.keys(content.modifiers).length} modifier types, ${content.cultures.length} cultures, ${content.religions.length} religions, ${titles.titles.counties.length}/${titles.titles.duchies.length}/${titles.titles.kingdoms.length}/${titles.titles.empires.length}/${titles.titles.hegemonies.length} counties/duchies/kingdoms/empires/hegemonies, ${goods.goods.length} trade goods, ${Math.round(population.pops.reduce((a, b) => a + b, 0) / 1e6)} million people, ${economy.economy.banks.length} banks, ${rulers.courts.filter(Boolean).length} historical rulers, ${faith.faith.faiths.reduce((n, f) => n + f.holySites.length, 0)} holy sites, ${scenario.graph!.to.length} march routes, ${warnings.length} warnings`);

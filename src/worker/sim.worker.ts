@@ -8,13 +8,15 @@ import {
 } from '../sim/economy';
 import { cannotDeed, deedCost, deedIncome, excommunicationThreat, holySitesAt, realmFaith, startFaith, tiersOf } from '../sim/faith';
 import { hasModifier } from '../sim/modifiers';
+import { atWar, cannotHire, levyPool } from '../sim/military';
+import { armyWage } from '../sim/economy';
 import { deserialize, serialize } from '../sim/save';
 import { ensureStanding } from '../sim/standing';
 import type { Scenario } from '../sim/scenario';
 import { newGame, type GameState, type Speed } from '../sim/state';
 import { tick } from '../sim/tick';
 import type {
-  CharacterRef, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, StandingReport, ToWorker,
+  ArmyView, CharacterRef, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, StandingReport, ToWorker,
 } from './protocol';
 
 /** Milliseconds per game day (speed 5 ≈ 100 days per second, if the tick keeps up). */
@@ -117,6 +119,35 @@ function standingReport(s: GameState, ctx: EconomyContext, realm: number): Stand
   };
 }
 
+function edgeDays(ctx: EconomyContext, from: number, to: number): number {
+  const g = ctx.graph;
+  if (!g) return 10;
+  for (let i = g.start[from]!; i < g.start[from + 1]!; i++) if (g.to[i] === to) return g.days[i]!;
+  return 10;
+}
+
+function postArmies(s: GameState, ctx: EconomyContext) {
+  const m = ctx.content.military;
+  const armies: ArmyView[] = s.armies.map((a) => {
+    let eta = 0;
+    let from = a.location;
+    for (const p of a.path) { eta += edgeDays(ctx, from, p); from = p; }
+    const men = a.levies + a.menAtArms;
+    const enemyHolds = atWar(s, a.realm, s.provinces[a.location]?.controller ?? 0);
+    return {
+      id: a.id, realm: a.realm, location: a.location, next: a.path[0] ?? 0,
+      progress: a.path.length ? Math.min(100, Math.trunc((a.progress * 100) / edgeDays(ctx, a.location, a.path[0]!))) : 0,
+      destination: a.path[a.path.length - 1] ?? 0, eta: Math.ceil(Math.max(0, eta - a.progress) / 10),
+      path: [...a.path], levies: a.levies, menAtArms: a.menAtArms, morale: Math.trunc(a.morale / 100), commander: ref(s, a.commander), ready: a.ready,
+      fighting: !a.retreating && s.armies.some((x) => x.location === a.location && !x.retreating && atWar(s, a.realm, x.realm)),
+      retreating: a.retreating,
+      siege: enemyHolds ? a.siege : 0, siegeNeed: enemyHolds ? Math.max(m.occupyMin, Math.trunc((m.occupyDays * 1000) / Math.max(1, men))) : 0,
+      wage: armyWage(ctx.content, a, s.day),
+    };
+  });
+  post({ type: 'armies', armies, wars: s.wars });
+}
+
 function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport | ProvinceReport | CharacterReport | null {
   if (q.kind === 'character') return characterReport(s, ctx, q.id);
   if (q.kind === 'realm') {
@@ -138,6 +169,7 @@ function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport
       people,
       court: courtReport(s, ctx, q.id),
       standing: standingReport(s, ctx, q.id),
+      military: { ...levyPool(s, ctx, q.id), hireCost: Math.trunc(ctx.content.military.menAtArms.cost), cannotHire: cannotHire(s, ctx, q.id, 1000) },
     };
   }
   const p = s.provinces[q.id];
@@ -162,6 +194,7 @@ function step() {
   if (!state) return;
   const r = tick(state, economy ?? undefined);
   if (r.modifiersChanged) postWorld(state);
+  if (economy && (state.armies.length || state.wars.length || r.notices.length)) postArmies(state, economy);
   postNotices(state, r.notices);
   postStatus(state);
   schedule();
@@ -175,6 +208,7 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
     economy = {
       content, goods: scenario.good ?? [], centres: scenario.tradeCentre ?? [], seats: scenario.seats ?? [],
       culture: scenario.culture ?? [], religion: scenario.religion ?? [],
+      graph: scenario.graph, pos: scenario.pos, kmPerPx: scenario.kmPerPx, terrain: scenario.terrain,
     };
     state = newGame(msg.seed, scenario, content.economy.banks.map((b) => b.capital));
     startCharacters(state, economy);
@@ -185,7 +219,8 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
     return; // nothing to act on before init
   } else if (msg.type === 'command') {
     const notices: Notice[] = [];
-    if (applyCommand(state, msg.cmd, economy.content, economy.goods, notices)) postWorld(state);
+    if (applyCommand(state, msg.cmd, economy.content, economy.goods, notices, economy)) postWorld(state);
+    postArmies(state, economy);
     postNotices(state, notices);
   } else if (msg.type === 'requestSave') {
     post({ type: 'saveData', requestId: msg.requestId, text: serialize(state) });
@@ -200,6 +235,7 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
       ensureStanding(state);
       state.paused = true;
       postWorld(state);
+      postArmies(state, economy);
       post({ type: 'loaded', requestId: msg.requestId, error: null });
     } catch (err) {
       post({ type: 'loaded', requestId: msg.requestId, error: err instanceof Error ? err.message : String(err) });

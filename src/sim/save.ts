@@ -49,6 +49,8 @@ export const migrations: Record<number, Migration> = {
     if (economy) startFaith(next as unknown as GameState, economy);
     return next;
   },
+  // v7 added armies and wars: none yet.
+  6: (s) => ({ ...s, armies: [], nextArmyId: 1, wars: [], nextWarId: 1 }),
 };
 
 export class SaveError extends Error {}
@@ -111,7 +113,7 @@ function validate(s: GameState): void {
     s.economy.slice(1).every((e) => Number.isInteger(e?.treasury)) && Array.isArray(s.banks) && Array.isArray(s.loans) &&
     s.loans.every((l) => Number.isInteger(l?.principal) && realmRef(l.realm) && s.banks[l.bank] !== undefined) &&
     Array.isArray(s.construction) && typeof s.buildings === 'object' && s.buildings !== null &&
-    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) && Array.isArray(s.standing) && s.standing.every((x) => x === null || (Number.isInteger(x.prestige) && Number.isInteger(x.piety))) &&
+    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) && Array.isArray(s.standing) && Array.isArray(s.armies) && Array.isArray(s.wars) && s.armies.every((a) => realmRef(a?.realm) && a.realm > 0 && s.provinces[a.location] !== undefined && Number.isInteger(a.levies) && Number.isInteger(a.menAtArms)) && s.standing.every((x) => x === null || (Number.isInteger(x.prestige) && Number.isInteger(x.piety))) &&
     s.courts.every((c) => c === null || (Number.isInteger(c.ruler) && Array.isArray(c.council))) &&
     s.modifiers.every((m) =>
       Number.isInteger(m?.id) && m.id < s.nextModifierId && typeof m.def === 'string' && Number.isInteger(m.start) &&

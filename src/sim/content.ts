@@ -298,6 +298,37 @@ export function emptyFaith(): FaithDef {
   };
 }
 
+/** Armies (data/content/military.yaml). Money in hundredths of a ducat; percentages as whole percent. */
+export interface MilitaryDef {
+  levy: { name: string; description: string; strength: number; wage: number; lateWage: number; serviceDays: number };
+  menAtArms: { name: string; description: string; strength: number; wage: number; cost: number };
+  /** Hundredths of a percent of the people, at a levy size of 100%: men = people × levy_size × levyShare / 10^8. */
+  levyShare: number;
+  menAtArmsPerThousandLevies: number;
+  musterDays: number;
+  terrainDefence: Record<string, number>;
+  attrition: number;
+  attritionMax: number;
+  hostileSupply: number;
+  homeSupply: number;
+  casualties: number;
+  moraleLoss: number;
+  moraleRegain: number;
+  warcraftStrength: number;
+  occupyDays: number;
+  occupyMin: number;
+}
+
+/** No armies to speak of: for content built without data/content/military.yaml. */
+export function emptyMilitary(): MilitaryDef {
+  return {
+    levy: { name: 'Levies', description: '', strength: 100, wage: 0, lateWage: 0, serviceDays: 120 },
+    menAtArms: { name: 'Men-at-arms', description: '', strength: 300, wage: 0, cost: 0 },
+    levyShare: 0, menAtArmsPerThousandLevies: 0, musterDays: 0, terrainDefence: {}, attrition: 0, attritionMax: 0, hostileSupply: 100, homeSupply: 100,
+    casualties: 15, moraleLoss: 400, moraleRegain: 25, warcraftStrength: 0, occupyDays: 30, occupyMin: 5,
+  };
+}
+
 export interface Content {
   stats: Record<string, StatDef>;
   modifiers: Record<string, ModifierDef>;
@@ -310,4 +341,5 @@ export interface Content {
   economy: EconomyDef;
   characters: CharactersDef;
   faith: FaithDef;
+  military: MilitaryDef;
 }

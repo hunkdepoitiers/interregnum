@@ -1,11 +1,12 @@
-import { command, status, world } from '../bridge/client';
+import { armies, command, status, wars, world } from '../bridge/client';
 import { ledgerNet } from '../sim/economy';
 import { money, signedMoney, treasuryOpen, useReport } from './economy';
 import type { Realm } from '../sim/state';
 import { mapData, selectedRealm, selectProvince, selectRealm } from './App';
 import { dayToDate, formatDate } from '../sim/calendar';
 import { SKILL_NAMES } from '../sim/characters';
-import type { CourtReport, StandingReport } from '../worker/protocol';
+import type { CourtReport, MilitaryReport, StandingReport } from '../worker/protocol';
+import { menLabel, selectArmy } from './ArmyPanel';
 import { CharLink, Medallion } from './CharacterPanel';
 import { Row, Section } from './folio';
 import { content } from './StatList';
@@ -76,6 +77,7 @@ export function RealmPanel() {
           {report && <Row label="People">{report.people.toLocaleString('en')}</Row>}
         </Section>
         {report?.court && <Crown court={report.court} />}
+        {report?.military && <Arms realm={realm.id} m={report.military} mine={status.value.player === realm.id} />}
         {report?.standing && <Standing realm={realm.id} s={report.standing} mine={status.value.player === realm.id} />}
         <Section title="Treasury">
           {report && <Row label="Treasury"><span class={report.treasury < 0 ? 'warn' : ''}>{money(report.treasury)} ducats</span></Row>}
@@ -239,6 +241,46 @@ function Standing({ realm, s, mine }: { realm: number; s: StandingReport; mine: 
               </button>
             );
           })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** Levies, men-at-arms, armies in the field and wars; debug war and peace until diplomacy (M9) brings real ones. */
+function Arms({ realm, m, mine }: { realm: number; m: MilitaryReport; mine: boolean }) {
+  const player = status.value.player;
+  const own = armies.value.filter((a) => a.realm === realm);
+  const myWars = wars.value.filter((w) => w.attackers.includes(realm) || w.defenders.includes(realm));
+  const atWarWithPlayer = myWars.some((w) => (w.attackers.includes(realm) && w.defenders.includes(player)) || (w.defenders.includes(realm) && w.attackers.includes(player)));
+  return (
+    <section class="folio-sec">
+      <h3><span class="initial">A</span>rms</h3>
+      <dl class="rows">
+        <Row label="Levies"><span title="People of the realm × levy size × the levy share">{m.raised.toLocaleString('en')} raised of {m.total.toLocaleString('en')}</span></Row>
+        <Row label="Men-at-arms">{m.menAtArms.toLocaleString('en')} <span class="muted">of {m.maxMenAtArms.toLocaleString('en')} at most</span></Row>
+        {own.map((a) => (
+          <Row key={a.id} label="Army">
+            <button class="link" onClick={() => selectArmy(a.id)}>{menLabel(a.levies + a.menAtArms)} men</button>
+            <span class="muted"> {a.retreating ? 'retreating' : a.fighting ? 'in battle' : a.next ? 'marching' : 'encamped'}</span>
+          </Row>
+        ))}
+        {myWars.map((w) => (
+          <Row key={w.id} label="At war">
+            <span>{(w.attackers.includes(realm) ? w.defenders : w.attackers).filter((r, i) => i === 0 || r === player).map((r) => <RealmLink key={r} id={r} />)}</span>
+            {mine && <button class="small-btn" title="Debug: white peace, occupied land returns" onClick={() => command({ type: 'makePeace', war: w.id })}>Make peace</button>}
+          </Row>
+        ))}
+      </dl>
+      {mine && (
+        <div class="deeds">
+          <button class="small-btn" disabled={m.raised >= m.total} onClick={() => command({ type: 'raiseLevies', realm })}>Raise levies</button>
+          <button class="small-btn" disabled={!!m.cannotHire} title={m.cannotHire ?? `Hire 1,000 men-at-arms for ${money(m.hireCost)} ducats.`} onClick={() => command({ type: 'hireMenAtArms', realm, men: 1000 })}>Hire 1,000 men-at-arms</button>
+        </div>
+      )}
+      {!mine && player > 0 && !atWarWithPlayer && (
+        <div class="deeds">
+          <button class="small-btn" title="Debug until diplomacy: no reason needed" onClick={() => command({ type: 'declareWar', attacker: player, defender: realm })}>Declare war (debug)</button>
         </div>
       )}
     </section>

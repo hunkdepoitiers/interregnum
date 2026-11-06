@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { heirOf, monthlyCharacters, skillsOf, startCharacters } from '../src/sim/characters';
-import { emptyCharacters, emptyFaith, emptyEconomy, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
+import { emptyCharacters, emptyFaith, emptyMilitary, emptyEconomy, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
 import type { EconomyContext } from '../src/sim/economy';
 import { hashState } from '../src/sim/hash';
 import { explain, hasModifier } from '../src/sim/modifiers';
@@ -33,6 +33,7 @@ const content: Content = {
     laws: ['agnatic', 'cognatic', 'open', 'elective', 'republic', 'theocracy'].map((key) => ({ key, name: key, description: '' })),
   },
   faith: emptyFaith(),
+  military: emptyMilitary(),
 };
 
 const Y = 365.25;

@@ -2,9 +2,9 @@ import { signal } from '@preact/signals';
 import type { Command } from '../sim/commands';
 import type { Content } from '../sim/content';
 import type { Scenario } from '../sim/scenario';
-import type { Speed } from '../sim/state';
+import type { Speed, War } from '../sim/state';
 import type { Notice } from '../sim/economy';
-import type { CharacterReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker, WorldView } from '../worker/protocol';
+import type { ArmyView, CharacterReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker, WorldView } from '../worker/protocol';
 
 /**
  * Main-thread handle on the simulation worker. The UI reads this signal and never touches sim state.
@@ -18,6 +18,9 @@ export const status = signal<{ day: number; speed: Speed; paused: boolean; playe
 export const world = signal<WorldView | null>(null);
 /** Bumped whenever money may have moved outside the monthly settlement (a command), so economy views refetch. */
 export const economyEpoch = signal(0);
+/** Every army in the field and every war, sent each day while there are any. */
+export const armies = signal<ArmyView[]>([]);
+export const wars = signal<War[]>([]);
 /** Called with what the player should hear about (set by the UI). */
 export let onNotices: (notices: Notice[]) => void = () => {};
 export function setNoticeHandler(fn: (notices: Notice[]) => void) {
@@ -36,6 +39,11 @@ worker.onmessage = (e: MessageEvent<FromWorker>) => {
   }
   if (msg.type === 'world') {
     world.value = { realms: msg.realms, owner: msg.owner, controller: msg.controller, modifiers: msg.modifiers, development: msg.development };
+    return;
+  }
+  if (msg.type === 'armies') {
+    armies.value = msg.armies;
+    wars.value = msg.wars;
     return;
   }
   if (msg.type === 'notices') {

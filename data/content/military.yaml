@@ -1,0 +1,44 @@
+# Armies, movement, supply and battle (M7). Read by tools/build-data.ts (military-lib). Money in ducats.
+# Numbers are tuned for play: GUESS.
+
+# Unit types. strength: fighting worth of 1,000 men; wage: ducats a month per 1,000 men; cost: ducats per 1,000 men
+# to recruit (levies are raised for nothing). Levies serve `service_days` for their keep, then cost `late_wage`.
+units:
+  levy: { name: Levies, strength: 1, wage: 4, late_wage: 12, service_days: 120, description: Peasants called to arms by their lords. Cheap, slow to form up and quick to break. }
+  men_at_arms: { name: Men-at-arms, strength: 3, wage: 30, cost: 150, description: Professional soldiers, armoured and drilled, paid month by month. }
+
+# Levies: the realm's people × its levy size stat × this share. With a 10% levy size a realm of a million raises 5,000.
+levy_share: 5
+# Most men-at-arms a realm may keep, per 1,000 of its levies.
+men_at_arms_per_thousand_levies: 250
+# Levies muster at the capital this many days after the call.
+muster_days: 20
+
+# Movement: km a day on open ground, times a terrain factor (percent). Straits take extra days.
+march_km: 20
+strait_days: 3
+terrain_speed: { farmlands: 100, plains: 100, steppe: 110, hills: 75, highlands: 60, forest: 70, jungle: 50, marsh: 55, desert: 70, tundra: 60 }
+# Defenders fight better on hard ground (percent of strength).
+terrain_defence: { farmlands: 100, plains: 100, steppe: 100, hills: 120, highlands: 130, forest: 115, jungle: 120, marsh: 120, desert: 105, tundra: 105 }
+
+# Supply: an army above the province's supply limit (thousands of men) loses this share (%) a month per 100% over,
+# at most `attrition_max` (%). In hostile land the limit counts `hostile_supply` percent; in land its own side holds,
+# `home_supply` percent.
+attrition: 5
+attrition_max: 10
+hostile_supply: 60
+home_supply: 200
+
+# Battle, each day: a side kills (enemy strength in thousands × `casualties` men) ×(80..120)%, and loses morale
+# by the same share of its men × `morale_loss`. A side breaks at zero morale and retreats. Morale recovers
+# `morale_regain` (%) a month out of battle.
+casualties: 15
+morale_loss: 400
+morale_regain: 25
+# Commander's warcraft above 10 adds this percent of strength per point.
+warcraft_strength: 4
+
+# Occupation: an enemy army alone in an unfortified province takes it in `occupy_days` (days for 1,000 men; more
+# men, faster, never under `occupy_min`).
+occupy_days: 30
+occupy_min: 5

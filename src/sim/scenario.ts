@@ -98,4 +98,14 @@ export interface Scenario {
   courts?: (Court | null)[];
   /** Per realm id - 1: the name of its seat, for houses founded there ("of Paris"). */
   seats?: string[];
+  /**
+   * The march graph of land provinces: province p's neighbours are to[start[p] .. start[p + 1]), each reached in
+   * days[i] tenths of a day (terrain, distance, straits). pos holds every province's centroid, x and y in map pixels.
+   */
+  graph?: { start: number[]; to: number[]; days: number[] };
+  pos?: number[];
+  /** Kilometres per map pixel at the standard parallel, for the march planner's estimate. */
+  kmPerPx?: number;
+  /** Per province id: terrain key ('' for none). */
+  terrain?: string[];
 }

@@ -1,6 +1,6 @@
 /**
  * Runs the built game headless for some years and prints the money of the biggest realms each year, for balancing:
- *   npx tsx tools/run-years.ts [years=10] [realm keys...]
+ *   npx tsx tools/run-years.ts [years=10] [realm keys...] [--war attacker,defender]
  * Reads public/generated/{scenario,content}.json, so run build-data first.
  */
 import { readFileSync } from 'node:fs';
@@ -9,6 +9,7 @@ import { computeLedgers, ducats, LEDGER, startEconomy, type EconomyContext } fro
 import type { Scenario } from '../src/sim/scenario';
 import { ageOf, startCharacters } from '../src/sim/characters';
 import { startFaith, tiersOf } from '../src/sim/faith';
+import { declareWar } from '../src/sim/military';
 import { newGame } from '../src/sim/state';
 import { tick } from '../src/sim/tick';
 
@@ -18,13 +19,21 @@ const content = JSON.parse(readFileSync('public/generated/content.json', 'utf8')
 const ctx: EconomyContext = {
   content, goods: scenario.good ?? [], centres: scenario.tradeCentre ?? [], seats: scenario.seats ?? [],
   culture: scenario.culture ?? [], religion: scenario.religion ?? [],
+  graph: scenario.graph, pos: scenario.pos, kmPerPx: scenario.kmPerPx, terrain: scenario.terrain,
 };
 const state = newGame(1314, scenario, content.economy.banks.map((b) => b.capital));
 startCharacters(state, ctx);
 startEconomy(state, ctx);
 startFaith(state, ctx);
 
-const keys = process.argv.slice(3);
+const warAt = process.argv.indexOf('--war');
+const warPair = warAt > 0 ? process.argv[warAt + 1]!.split(',') : null;
+const keys = process.argv.slice(3).filter((_, i, all) => all[i] !== '--war' && all[i - 1] !== '--war');
+if (warPair) {
+  const id = (k: string) => state.realms.find((r) => r?.key === k)?.id ?? 0;
+  const w = declareWar(state, id(warPair[0]!), id(warPair[1]!));
+  console.log(`War: ${w?.attackers.map((r) => state.realms[r]!.key).join(', ')} against ${w?.defenders.map((r) => state.realms[r]!.key).join(', ')}`);
+}
 const watched = (keys.length ? keys : ['france', 'england', 'castile', 'venice', 'golden_horde', 'mamluks', 'yuan', 'delhi', 'papal_states', 'scotland'])
   .map((k) => state.realms.findIndex((r) => r?.key === k)).filter((i) => i > 0);
 
@@ -61,6 +70,13 @@ for (let y = 1; y <= years; y++) {
     }
   }
   if (y % (years > 20 ? 10 : 1) === 0 || y === years) report(`Year ${y}, ${people()} million people`);
+}
+if (warPair) {
+  const occupied = state.provinces.filter((p) => p.owner && p.controller !== p.owner);
+  const by = new Map<string, number>();
+  for (const p of occupied) { const k = `${state.realms[p.controller]?.key} holds ${state.realms[p.owner]?.key}`; by.set(k, (by.get(k) ?? 0) + 1); }
+  console.log(`armies: ${state.armies.map((a) => `${state.realms[a.realm]?.key} ${a.levies}+${a.menAtArms} @${a.location} m${Math.trunc(a.morale / 100)}`).join('; ')}`);
+  console.log(`occupied: ${[...by].map(([k, n]) => `${k}: ${n}`).join(', ')}`);
 }
 const ex = state.modifiers.filter((m) => m.def === 'excommunicated').length;
 console.log(`excommunicated now: ${ex}; prestige range ${Math.min(...state.standing.filter(Boolean).map((x) => x!.prestige))}..${Math.max(...state.standing.filter(Boolean).map((x) => x!.prestige))}, piety range ${Math.min(...state.standing.filter(Boolean).map((x) => x!.piety))}..${Math.max(...state.standing.filter(Boolean).map((x) => x!.piety))}`);

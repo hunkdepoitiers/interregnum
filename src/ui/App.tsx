@@ -1,6 +1,6 @@
 import { computed, effect, signal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
-import { command, setNoticeHandler, startGame, world } from '../bridge/client';
+import { armies, command, setNoticeHandler, startGame, status, world } from '../bridge/client';
 import type { MapData, RiverData } from '../content/map';
 import type { EditsSource, Scenario } from '../content/scenario';
 import type { Content } from '../sim/content';
@@ -9,6 +9,7 @@ import { computeLabels } from '../render/labels';
 import { LABEL_FONT, loadIdTiles, MapView } from '../render/map-view';
 import { editing, paint, restoreEdits, setBaseEdits } from './editor';
 import { EditorPanel } from './EditorPanel';
+import { ArmyPanel, menLabel, selectArmy, selectedArmy } from './ArmyPanel';
 import { CharacterPanel, selectedCharacter } from './CharacterPanel';
 import { DebugConsole } from './DebugConsole';
 import { MapModeBar } from './MapModeBar';
@@ -48,7 +49,7 @@ effect(() => {
 });
 
 export function selectProvince(id: number, center = false) {
-  if (id) selectedCharacter.value = 0;
+  if (id) { selectedCharacter.value = 0; selectedArmy.value = 0; }
   selected.value = id;
   selectedRealm.value = 0;
   view?.setSelected(id);
@@ -58,7 +59,7 @@ export function selectProvince(id: number, center = false) {
 }
 
 export function selectRealm(id: number, center = false) {
-  if (id) selectedCharacter.value = 0;
+  if (id) { selectedCharacter.value = 0; selectedArmy.value = 0; }
   selected.value = 0;
   selectedRealm.value = id;
   view?.setSelected(0);
@@ -68,7 +69,7 @@ export function selectRealm(id: number, center = false) {
   if (center && capital) view?.centerOn(capital.centroid[0], capital.centroid[1]);
 }
 
-setNoticeHandler((notices) => showToast(notices.map((n) => n.text).join(' ')));
+setNoticeHandler((notices) => showToast(notices.map((n) => n.text.replace('{province}', mapData.value?.provinces.find((q) => q.id === n.province)?.name ?? 'a province')).join(' ')));
 
 export function showToast(text: string) {
   toast.value = text;
@@ -102,6 +103,8 @@ function installDebugHooks(map: MapData) {
       occupy: (p: string, r: string) => command({ type: 'setController', province: prov(p), realm: realm(r) }),
       transfer: (p: string, r: string) => command({ type: 'setOwner', province: prov(p), realm: realm(r) }),
       select: (p: string) => selectProvince(prov(p), true),
+      view: () => view,
+      army: (id: number) => selectArmy(id),
     },
   });
 }
@@ -132,6 +135,12 @@ export function App() {
         hovered.value = { id, x, y };
       };
       view.onClick = (id) => selectProvince(id);
+      view.onArmyClick = (id) => selectArmy(id);
+      // Right click: the player's selected army marches there.
+      view.onContextClick = (id) => {
+        const a = armies.value.find((x) => x.id === selectedArmy.value);
+        if (a && id && a.realm === status.value.player) command({ type: 'moveArmy', realm: a.realm, army: a.id, to: id });
+      };
       view.onPaint = paint;
       await view.mount(host.current);
       view.setRivers(await riversReady);
@@ -145,6 +154,22 @@ export function App() {
       });
       installDebugHooks(map);
       mapData.value = map;
+      const at = new Map(map.provinces.map((p) => [p.id, p.centroid]));
+      effect(() => {
+        const w = world.value;
+        const sel = selectedArmy.value;
+        view?.setArmies(armies.value.map((a) => {
+          const from = at.get(a.location) ?? [0, 0];
+          const to = a.next ? at.get(a.next) ?? from : from;
+          const f = a.progress / 100;
+          return {
+            id: a.id, x: from[0] + (to[0] - from[0]) * f, y: from[1] + (to[1] - from[1]) * f,
+            color: parseInt((w?.realms[a.realm]?.color ?? '#888888').slice(1), 16), label: menLabel(a.levies + a.menAtArms),
+            selected: a.id === sel, fighting: a.fighting,
+            path: a.id === sel ? a.path.map((p) => (at.get(p) ?? [0, 0]) as [number, number]) : [],
+          };
+        }));
+      });
     })().catch((e) => (loadError.value = `Could not load the map: ${String(e)}`));
     return () => {
       cancelled = true;
@@ -160,6 +185,7 @@ export function App() {
       <ProvincePanel />
       <RealmPanel />
       <CharacterPanel />
+      <ArmyPanel />
       <TreasuryPanel />
       <MapModeBar />
       <EditorPanel />

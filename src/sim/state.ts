@@ -4,7 +4,7 @@ import type { Character, Court, Dynasty, Scenario, ScenarioRealm } from './scena
 
 export type { Character, Court, Dynasty };
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 /** Speed 1 (slowest) .. 5 (fastest). */
 export type Speed = 1 | 2 | 3 | 4 | 5;
@@ -83,6 +83,40 @@ export interface RealmStanding {
   pilgrimage: { ruler: number; until: number } | null;
 }
 
+/** An army in the field (src/sim/military.ts). */
+export interface Army {
+  id: number;
+  realm: number;
+  /** Province it stands in, or marches from. */
+  location: number;
+  /** Provinces still to march through, the next first. */
+  path: number[];
+  /** Tenths of a day marched toward path[0]. */
+  progress: number;
+  levies: number;
+  menAtArms: number;
+  /** 0..10000. */
+  morale: number;
+  /** Day its levies were called up (their unpaid service runs from here). */
+  raised: number;
+  /** Day it has mustered and may march. */
+  ready: number;
+  /** Character leading it; 0 = none. */
+  commander: number;
+  /** Days it has held the province toward occupying it. */
+  siege: number;
+  /** Fleeing a lost battle: it cannot be caught or give battle until it stops. */
+  retreating: boolean;
+}
+
+export interface War {
+  id: number;
+  name: string;
+  attackers: number[];
+  defenders: number[];
+  start: number;
+}
+
 export interface GameState {
   saveVersion: number;
   seed: number;
@@ -121,6 +155,10 @@ export interface GameState {
   courts: (Court | null)[];
   /** Indexed like realms. */
   standing: (RealmStanding | null)[];
+  armies: Army[];
+  nextArmyId: number;
+  wars: War[];
+  nextWarId: number;
 }
 
 export function provincesFromScenario(scenario: Scenario): ProvinceState[] {
@@ -181,5 +219,9 @@ export function newGame(seed: number, scenario: Scenario, bankCapitals: number[]
     ...economyFromScenario(scenario, realms.length, bankCapitals),
     ...charactersFromScenario(scenario),
     standing: realms.map((r) => (r ? { prestige: 0, piety: 0, log: [], cooldowns: {}, pilgrimage: null } : null)),
+    armies: [],
+    nextArmyId: 1,
+    wars: [],
+    nextWarId: 1,
   };
 }

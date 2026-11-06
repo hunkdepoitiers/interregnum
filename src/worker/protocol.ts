@@ -3,7 +3,7 @@ import type { Content } from '../sim/content';
 import type { CreditRating, LoanOffer, Notice, ProvinceEconomy } from '../sim/economy';
 import type { Modifier } from '../sim/modifiers';
 import type { Scenario } from '../sim/scenario';
-import type { Construction, Ledger, Loan, Realm, Speed } from '../sim/state';
+import type { Construction, Ledger, Loan, Realm, Speed, War } from '../sim/state';
 
 /** Questions the UI asks the worker about money and people. */
 export type EconomyQuery = { kind: 'realm'; id: number } | { kind: 'province'; id: number } | { kind: 'character'; id: number };
@@ -75,6 +75,45 @@ export interface StandingReport {
   deeds: { key: string; name: string; description: string; cost: number; income: number; prestige: number; piety: number; days: number; why: string | null }[];
 }
 
+/** An army as the map and the army panel show it. */
+export interface ArmyView {
+  id: number;
+  realm: number;
+  location: number;
+  /** Province it marches into next (0 = standing), how far along (0-100), and where it is bound. */
+  next: number;
+  progress: number;
+  destination: number;
+  /** Provinces still to march through. */
+  path: number[];
+  /** Days left to the destination. */
+  eta: number;
+  levies: number;
+  menAtArms: number;
+  /** 0-100. */
+  morale: number;
+  commander: CharacterRef | null;
+  /** Mustering until this day. */
+  ready: number;
+  fighting: boolean;
+  retreating: boolean;
+  /** Days spent taking the province, and days it needs (0 = not occupying). */
+  siege: number;
+  siegeNeed: number;
+  wage: number;
+}
+
+export interface MilitaryReport {
+  /** Levies the realm can call up in all. */
+  total: number;
+  raised: number;
+  menAtArms: number;
+  maxMenAtArms: number;
+  /** Cost of hiring 1,000 men-at-arms, and why the realm cannot now (null = it can). */
+  hireCost: number;
+  cannotHire: string | null;
+}
+
 export interface RealmReport {
   treasury: number;
   /** Last month's settled ledger, and this month's as it stands (one-offs so far included). */
@@ -90,6 +129,7 @@ export interface RealmReport {
   people: number;
   court: CourtReport | null;
   standing: StandingReport | null;
+  military: MilitaryReport;
 }
 
 export interface ProvinceReport {
@@ -123,6 +163,7 @@ export interface WorldView {
 export type FromWorker =
   | { type: 'status'; day: number; speed: Speed; paused: boolean; player: number; treasury: number | null; net: number | null }
   | { type: 'notices'; notices: Notice[] }
+  | { type: 'armies'; armies: ArmyView[]; wars: War[] }
   | { type: 'queryResult'; requestId: number; result: RealmReport | ProvinceReport | CharacterReport | null }
   | ({ type: 'world' } & WorldView)
   | { type: 'saveData'; requestId: number; text: string }

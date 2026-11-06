@@ -1,4 +1,5 @@
-import { command, status, world } from '../bridge/client';
+import { armies, command, status, world } from '../bridge/client';
+import { menLabel, selectArmy } from './ArmyPanel';
 import { STRATA } from '../sim/content';
 import { content } from './StatList';
 import type { ProvinceReport } from '../worker/protocol';
@@ -24,7 +25,6 @@ const STRATUM_LABEL: Record<(typeof STRATA)[number], string> = {
 
 /** When a field that has no simulation yet arrives (docs/ROADMAP.md). */
 const EVENTS = 'events (M10)';
-const ARMIES = 'armies (M7)';
 const SIEGES = 'sieges (M8)';
 
 function areaKm2(map: MapData, p: MapProvince): number {
@@ -116,7 +116,7 @@ export function ProvincePanel() {
               <Row label="Area">≈ {(Math.round(areaKm2(map, p) / 100) * 100).toLocaleString('en')} km²</Row>
               <StatRow stat="development" scope="province" id={p.id} />
               <StatRow stat="supply_limit" scope="province" id={p.id} />
-              <Pending label="Control" when={ARMIES} />
+              <Row label="Control">{controller && controller !== owner ? <span class="warn">Occupied by <RealmLink id={controller} /></span> : 'Held by its owner'}</Row>
               <Pending label="Prosperity" when={EVENTS} />
               <Pending label="Fortifications" when={SIEGES} />
             </Section>
@@ -144,8 +144,12 @@ export function ProvincePanel() {
             </Section>
             {report && <Buildings id={p.id} owner={owner} report={report} />}
             <Section title="Arms">
-              <Pending label="Manpower" when={ARMIES} />
-              {p.coastal && <Pending label="Sailors" when={ARMIES} />}
+              {armies.value.filter((a) => a.location === p.id).map((a) => (
+                <Row key={a.id} label="Army">
+                  <button class="link" onClick={() => selectArmy(a.id)}>{menLabel(a.levies + a.menAtArms)} men</button> <span class="muted">of </span><RealmLink id={a.realm} />
+                </Row>
+              ))}
+              {p.coastal && <Pending label="Sailors" when="navies (later)" />}
               <Pending label="Garrison" when={SIEGES} />
             </Section>
             <DeJure id={p.id} />
