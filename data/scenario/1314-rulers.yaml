@@ -111,6 +111,7 @@ rulers:
   bavaria: { name: Louis IV, born: 1282, dynasty: wittelsbach, traits: [ambitious], skills: [13, 11, 12], spouse: [Beatrix of Swidnica, 1290], children: [[Matilda, f, 1313]], siblings: [[Rudolf, m, 1274]] }
   habsburg: { name: Frederick the Fair, born: 1289, dynasty: habsburg, traits: [just, brave], skills: [12, 10, 12], spouse: [Isabella of Aragon, 1305], siblings: [[Leopold, m, 1290], [Albert, m, 1298], [Henry, m, 1299], [Otto, m, 1301]] }
   brabant: { name: John III, born: 1300, dynasty: reginar, skills: [11, 10, 10], regent: [Godfrey of Brabant, m, 1270] }
+  anjou: { name: Charles of Valois, born: 1270, dynasty: capet, law: agnatic, traits: [ambitious, brave], skills: [10, 8, 13], spouse: [Mahaut of Châtillon, 1293], children: [[Philip, m, 1293], [Joan, f, 1294]] }
   flanders: { name: Robert III, born: 1249, dynasty: dampierre, traits: [brave, wroth], skills: [11, 8, 13], children: [[Louis, m, 1272], [Robert, m, 1278]] }
   burgundy: { name: Hugh V, born: 1294, dynasty: capet_burgundy, skills: [9, 9, 9], siblings: [[Odo, m, 1295], [Joan, f, 1293]] }
   brittany: { name: John III, born: 1286, dynasty: dreux, skills: [10, 10, 9], spouse: [Isabella of Castile, 1283], siblings: [[Guy, m, 1287], [John, m, 1294]] }
