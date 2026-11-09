@@ -1,5 +1,6 @@
 import { useEffect } from 'preact/hooks';
-import { command, status, world } from '../bridge/client';
+import { command, status, wars, world } from '../bridge/client';
+import { openPeace } from './PeaceWindow';
 import { selectRealm, selectedRealm } from './App';
 import { money, signedMoney } from './economy';
 import { CoatOfArms } from './heraldry';
@@ -35,6 +36,15 @@ export function TopBar() {
   return (
     <header class="topbar panel">
       {mine && <button class="flag" title={`${mine.name}: open your realm`} aria-label="Your realm" onClick={() => open('realm')}><CoatOfArms realm={mine} size={36} /></button>}
+      {wars.value.filter((w) => w.attackers.includes(player) || w.defenders.includes(player)).map((w) => {
+        const score = w.attackers.includes(player) ? w.score : -w.score;
+        const foe = world.value?.realms[w.attackers.includes(player) ? w.defenders[0]! : w.attackers[0]!];
+        return (
+          <button key={w.id} class={`war-shield${score < 0 ? ' losing' : ''}`} title={`War with ${foe?.name}. Click to negotiate peace.`} onClick={() => openPeace(w)}>
+            ⚔ {score > 0 ? '+' : ''}{score}
+          </button>
+        );
+      })}
       <span class="date">{formatDate(dayToDate(status.value.day))}</span>
       <button
         class="playpause"

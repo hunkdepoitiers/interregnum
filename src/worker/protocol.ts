@@ -131,8 +131,20 @@ export interface SiegeView {
 }
 
 export interface PeaceOffer {
-  land: number[];
-  landCost: number;
+  /** Occupied land on the table, with each province's value. */
+  land: { id: number; value: number }[];
+  /** Land costs (sum of values × landRate / loserValue), at least 1. */
+  landRate: number;
+  loserValue: number;
+  tributeYears: number;
+  vassals: number[];
+  releaseCost: number;
+  vassalizeCost: number;
+  vassalizeWhy: string | null;
+  humiliateCost: number;
+  humiliatePrestige: number;
+  breakCost: number;
+  allies: number;
   gold: { months: number; amount: number; cost: number }[];
   tributeCost: number;
   tributeShare: number;
@@ -155,6 +167,9 @@ export interface WarView {
   concede: PeaceOffer | null;
   /** Share (%) of the score against it that a beaten side's offer must be worth. */
   concedeShare: number;
+  /** How far ahead an enemy may be and still accept a white peace. */
+  whiteLimit: number;
+  cb: string;
 }
 
 export interface MilitaryReport {

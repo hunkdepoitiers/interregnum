@@ -1,4 +1,4 @@
-import { add, ledgerIncome, type EconomyContext, type Notice } from './economy';
+import { add, computeLedgers, ledgerIncome, type EconomyContext, type Notice } from './economy';
 import { addTruce, allied, callToArms, marriageOf, truceUntil } from './diplomacy';
 import { declareWar, endWar } from './military';
 import { fireOn } from './events';
@@ -11,7 +11,7 @@ import type { GameState, War } from './state';
 const leader = (w: War, attackers: boolean) => (attackers ? w.attackers[0]! : w.defenders[0]!);
 
 /** A province's worth in a war: development, and far more if fortified. */
-function value(state: GameState, province: number): number {
+export function value(state: GameState, province: number): number {
   return Math.max(1, Math.trunc((state.provinceBase.development?.[province] ?? 100) / 100)) * (1 + (state.forts[province]?.level ?? 0));
 }
 
@@ -103,6 +103,33 @@ export interface PeaceTerms {
   months: number;
   /** The loser pays tribute for some years. */
   tribute?: boolean;
+  /** Vassals of the loser set free. */
+  release?: number[];
+  /** The loser becomes the winner's vassal. */
+  vassalize?: boolean;
+  /** Prestige passes from loser to winner. */
+  humiliate?: boolean;
+  /** The loser's alliances end. */
+  breakAlliances?: boolean;
+}
+
+const noTerms = (t: PeaceTerms) => !t.cede.length && !t.months && !t.tribute && !t.release?.length && !t.vassalize && !t.humiliate && !t.breakAlliances;
+
+/** Why the loser cannot be made a vassal; null = it can. */
+export function cannotVassalize(state: GameState, war: War, winnerAttackers: boolean): string | null {
+  const lose = state.realms[leader(war, !winnerAttackers)];
+  if (!lose) return 'No such realm.';
+  if (war.cb === 'raid') return 'A raid takes only plunder.';
+  if (lose.overlord) return 'They already have an overlord.';
+  return null;
+}
+
+/** The whole value of the losing side's land. */
+export function loserValue(state: GameState, war: War, winnerAttackers: boolean): number {
+  const lose = new Set(winnerAttackers ? war.defenders : war.attackers);
+  let total = 0;
+  for (const p of state.provinces) if (lose.has(p.owner)) total += value(state, p.id);
+  return total;
 }
 
 /** The land the winning side could take: held by it, owned by the other side. */
@@ -117,18 +144,20 @@ export function peaceCost(state: GameState, ctx: EconomyContext, war: War, winne
   const w = ctx.content.war.peace;
   let land = 0;
   if (terms.cede.length) {
-    const lose = new Set(winnerAttackers ? war.defenders : war.attackers);
-    let total = 0;
-    for (const p of state.provinces) if (lose.has(p.owner)) total += value(state, p.id);
+    const total = loserValue(state, war, winnerAttackers);
     const taken = terms.cede.reduce((t, p) => t + value(state, p), 0);
     land = Math.max(1, Math.trunc((taken * w.land) / Math.max(1, total)));
   }
-  return land + terms.months * w.indemnityPerMonth + (terms.tribute ? ctx.content.diplomacy.peaceTribute.cost : 0);
+  return land + terms.months * w.indemnityPerMonth + (terms.tribute ? ctx.content.diplomacy.peaceTribute.cost : 0)
+    + (terms.release?.length ?? 0) * w.releaseVassal + (terms.vassalize ? w.vassalize : 0) + (terms.humiliate ? w.humiliate : 0) + (terms.breakAlliances ? w.breakAlliances : 0);
 }
 
 /** What the indemnity amounts to, in hundredths of a ducat. */
-export function indemnity(state: GameState, war: War, winnerAttackers: boolean, months: number): number {
-  return ledgerIncome(state.economy[leader(war, !winnerAttackers)]?.ledger ?? {}) * months;
+export function indemnity(state: GameState, ctx: EconomyContext, war: War, winnerAttackers: boolean, months: number): number {
+  const loser = leader(war, !winnerAttackers);
+  // Before the first month is settled there are no accounts yet: go by what the month will bring.
+  const income = ledgerIncome(state.economy[loser]?.ledger ?? {}) || ledgerIncome(computeLedgers(state, ctx)[loser] ?? {});
+  return income * months;
 }
 
 /** A realm that lost its capital moves it; one that lost everything is gone, its armies with it. */
@@ -167,7 +196,7 @@ export function settle(state: GameState, ctx: EconomyContext, war: War, winnerAt
       p.owner = win;
       p.controller = win;
     }
-    const gold = indemnity(state, war, winnerAttackers, terms.months);
+    const gold = terms.months ? indemnity(state, ctx, war, winnerAttackers, terms.months) : 0;
     if (gold) {
       const le = state.economy[lose]!;
       const we = state.economy[win]!;
@@ -178,6 +207,13 @@ export function settle(state: GameState, ctx: EconomyContext, war: War, winnerAt
       const t = ctx.content.diplomacy.peaceTribute;
       state.tributes.push({ payer: lose, to: win, share: t.share, until: state.day + t.days });
     }
+    for (const r of terms.release ?? []) if (state.realms[r]?.overlord === lose) state.realms[r]!.overlord = 0;
+    if (terms.humiliate) {
+      changeStanding(state, ctx.content, win, { prestige: peace.humiliatePrestige }, 'Humiliated a rival');
+      changeStanding(state, ctx.content, lose, { prestige: -peace.humiliatePrestige }, 'Publicly humiliated');
+    }
+    if (terms.breakAlliances) state.alliances = state.alliances.filter((x) => x.a !== lose && x.b !== lose);
+    if (terms.vassalize && !cannotVassalize(state, war, winnerAttackers)) state.realms[lose]!.overlord = win;
     if (winnerAttackers && war.cb === 'independence') for (const r of war.attackers) if (state.realms[r]?.overlord === defender) state.realms[r]!.overlord = 0;
     const iWon = winnerAttackers && cb;
     changeStanding(state, ctx.content, win, { prestige: peace.winPrestige + (iWon ? cb.winPrestige : 0), piety: iWon ? cb.winPiety : 0 }, 'Victory in war');
@@ -207,7 +243,7 @@ export function proposePeace(state: GameState, ctx: EconomyContext, realm: numbe
   const amAttacker = leader(war, true) === realm;
   const score = amAttacker ? warScore(state, ctx, war).score : -warScore(state, ctx, war).score;
   const p = ctx.content.war.peace;
-  const white = !terms.cede.length && !terms.months && !terms.tribute;
+  const white = noTerms(terms);
   if (white) {
     if (-score > p.aiWhite) return none;
     return { accepted: true, notices: settle(state, ctx, war, null, terms) };
@@ -215,6 +251,9 @@ export function proposePeace(state: GameState, ctx: EconomyContext, realm: numbe
   const winnerAttackers = demand ? amAttacker : !amAttacker;
   const onOffer = new Set(landOnOffer(state, war, winnerAttackers));
   if (terms.cede.some((c) => !onOffer.has(c))) return none;
+  const loser = leader(war, !winnerAttackers);
+  if (terms.release?.some((r) => state.realms[r]?.overlord !== loser)) return none;
+  if (terms.vassalize && cannotVassalize(state, war, winnerAttackers)) return none;
   const cost = peaceCost(state, ctx, war, winnerAttackers, terms);
   const ok = demand ? cost <= score : cost * 100 >= -score * p.concede;
   return ok ? { accepted: true, notices: settle(state, ctx, war, winnerAttackers, terms) } : none;

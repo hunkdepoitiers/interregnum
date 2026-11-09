@@ -340,6 +340,22 @@ label.law.on { background: rgba(184, 137, 47, 0.18); }
 .realm-tabs button.on { background: var(--rubric); color: var(--vellum); }
 .topbar .flag { padding: 0; border: none; background: none; line-height: 0; }
 
+/* ---------- The peace treaty */
+.topbar .war-shield { padding: 2px 8px; font: 15px var(--display); color: #2e6b2e; white-space: nowrap; }
+.topbar .war-shield.losing { color: var(--rubric); }
+.peace-window { position: absolute; z-index: 20; top: 64px; right: 10px; bottom: 64px; width: 410px; display: flex; flex-direction: column; overflow: hidden; padding: 12px; }
+.peace-window h2 { margin: 0 0 6px; font: 22px var(--display); }
+.peace-window h3 { margin: 10px 0 4px; font: 16px var(--display); color: var(--rubric); border-bottom: 1px solid var(--gilt); }
+.peace-window .close { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; padding: 0; line-height: 1; font-size: 18px; }
+.peace-terms { display: flex; flex-direction: column; gap: 2px; font-size: 15px; }
+.peace-terms label.off { color: var(--ink-soft); opacity: 0.7; }
+.peace-land { max-height: 240px; overflow-y: auto; margin-top: 4px; scrollbar-width: thin; }
+.peace-foot { flex: none; border-top: 1px solid var(--gilt); padding-top: 6px; text-align: center; }
+.peace-cost { font-size: 16px; }
+.peace-verdict { font-size: 15px; margin: 2px 0 6px; color: #2e6b2e; }
+.peace-verdict.warn { color: var(--rubric); }
+.peace-send { width: 100%; padding: 6px; font: 17px var(--display); }
+
 /* ---------- Choosing a realm */
 .nation-banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); padding: 6px 28px; text-align: center; }
 .nation-banner h1 { margin: 0; font: 26px var(--display); color: var(--rubric); }
@@ -365,6 +381,7 @@ label.law.on { background: rgba(184, 137, 47, 0.18); }
   .credits { right: auto; left: 8px; bottom: 150px; font-size: 10px; }
   .editor-panel { top: auto; bottom: 108px; left: 8px; right: 8px; width: auto; max-height: 45%; }
   .stat-tip { width: calc(100% - 16px); }
+  .peace-window { top: 56px; left: 8px; right: 8px; bottom: 108px; width: auto; }
   .nation-banner { display: none; }
   .nation-list { top: 8px; left: 8px; right: 8px; bottom: auto; width: auto; height: 110px; }
 }

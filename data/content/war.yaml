@@ -113,6 +113,12 @@ peace:
   land: 150
   indemnity_per_month: 3
   indemnity_months: [3, 6, 12]
+  # War score for the other terms; humiliation moves this much prestige from loser to winner.
+  vassalize: 60
+  release_vassal: 10
+  humiliate: 10
+  humiliate_prestige: 50
+  break_alliances: 5
   win_prestige: 30
   lose_prestige: -30
   # AI: leaders settle when the winner has this much, or the war is this many days old.

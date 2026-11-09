@@ -194,6 +194,21 @@ describe('war and peace', () => {
     expect(s.realms[2]!.capital).toBe(3);
   });
 
+  it('prices and carries out every term of a treaty', () => {
+    const s = game();
+    atWalls(s);
+    s.realms[2]!.overlord = 0;
+    s.alliances.push({ a: 2, b: 1, start: 0 });
+    s.provinces[3]!.controller = 1;
+    const w = s.wars[0]!;
+    w.battles = 40;
+    s.provinces[4]!.controller = 1;
+    expect(proposePeace(s, ctx, 1, w.id, { cede: [], months: 0, vassalize: true, humiliate: true, breakAlliances: true, release: [1] }, true).accepted).toBe(false); // 1 is no vassal of theirs
+    expect(proposePeace(s, ctx, 1, w.id, { cede: [], months: 0, vassalize: true, humiliate: true, breakAlliances: true }, true).accepted).toBe(true);
+    expect(s.realms[2]!.overlord).toBe(1);
+    expect(s.alliances).toHaveLength(0);
+  });
+
   it('runs the same twice and survives a save', () => {
     const go = () => { const s = game(); atWalls(s); run(s, 300); return s; };
     const a = go();

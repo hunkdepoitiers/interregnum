@@ -13,7 +13,7 @@ import { hasModifier } from '../sim/modifiers';
 import { atWar, cannotHire, cannotHireCompany, levyPool } from '../sim/military';
 import { assaultChance, bribeChance, bribeCost, dailyProgress, fullGarrison, startForts } from '../sim/sieges';
 import { allied, cannotDiplo, contractOf, factionPower, giftCost, opinion, startDiplomacy, truceUntil, type DiploAction } from '../sim/diplomacy';
-import { casusBelli, indemnity, landOnOffer, peaceCost, warScore } from '../sim/war';
+import { cannotVassalize, casusBelli, indemnity, landOnOffer, loserValue, peaceCost, value, warScore } from '../sim/war';
 import { armyWage } from '../sim/economy';
 import { deserialize, serialize } from '../sim/save';
 import { ensureStanding } from '../sim/standing';
@@ -171,15 +171,20 @@ function postArmies(s: GameState, ctx: EconomyContext) {
     const iAttack = war.attackers[0] === s.player;
     const offer = (winnerAttackers: boolean): PeaceOffer => {
       const land = war.cb === 'raid' ? [] : landOnOffer(s, war, winnerAttackers);
+      const loser = winnerAttackers ? war.defenders[0]! : war.attackers[0]!;
       return {
-        land, landCost: land.length ? peaceCost(s, ctx, war, winnerAttackers, { cede: land, months: 0 }) : 0,
+        land: land.map((id) => ({ id, value: value(s, id) })), landRate: w.peace.land, loserValue: loserValue(s, war, winnerAttackers),
+        tributeYears: Math.round(ctx.content.diplomacy.peaceTribute.days / 365),
+        vassals: s.realms.filter((r) => r && r.overlord === loser).map((r) => r!.id), releaseCost: w.peace.releaseVassal,
+        vassalizeCost: w.peace.vassalize, vassalizeWhy: cannotVassalize(s, war, winnerAttackers), humiliateCost: w.peace.humiliate, humiliatePrestige: w.peace.humiliatePrestige,
+        breakCost: w.peace.breakAlliances, allies: s.alliances.filter((x) => x.a === loser || x.b === loser).length,
         tributeCost: ctx.content.diplomacy.peaceTribute.cost, tributeShare: ctx.content.diplomacy.peaceTribute.share,
-        gold: w.peace.indemnityMonths.map((months) => ({ months, amount: indemnity(s, war, winnerAttackers, months), cost: peaceCost(s, ctx, war, winnerAttackers, { cede: [], months }) })),
+        gold: w.peace.indemnityMonths.map((months) => ({ months, amount: indemnity(s, ctx, war, winnerAttackers, months), cost: peaceCost(s, ctx, war, winnerAttackers, { cede: [], months }) })),
       };
     };
     return {
       id: war.id, name: war.name, cbName: w.casusBelli.find((c) => c.key === war.cb)?.name ?? war.cb, attackers: war.attackers, defenders: war.defenders, start: war.start,
-      ...warScore(s, ctx, war), demand: lead ? offer(iAttack) : null, concede: lead ? offer(!iAttack) : null, concedeShare: w.peace.concede,
+      ...warScore(s, ctx, war), demand: lead ? offer(iAttack) : null, concede: lead ? offer(!iAttack) : null, concedeShare: w.peace.concede, whiteLimit: w.peace.aiWhite, cb: war.cb,
     };
   });
   post({ type: 'armies', armies, wars, sieges });

@@ -33,7 +33,7 @@ export function compileWar(src: WarSource): WarDef {
     casusBelli, raidLoot: ducats(src.raid_loot),
     score: { battleCap: src.score.battle_cap, battleMen: src.score.battle_men, battleMax: src.score.battle_max, tickingCap: src.score.ticking_cap, ticking: src.score.ticking },
     peace: {
-      land: p.land, indemnityPerMonth: p.indemnity_per_month, indemnityMonths: p.indemnity_months, winPrestige: p.win_prestige, losePrestige: p.lose_prestige,
+      land: p.land, indemnityPerMonth: p.indemnity_per_month, indemnityMonths: p.indemnity_months, vassalize: p.vassalize, releaseVassal: p.release_vassal, humiliate: p.humiliate, humiliatePrestige: p.humiliate_prestige, breakAlliances: p.break_alliances, winPrestige: p.win_prestige, losePrestige: p.lose_prestige,
       aiScore: p.ai_score, aiDays: p.ai_days, aiWhite: p.ai_white, concede: p.concede,
     },
   };

@@ -4,7 +4,7 @@ import { armies, command, setNoticeHandler, startGame, status, world } from '../
 import type { MapData, RiverData } from '../content/map';
 import type { EditsSource, Scenario } from '../content/scenario';
 import type { Content } from '../sim/content';
-import { buildLookup, hexToRgb, type MapMode, type Peoples } from '../render/map-modes';
+import { buildLookup, hexToRgb, tintLookup, type MapMode, type Peoples } from '../render/map-modes';
 import { computeLabels } from '../render/labels';
 import { LABEL_FONT, loadIdTiles, MapView } from '../render/map-view';
 import { editing, paint, restoreEdits, setBaseEdits } from './editor';
@@ -14,6 +14,7 @@ import { CharacterPanel, selectedCharacter } from './CharacterPanel';
 import { DebugConsole } from './DebugConsole';
 import { EventWindow } from './EventWindow';
 import { MapModeBar } from './MapModeBar';
+import { peaceMapClick, peaceTint, PeaceWindow } from './PeaceWindow';
 import { ProvincePanel } from './ProvincePanel';
 import { RealmPanel } from './RealmPanel';
 import { content } from './StatList';
@@ -34,6 +35,8 @@ export const selectedRealm = signal(0);
 export const toast = signal<string | null>(null);
 const loadError = signal<string | null>(null);
 let view: MapView | null = null;
+let labelledWorld: unknown = null;
+let labelledMode: unknown = null;
 
 const START_SEED = 1314;
 
@@ -85,8 +88,15 @@ effect(() => {
   const w = world.value;
   const mode = hasRealms.value ? mapMode.value : 'terrain';
   if (map && view) {
-    view.setLookup(buildLookup(map, mode, w, peoples.value));
-    view.setLabels(mode === 'political' && w ? computeLabels(map, w) : []);
+    const lut = buildLookup(map, mode, w, peoples.value);
+    const tint = peaceTint.value;
+    if (tint) { tintLookup(lut, tint.offered, [240, 226, 190]); tintLookup(lut, tint.picked, [214, 160, 40]); }
+    view.setLookup(lut);
+    if (w !== labelledWorld || mode !== labelledMode) {
+      labelledWorld = w;
+      labelledMode = mode;
+      view.setLabels(mode === 'political' && w ? computeLabels(map, w) : []);
+    }
   }
 });
 
@@ -135,7 +145,7 @@ export function App() {
         view!.setHover(id);
         hovered.value = { id, x, y };
       };
-      view.onClick = (id) => (choosing.value ? pickProvince(id) : selectProvince(id));
+      view.onClick = (id) => (choosing.value ? pickProvince(id) : peaceMapClick(id) || selectProvince(id));
       view.onArmyClick = (id) => selectArmy(id);
       // Right click: the player's selected army marches there.
       view.onContextClick = (id) => {
@@ -190,6 +200,7 @@ export function App() {
       <NationSelect />
       <MapModeBar />
       <EditorPanel />
+      <PeaceWindow />
       <EventWindow />
       <DebugConsole />
       <SaveMenu />

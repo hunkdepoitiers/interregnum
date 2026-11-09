@@ -71,6 +71,14 @@ export function hexToRgb(hex: string): Rgb {
  * Layer 0: base colour (the owner's colour in political mode). Layer 1: the controller's colour, drawn as
  * stripes where it differs from layer 0. Alpha encodes the province kind (KIND_ALPHA).
  */
+/** Repaints these provinces in the lookup (both layers): the peace table's land on the map. */
+export function tintLookup(lut: Uint8Array, ids: number[], rgb: Rgb): void {
+  for (const id of ids) for (let row = 0; row < 2; row++) {
+    const o = ((row * LOOKUP_ROWS + Math.floor(id / LOOKUP_WIDTH)) * LOOKUP_WIDTH + (id % LOOKUP_WIDTH)) * 4;
+    lut[o] = rgb[0]; lut[o + 1] = rgb[1]; lut[o + 2] = rgb[2];
+  }
+}
+
 export function buildLookup(map: MapData, mode: MapMode, world: WorldView | null, peoples: Peoples | null = null): Uint8Array {
   const lut = new Uint8Array(LOOKUP_WIDTH * LOOKUP_HEIGHT * 4);
   const put = (row: number, id: number, rgb: Rgb, alpha: number) => {

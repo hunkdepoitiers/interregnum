@@ -36,7 +36,7 @@ export const warSourceSchema = z.object({
   raid_loot: nonNeg,
   score: z.object({ battle_cap: count, battle_men: count, battle_max: count, ticking_cap: count, ticking: count }),
   peace: z.object({
-    land: count, indemnity_per_month: count, indemnity_months: z.array(count).min(1), win_prestige: int, lose_prestige: int,
+    land: count, indemnity_per_month: count, indemnity_months: z.array(count).min(1), vassalize: count, release_vassal: count, humiliate: count, humiliate_prestige: count, break_alliances: count, win_prestige: int, lose_prestige: int,
     ai_score: count, ai_days: count, ai_white: count, concede: count,
   }),
 });

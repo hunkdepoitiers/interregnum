@@ -356,7 +356,7 @@ export interface WarDef {
   casusBelli: CasusBelliDef[];
   raidLoot: number;
   score: { battleCap: number; battleMen: number; battleMax: number; tickingCap: number; ticking: number };
-  peace: { land: number; indemnityPerMonth: number; indemnityMonths: number[]; winPrestige: number; losePrestige: number; aiScore: number; aiDays: number; aiWhite: number; concede: number };
+  peace: { land: number; indemnityPerMonth: number; indemnityMonths: number[]; vassalize: number; releaseVassal: number; humiliate: number; humiliatePrestige: number; breakAlliances: number; winPrestige: number; losePrestige: number; aiScore: number; aiDays: number; aiWhite: number; concede: number };
 }
 
 /** No forts, companies or reasons for war beyond conquest: for content built without data/content/war.yaml. */
@@ -370,7 +370,7 @@ export function emptyWar(): WarDef {
     desertion: { share: 0, morale: 0 }, levyRecovery: 3, battlePrestigeMen: 1000, companies: [],
     casusBelli: [{ key: 'conquest', name: 'Conquest', description: '', prestige: 0, piety: 0, winPrestige: 0, winPiety: 0, minPiety: -1000000, governments: [] }], raidLoot: 0,
     score: { battleCap: 40, battleMen: 2000, battleMax: 8, tickingCap: 25, ticking: 1 },
-    peace: { land: 150, indemnityPerMonth: 3, indemnityMonths: [3, 6, 12], winPrestige: 0, losePrestige: 0, aiScore: 50, aiDays: 1095, aiWhite: 10, concede: 80 },
+    peace: { land: 150, indemnityPerMonth: 3, indemnityMonths: [3, 6, 12], vassalize: 60, releaseVassal: 10, humiliate: 10, humiliatePrestige: 50, breakAlliances: 5, winPrestige: 0, losePrestige: 0, aiScore: 50, aiDays: 1095, aiWhite: 10, concede: 80 },
   };
 }
 

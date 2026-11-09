@@ -10,6 +10,7 @@ import { SKILL_NAMES } from '../sim/characters';
 import type { CourtReport, MilitaryReport, StandingReport } from '../worker/protocol';
 import { menLabel, selectArmy } from './ArmyPanel';
 import { DiplomacySection } from './DiplomacySection';
+import { openPeace } from './PeaceWindow';
 import { WarBox } from './WarBox';
 import { CharLink, Medallion } from './CharacterPanel';
 import { Row, Section } from './folio';
@@ -302,6 +303,8 @@ function DeclareWar({ realm, m }: { realm: number; m: MilitaryReport }) {
   const myWars = wars.value.filter((w) => w.attackers.includes(realm) || w.defenders.includes(realm));
   const mine = player === realm;
   const atWarWithPlayer = myWars.some((w) => (w.attackers.includes(realm) && w.defenders.includes(player)) || (w.defenders.includes(realm) && w.attackers.includes(player)));
+  const shared = myWars.find((w) => (w.attackers.includes(realm) && w.defenders.includes(player)) || (w.defenders.includes(realm) && w.attackers.includes(player)));
+  if (shared) return <section class="folio-sec"><h3><span class="initial">W</span>ar</h3><div class="deeds"><button class="small-btn" onClick={() => openPeace(shared)}>Negotiate peace</button></div></section>;
   if (mine || !player || atWarWithPlayer || !m.casusBelli.length) return null;
   return (
     <section class="folio-sec">
