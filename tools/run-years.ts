@@ -73,7 +73,7 @@ for (let y = 1; y <= years; y++) {
       if (n.text.includes('come of age')) tally.comingOfAge++;
       if (n.text.includes('helped himself')) tally.embezzled++;
       if (/^(The Bruce|Morgarten|Mühldorf)/.test(n.text)) console.log(`  [y${y}] ${n.text}`);
-      if (/risen in revolt|has invaded|forced you|formed a faction/.test(n.text)) console.log(`  [y${y}] ${n.realm ? state.realms[n.realm]?.key : 'all'}: ${n.text}`);
+      if (/risen in revolt|has invaded|forced you|formed a faction|Peace:|declared war/.test(n.text)) console.log(`  [y${y}] ${n.realm ? state.realms[n.realm]?.key : 'all'}: ${n.text}`);
     }
   }
   if (y % (years > 20 ? 10 : 1) === 0 || y === years) report(`Year ${y}, ${people()} million people`);
@@ -87,6 +87,14 @@ if (warPair) {
   console.log(`occupied: ${[...by].map(([k, n]) => `${k}: ${n}`).join(', ')}`);
 }
 console.log(`events done: ${state.eventsDone.length}; pulses on cooldown: ${Object.keys(state.eventCooldowns).length}; ${state.realms.find((r) => r?.key === 'ottomans') ? `Bursa owner ${state.realms[state.provinces[content.events.places.bursa!]!.owner]?.key}` : ''}`);
+{
+  const owners = new Set<number>(); for (const p of state.provinces) if (p.owner) owners.add(p.owner);
+  const gone = state.realms.filter((r) => r && !owners.has(r.id)).length;
+  const defaults = state.economy.reduce((n, e) => n + (e?.defaults.length ?? 0), 0);
+  const size = new Map<number, number>(); for (const p of state.provinces) if (p.owner) size.set(p.owner, (size.get(p.owner) ?? 0) + 1);
+  console.log(`largest: ${[...size].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([id, n]) => `${state.realms[id]?.key} ${n}`).join(', ')}`);
+  console.log(`world: ${owners.size} realms hold land (${gone} gone), ${state.wars.length} wars, ${state.armies.length} armies, ${state.loans.length} loans, ${defaults} defaults, ${state.alliances.length} alliances, ${state.marriages.length} marriages, ${state.tributes.length} tributes, ${state.truces.length} truces, ${state.sieges.length} sieges`);
+}
 const ex = state.modifiers.filter((m) => m.def === 'excommunicated').length;
 console.log(`excommunicated now: ${ex}; prestige range ${Math.min(...state.standing.filter(Boolean).map((x) => x!.prestige))}..${Math.max(...state.standing.filter(Boolean).map((x) => x!.prestige))}, piety range ${Math.min(...state.standing.filter(Boolean).map((x) => x!.piety))}..${Math.max(...state.standing.filter(Boolean).map((x) => x!.piety))}`);
 tally.newHouses = state.modifiers.filter((m) => m.def === 'dynasty_change').length;
