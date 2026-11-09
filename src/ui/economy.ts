@@ -1,11 +1,9 @@
-import { signal } from '@preact/signals';
 import { useEffect, useState } from 'preact/hooks';
 import { economyEpoch, query, status, world } from '../bridge/client';
 import { dayToDate } from '../sim/calendar';
 import type { CharacterReport, ProvinceReport, RealmReport } from '../worker/protocol';
 
 /** Realm whose treasury screen is open; 0 = closed. */
-export const treasuryOpen = signal(0);
 
 /** Hundredths of a ducat as whole ducats: "1,234". */
 export function money(h: number): string {

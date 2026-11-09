@@ -1,6 +1,9 @@
 import { useEffect } from 'preact/hooks';
 import { command, status, world } from '../bridge/client';
-import { money, signedMoney, treasuryOpen } from './economy';
+import { selectRealm, selectedRealm } from './App';
+import { money, signedMoney } from './economy';
+import { CoatOfArms } from './heraldry';
+import { realmTab } from './RealmPanel';
 import { dayToDate, formatDate } from '../sim/calendar';
 import type { Speed } from '../sim/state';
 
@@ -22,8 +25,16 @@ export function TopBar() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  const player = status.value.player;
+  const mine = player ? world.value?.realms[player] : null;
+  const open = (tab: typeof realmTab.value) => {
+    if (selectedRealm.value === player && realmTab.value === tab) { selectRealm(0); return; }
+    realmTab.value = tab;
+    selectRealm(player);
+  };
   return (
     <header class="topbar panel">
+      {mine && <button class="flag" title={`${mine.name}: open your realm`} aria-label="Your realm" onClick={() => open('realm')}><CoatOfArms realm={mine} size={36} /></button>}
       <span class="date">{formatDate(dayToDate(status.value.day))}</span>
       <button
         class="playpause"
@@ -51,7 +62,7 @@ export function TopBar() {
         <button
           class={`purse${status.value.treasury < 0 ? ' in-debt' : ''}`}
           title={`Treasury of ${world.value?.realms[status.value.player]?.name ?? 'your realm'}; last month's balance after it`}
-          onClick={() => (treasuryOpen.value = treasuryOpen.value ? 0 : status.value.player)}
+          onClick={() => open('economy')}
         >
           {money(status.value.treasury)} ducats <span class="net">{signedMoney(status.value.net ?? 0)}</span>
         </button>

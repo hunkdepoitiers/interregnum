@@ -3,14 +3,12 @@ import { command, status, world } from '../bridge/client';
 import { dayToDate, formatDate } from '../sim/calendar';
 import { LEDGER, ledgerNet } from '../sim/economy';
 import { mapData } from './App';
-import { money, percent, signedMoney, treasuryOpen, useReport } from './economy';
+import { money, percent, signedMoney, useReport } from './economy';
 import { Row, Section } from './folio';
-import { CoatOfArms } from './heraldry';
 import { content } from './StatList';
 
-/** The treasury screen: ledger, credit, debts, borrowing, tax law and works, for any realm; actions for the player's. */
-export function TreasuryPanel() {
-  const id = treasuryOpen.value;
+/** The Economy tab: ledger, credit, debts, borrowing, tax law and works, for any realm; actions for the player's. */
+export function TreasuryPanel({ id }: { id: number }) {
   const realm = world.value?.realms[id];
   const report = useReport(realm ? { kind: 'realm', id } : null);
   const [bank, setBank] = useState(-1);
@@ -34,16 +32,7 @@ export function TreasuryPanel() {
   };
 
   return (
-    <aside class="treasury-panel folio panel" aria-label="Treasury">
-      <header class="folio-head realm-head">
-        <CoatOfArms realm={realm} size={56} />
-        <div class="cartouche">
-          <h2>The Treasury</h2>
-          <p class="sub">{realm.name}</p>
-        </div>
-        <button class="close" aria-label="Close" onClick={() => (treasuryOpen.value = 0)}>×</button>
-      </header>
-      <div class="folio-body">
+    <>
         <Section title="The Purse">
           <Row label="In the treasury"><span class={report.treasury < 0 ? 'warn' : ''}>{money(report.treasury)} ducats</span></Row>
           <Row label="This month, so far">{signedMoney(ledgerNet(report.projected))}</Row>
@@ -167,7 +156,6 @@ export function TreasuryPanel() {
             </button>
           </div>
         )}
-      </div>
-    </aside>
+    </>
   );
 }

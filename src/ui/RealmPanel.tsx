@@ -1,6 +1,8 @@
+import { signal } from '@preact/signals';
 import { armies, command, status, wars, world } from '../bridge/client';
+import { TreasuryPanel } from './TreasuryPanel';
 import { ledgerNet } from '../sim/economy';
-import { money, signedMoney, treasuryOpen, useReport } from './economy';
+import { money, signedMoney, useReport } from './economy';
 import type { Realm } from '../sim/state';
 import { mapData, selectedRealm, selectProvince, selectRealm } from './App';
 import { dayToDate, formatDate } from '../sim/calendar';
@@ -39,11 +41,17 @@ export function RealmLink({ id }: { id: number }) {
   );
 }
 
+export type RealmTab = 'realm' | 'court' | 'diplomacy' | 'economy' | 'military' | 'faith' | 'lands';
+const TABS: [RealmTab, string][] = [['realm', 'Realm'], ['court', 'Court'], ['diplomacy', 'Diplomacy'], ['economy', 'Economy'], ['military', 'Military'], ['faith', 'Faith'], ['lands', 'Lands']];
+/** The open tab; it stays open as the player moves from realm to realm. */
+export const realmTab = signal<RealmTab>('realm');
+
 export function RealmPanel() {
   const w = world.value;
   const map = mapData.value;
   const realm = w?.realms[selectedRealm.value];
   const report = useReport(realm ? { kind: 'realm', id: realm.id } : null);
+  const tab = realmTab.value;
   if (!w || !map || !realm) return null;
 
   const owned = map.provinces.filter((p) => w.owner[p.id] === realm.id).sort((a, b) => a.name.localeCompare(b.name));
@@ -65,59 +73,66 @@ export function RealmPanel() {
         </div>
         <button class="close" aria-label="Close" onClick={() => selectRealm(0)}>×</button>
       </header>
+      <nav class="realm-tabs" role="tablist" aria-label="Realm">
+        {TABS.map(([key, label]) => (
+          <button key={key} role="tab" aria-selected={tab === key} class={tab === key ? 'on' : ''} onClick={() => (realmTab.value = key)}>{label}</button>
+        ))}
+      </nav>
       <div class="folio-body">
-        <Section title="The Realm">
-          <Row label="Capital">
-            <button class="link" onClick={() => selectProvince(realm.capital, true)}>{capital?.name ?? '—'}</button>
-          </Row>
-          {realm.overlord > 0 && <Row label="Overlord"><RealmLink id={realm.overlord} /></Row>}
-          <Row label="Provinces">
-            {owned.length}
-            {occupiedByOthers > 0 && <span class="warn"> ({occupiedByOthers} occupied by enemies)</span>}
-          </Row>
-          {heldAbroad > 0 && <Row label="Occupying">{heldAbroad} foreign provinces</Row>}
-          {report && <Row label="People">{report.people.toLocaleString('en')}</Row>}
-        </Section>
-        {report?.court && <Crown court={report.court} />}
-        {report?.diplomacy && <DiplomacySection realm={realm.id} d={report.diplomacy} />}
-        {report?.military && <Arms realm={realm.id} m={report.military} mine={status.value.player === realm.id} />}
-        {report?.standing && <Standing realm={realm.id} s={report.standing} mine={status.value.player === realm.id} />}
-        <Section title="Treasury">
-          {report && <Row label="Treasury"><span class={report.treasury < 0 ? 'warn' : ''}>{money(report.treasury)} ducats</span></Row>}
-          {report && <Row label="This month">{signedMoney(ledgerNet(report.projected))}</Row>}
-          {report && <Row label="Debts">{money(report.credit.debt)} ducats</Row>}
-          {report && <Row label="Credit">{report.credit.value} <span class="muted">of 100</span></Row>}
-        </Section>
-        <div class="realm-actions">
-          {status.value.player === realm.id
-            ? <span class="muted">You rule this realm.</span>
-            : <button onClick={() => command({ type: 'setPlayer', realm: realm.id })}>Play as this realm</button>}
-          <button onClick={() => (treasuryOpen.value = realm.id)}>Treasury</button>
-        </div>
-        <section class="folio-sec">
-          <h3><span class="initial">S</span>tanding</h3>
-          <StatList scope="realm" id={realm.id} />
-        </section>
-        <ModifierList scope="realm" id={realm.id} />
-        {vassals.length > 0 && (
+        {tab === 'realm' && (
+          <>
+            <Section title="The Realm">
+              <Row label="Capital">
+                <button class="link" onClick={() => selectProvince(realm.capital, true)}>{capital?.name ?? '—'}</button>
+              </Row>
+              {realm.overlord > 0 && <Row label="Overlord"><RealmLink id={realm.overlord} /></Row>}
+              <Row label="Provinces">
+                {owned.length}
+                {occupiedByOthers > 0 && <span class="warn"> ({occupiedByOthers} occupied by enemies)</span>}
+              </Row>
+              {heldAbroad > 0 && <Row label="Occupying">{heldAbroad} foreign provinces</Row>}
+              {report && <Row label="People">{report.people.toLocaleString('en')}</Row>}
+              {report && <Row label="Treasury"><span class={report.treasury < 0 ? 'warn' : ''}>{money(report.treasury)} ducats</span></Row>}
+              {report && <Row label="This month">{signedMoney(ledgerNet(report.projected))}</Row>}
+            </Section>
+            <section class="folio-sec">
+              <h3><span class="initial">S</span>tanding</h3>
+              <StatList scope="realm" id={realm.id} />
+            </section>
+            <ModifierList scope="realm" id={realm.id} />
+          </>
+        )}
+        {tab === 'court' && report?.court && <Crown court={report.court} />}
+        {tab === 'diplomacy' && (
+          <>
+            {report?.diplomacy && <DiplomacySection realm={realm.id} d={report.diplomacy} />}
+            {report?.military && <DeclareWar realm={realm.id} m={report.military} />}
+            {vassals.length > 0 && (
+              <section class="folio-sec">
+                <h3><span class="initial">V</span>assals and tributaries</h3>
+                <ul class="plain">
+                  {vassals.map((v) => <li key={v.id}><RealmLink id={v.id} /></li>)}
+                </ul>
+              </section>
+            )}
+          </>
+        )}
+        {tab === 'economy' && <TreasuryPanel id={realm.id} />}
+        {tab === 'military' && report?.military && <Arms realm={realm.id} m={report.military} mine={status.value.player === realm.id} />}
+        {tab === 'faith' && report?.standing && <Standing realm={realm.id} s={report.standing} mine={status.value.player === realm.id} />}
+        {tab === 'lands' && (
           <section class="folio-sec">
-            <h3><span class="initial">V</span>assals and tributaries</h3>
-            <ul class="plain">
-              {vassals.map((v) => <li key={v.id}><RealmLink id={v.id} /></li>)}
+            <h3><span class="initial">P</span>rovinces</h3>
+            <ul class="columns">
+              {owned.map((p) => (
+                <li key={p.id}>
+                  <button class="link" onClick={() => selectProvince(p.id, true)}>{p.name}</button>
+                  {w.controller[p.id] !== realm.id && <span class="tag">occupied</span>}
+                </li>
+              ))}
             </ul>
           </section>
         )}
-        <section class="folio-sec">
-          <h3><span class="initial">P</span>rovinces</h3>
-          <ul class="columns">
-            {owned.map((p) => (
-              <li key={p.id}>
-                <button class="link" onClick={() => selectProvince(p.id, true)}>{p.name}</button>
-                {w.controller[p.id] !== realm.id && <span class="tag">occupied</span>}
-              </li>
-            ))}
-          </ul>
-        </section>
       </div>
     </aside>
   );
@@ -252,10 +267,8 @@ function Standing({ realm, s, mine }: { realm: number; s: StandingReport; mine: 
 
 /** Levies, men-at-arms, armies in the field and wars; debug war and peace until diplomacy (M9) brings real ones. */
 function Arms({ realm, m, mine }: { realm: number; m: MilitaryReport; mine: boolean }) {
-  const player = status.value.player;
   const own = armies.value.filter((a) => a.realm === realm);
   const myWars = wars.value.filter((w) => w.attackers.includes(realm) || w.defenders.includes(realm));
-  const atWarWithPlayer = myWars.some((w) => (w.attackers.includes(realm) && w.defenders.includes(player)) || (w.defenders.includes(realm) && w.attackers.includes(player)));
   return (
     <section class="folio-sec">
       <h3><span class="initial">A</span>rms</h3>
@@ -279,15 +292,26 @@ function Arms({ realm, m, mine }: { realm: number; m: MilitaryReport; mine: bool
           ))}
         </div>
       )}
-      {!mine && player > 0 && !atWarWithPlayer && (
+    </section>
+  );
+}
+
+/** The player's reasons to go to war with this realm. */
+function DeclareWar({ realm, m }: { realm: number; m: MilitaryReport }) {
+  const player = status.value.player;
+  const myWars = wars.value.filter((w) => w.attackers.includes(realm) || w.defenders.includes(realm));
+  const mine = player === realm;
+  const atWarWithPlayer = myWars.some((w) => (w.attackers.includes(realm) && w.defenders.includes(player)) || (w.defenders.includes(realm) && w.attackers.includes(player)));
+  if (mine || !player || atWarWithPlayer || !m.casusBelli.length) return null;
+  return (
+    <section class="folio-sec">
+      <h3><span class="initial">W</span>ar</h3>
         <div class="deeds">
           {m.casusBelli.map((c) => {
             const price = [c.prestige && `${c.prestige} prestige`, c.piety && `${c.piety} piety`].filter(Boolean).join(', ');
             return <button key={c.key} class="small-btn" disabled={!!c.why} title={`${c.description}${price ? `\nCosts ${price}.` : ''}${c.why ? `\n${c.why}` : ''}`} onClick={() => command({ type: 'declareWar', attacker: player, defender: realm, cb: c.key })}>{c.name}</button>;
           })}
         </div>
-      )}
     </section>
   );
 }
-

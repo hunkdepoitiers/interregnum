@@ -19,7 +19,7 @@ import { RealmPanel } from './RealmPanel';
 import { content } from './StatList';
 import { SaveMenu } from './SaveMenu';
 import { TopBar } from './TopBar';
-import { TreasuryPanel } from './TreasuryPanel';
+import { choosing, NationSelect, pickProvince } from './NationSelect';
 
 export const mapData = signal<MapData | null>(null);
 export const mapMode = signal<MapMode>('political');
@@ -135,7 +135,7 @@ export function App() {
         view!.setHover(id);
         hovered.value = { id, x, y };
       };
-      view.onClick = (id) => selectProvince(id);
+      view.onClick = (id) => (choosing.value ? pickProvince(id) : selectProvince(id));
       view.onArmyClick = (id) => selectArmy(id);
       // Right click: the player's selected army marches there.
       view.onContextClick = (id) => {
@@ -182,12 +182,12 @@ export function App() {
   return (
     <div class="app">
       <div class="map" ref={host} />
-      <TopBar />
+      {!choosing.value && <TopBar />}
       <ProvincePanel />
       <RealmPanel />
-      <CharacterPanel />
+      {!choosing.value && <CharacterPanel />}
       <ArmyPanel />
-      <TreasuryPanel />
+      <NationSelect />
       <MapModeBar />
       <EditorPanel />
       <EventWindow />

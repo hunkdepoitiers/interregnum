@@ -201,8 +201,6 @@ ul.columns li { break-inside: avoid; }
 .topbar .purse { font: 16px var(--display); padding: 3px 10px; }
 .topbar .purse .net { color: var(--ink-soft); font-size: 14px; margin-left: 4px; }
 .topbar .purse.in-debt { color: var(--rubric); border-color: var(--rubric); }
-.treasury-panel { top: 64px; right: 10px; bottom: 64px; width: 400px; display: flex; flex-direction: column; overflow: hidden; padding: 6px; }
-.treasury-panel .close { position: absolute; top: 6px; right: 6px; z-index: 2; width: 26px; height: 26px; padding: 0; line-height: 1; font-size: 18px; }
 .row.sub-row { padding-left: 16px; font-size: 14px; }
 .row.sub-row dt { font-style: italic; }
 .small { font-size: 13px; }
@@ -336,6 +334,26 @@ label.law.on { background: rgba(184, 137, 47, 0.18); }
 .console-log { max-height: 240px; overflow-y: auto; font: 13px/1.35 ui-monospace, Consolas, monospace; white-space: pre-wrap; }
 .debug-console input { width: 100%; font: 13px ui-monospace, Consolas, monospace; padding: 5px 7px; border: 1px solid var(--gilt); border-radius: 2px; background: #fbf4e4; }
 
+/* ---------- The realm window's tabs */
+.realm-tabs { flex: none; display: flex; flex-wrap: wrap; gap: 1px; padding: 6px 4px 0; border-bottom: 1px solid var(--gilt); }
+.realm-tabs button { flex: 1 1 auto; min-width: 0; padding: 3px 1px; font: 13px var(--display); border-bottom: none; border-radius: 3px 3px 0 0; white-space: nowrap; }
+.realm-tabs button.on { background: var(--rubric); color: var(--vellum); }
+.topbar .flag { padding: 0; border: none; background: none; line-height: 0; }
+
+/* ---------- Choosing a realm */
+.nation-banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); padding: 6px 28px; text-align: center; }
+.nation-banner h1 { margin: 0; font: 26px var(--display); color: var(--rubric); }
+.nation-banner p { margin: 0; font-size: 15px; color: var(--ink-soft); }
+.app:has(.nation-list) .nation-banner { left: calc(50% + 0px); }
+.nation-hint { font-size: 17px; text-align: center; margin: 24px 8px; color: var(--ink-soft); }
+.nation-play { flex: none; padding: 8px 12px; }
+.nation-play button { width: 100%; padding: 8px; font: 18px var(--display); background: var(--rubric); color: var(--vellum); }
+.nation-list { position: absolute; top: 10px; right: 10px; bottom: 64px; width: 230px; overflow-y: auto; padding: 8px; scrollbar-width: thin; }
+.nation-list h3 { margin: 8px 0 4px; font: 15px var(--display); color: var(--rubric); border-bottom: 1px solid var(--gilt); }
+.nation-list h3:first-child { margin-top: 0; }
+.nation-list button { display: flex; align-items: center; gap: 6px; width: 100%; padding: 1px 4px; border: none; background: none; text-align: left; font-size: 15px; }
+.nation-list button.on { background: rgba(184, 137, 47, 0.3); }
+
 /* ---------- Narrow screens: the side panel becomes a bottom sheet */
 @media (max-width: 760px) {
   .topbar, .app:has(.side-panel) .topbar { top: 8px; left: 50%; gap: 6px; padding: 4px 8px; }
@@ -346,8 +364,9 @@ label.law.on { background: rgba(184, 137, 47, 0.18); }
   .save-menu { left: 8px; right: 8px; justify-content: center; }
   .credits { right: auto; left: 8px; bottom: 150px; font-size: 10px; }
   .editor-panel { top: auto; bottom: 108px; left: 8px; right: 8px; width: auto; max-height: 45%; }
-  .treasury-panel { top: 56px; left: 8px; right: 8px; bottom: 108px; width: auto; z-index: 3; }
   .stat-tip { width: calc(100% - 16px); }
+  .nation-banner { display: none; }
+  .nation-list { top: 8px; left: 8px; right: 8px; bottom: auto; width: auto; height: 110px; }
 }
 
 /* ---------- Events */
