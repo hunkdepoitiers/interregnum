@@ -1,4 +1,5 @@
 import type { Content } from './content';
+import { answerEvent } from './events';
 import { doDeed } from './faith';
 import { declareWar, disband, endWar, hireCompany, hireMenAtArms, mergeArmies, moveArmy, raiseLevies, splitArmy } from './military';
 import { assault, bribe, hireEngineers } from './sieges';
@@ -42,6 +43,7 @@ export type Command =
   | { type: 'bribe'; realm: number; province: number; tier: number }
   | { type: 'hireEngineers'; realm: number; province: number }
   | { type: 'hireCompany'; realm: number; company: number }
+  | { type: 'eventChoice'; event: number; option: string }
   | { type: 'diplomacy'; realm: number; target: number; action: DiploAction }
   | { type: 'setContract'; realm: number; vassal: number; contract: string }
   | { type: 'answerDemand'; demand: number; pay: boolean }
@@ -137,6 +139,8 @@ export function applyCommand(state: GameState, cmd: Command, content?: Content, 
       return !!ctx && setContract(state, ctx, cmd.realm, cmd.vassal, cmd.contract);
     case 'answerDemand':
       return answerDemand(state, cmd.demand, cmd.pay, notices);
+    case 'eventChoice':
+      return !!ctx && answerEvent(state, ctx, cmd.event, cmd.option, notices);
     case 'hireCompany':
       if (ctx) hireCompany(state, ctx, cmd.realm, cmd.company);
       return false;

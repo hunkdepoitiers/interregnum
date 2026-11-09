@@ -217,6 +217,9 @@ export interface ProvinceReport {
   fort: { level: number; garrison: number; maxGarrison: number; supply: number } | null;
 }
 
+/** A player's unanswered event; its text is in Content.events. */
+export interface EventView { id: number; key: string; realm: number; ruler: string; options: { key: string; open: boolean; chance: number | null }[] }
+
 export type ToWorker =
   | { type: 'init'; seed: number; scenario: Scenario; content: Content }
   | { type: 'command'; cmd: Command }
@@ -238,6 +241,7 @@ export interface WorldView {
 export type FromWorker =
   | { type: 'status'; day: number; speed: Speed; paused: boolean; player: number; treasury: number | null; net: number | null }
   | { type: 'notices'; notices: Notice[] }
+  | { type: 'events'; events: EventView[] }
   | { type: 'armies'; armies: ArmyView[]; wars: WarView[]; sieges: SiegeView[] }
   | { type: 'queryResult'; requestId: number; result: RealmReport | ProvinceReport | CharacterReport | null }
   | ({ type: 'world' } & WorldView)

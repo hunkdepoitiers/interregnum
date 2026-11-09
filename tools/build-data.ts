@@ -28,6 +28,8 @@ import { warSourceSchema } from '../src/content/war';
 import { compileWar } from './war-lib';
 import { diplomacySourceSchema } from '../src/content/diplomacy';
 import { compileDiplomacy } from './diplomacy-lib';
+import { eventsSourceSchema } from '../src/content/events';
+import { compileEvents } from './events-lib';
 import { compileFaith } from './faith-lib';
 
 function load<T>(file: string, schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: { issues: { path: PropertyKey[]; message: string }[] } } }): T {
@@ -128,6 +130,9 @@ content.war = compileWar(load('data/content/war.yaml', warSourceSchema));
 const diplomacy = compileDiplomacy(load('data/content/diplomacy.yaml', diplomacySourceSchema), scenario.realms, map.provinces, ctxAll);
 errors.push(...diplomacy.errors);
 content.diplomacy = diplomacy.diplomacy;
+const events = compileEvents(load('data/content/events.yaml', eventsSourceSchema), content, scenario.realms, map.provinces, ctxAll);
+errors.push(...events.errors);
+content.events = events.events;
 const provinceName = new Map(map.provinces.map((p) => [p.id, p.name]));
 scenario.seats = scenario.realms.map((r) => provinceName.get(r.capital) ?? r.name);
 for (const w of warnings) console.warn(`warning: ${w}`);

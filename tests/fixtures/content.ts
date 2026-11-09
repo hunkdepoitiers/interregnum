@@ -1,4 +1,4 @@
-import { emptyCharacters, emptyFaith, emptyDiplomacy, emptyMilitary, emptyWar, emptyEconomy, type Content } from '../../src/sim/content';
+import { emptyCharacters, emptyFaith, emptyDiplomacy, emptyEvents, emptyMilitary, emptyWar, emptyEconomy, type Content } from '../../src/sim/content';
 
 // Fixed-point hundredths throughout: 500 = 5, 1000 as pct = +10%.
 export const content: Content = {
@@ -19,5 +19,5 @@ export const content: Content = {
   titles: { counties: [], duchies: [], kingdoms: [], empires: [], hegemonies: [] },
   goods: [],
   economy: emptyEconomy(),
-  characters: emptyCharacters(), faith: emptyFaith(), military: emptyMilitary(), war: emptyWar(), diplomacy: emptyDiplomacy(),
+  characters: emptyCharacters(), faith: emptyFaith(), military: emptyMilitary(), war: emptyWar(), diplomacy: emptyDiplomacy(), events: emptyEvents(),
 };

@@ -13,7 +13,7 @@ Every milestone ends deployed on Vercel and playable or testable. The next miles
 | M7 ✅ | **Armies, movement, occupation**: levies, professionals, raising/disbanding, upkeep, pathfinding, supply/attrition, battles, occupation of unfortified provinces; minimal defender AI | Declare a debug war, move armies, fight, occupy |
 | M8 ✅ | **Sieges, mercenaries, war**: forts, full siege system, starve/assault/bribe/engineers, mercenary companies, desertion, casus belli, war score, peace deals | Win a war through sieges; pay or receive an indemnity |
 | M9 ✅ | **Diplomacy and vassals**: opinion, alliances, marriages, truces, tribute, vassal contracts, factions, bribery, scripted Ilkhanate/Golden Horde | Vassals rebel when unpaid or unhappy; marriages and alliances matter in wars |
-| M10 | **Events engine**: scheduling, on-actions, event UI, historical event pack 1314–1330 | Historical events fire when conditions hold; odds shown |
+| M10 ✅ | **Events engine**: scheduling, on-actions, event UI, historical event pack 1314–1330 | Historical events fire when conditions hold; odds shown |
 | M11 | **AI**: budget, war, siege, diplomacy | AI realms expand, borrow, go bankrupt, and survive 100 headless years without crashing |
 | M12 | **Polish**: UI pass, autosave, save migrations, balance pass with a headless stats tool, playtest build, Tauri spike | Friends play a full session from the link and send save files |
 

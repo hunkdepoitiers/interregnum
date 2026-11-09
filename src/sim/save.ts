@@ -67,6 +67,11 @@ export const migrations: Record<number, Migration> = {
     if (economy) startDiplomacy(next as unknown as GameState, economy);
     return next;
   },
+  // v10 added events; history already past the save's date does not fire late.
+  9: (s, { economy }) => ({
+    ...s, pendingEvents: [], nextEventId: 1, eventCooldowns: {},
+    eventsDone: (economy?.content.events.list ?? []).filter((e) => e.day !== null && e.day <= (s.day as number)).map((e) => e.key),
+  }),
 };
 
 export class SaveError extends Error {}
@@ -129,7 +134,7 @@ function validate(s: GameState): void {
     s.economy.slice(1).every((e) => Number.isInteger(e?.treasury)) && Array.isArray(s.banks) && Array.isArray(s.loans) &&
     s.loans.every((l) => Number.isInteger(l?.principal) && realmRef(l.realm) && s.banks[l.bank] !== undefined) &&
     Array.isArray(s.construction) && typeof s.buildings === 'object' && s.buildings !== null &&
-    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) && Array.isArray(s.standing) && Array.isArray(s.armies) && Array.isArray(s.wars) && Array.isArray(s.sieges) && Array.isArray(s.alliances) && Array.isArray(s.tributes) && Array.isArray(s.factions) && typeof s.forts === 'object' && s.forts !== null && s.armies.every((a) => realmRef(a?.realm) && a.realm > 0 && s.provinces[a.location] !== undefined && Number.isInteger(a.levies) && Number.isInteger(a.menAtArms)) && s.standing.every((x) => x === null || (Number.isInteger(x.prestige) && Number.isInteger(x.piety))) &&
+    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) && Array.isArray(s.standing) && Array.isArray(s.armies) && Array.isArray(s.wars) && Array.isArray(s.sieges) && Array.isArray(s.pendingEvents) && Array.isArray(s.eventsDone) && Array.isArray(s.alliances) && Array.isArray(s.tributes) && Array.isArray(s.factions) && typeof s.forts === 'object' && s.forts !== null && s.armies.every((a) => realmRef(a?.realm) && a.realm > 0 && s.provinces[a.location] !== undefined && Number.isInteger(a.levies) && Number.isInteger(a.menAtArms)) && s.standing.every((x) => x === null || (Number.isInteger(x.prestige) && Number.isInteger(x.piety))) &&
     s.courts.every((c) => c === null || (Number.isInteger(c.ruler) && Array.isArray(c.council))) &&
     s.modifiers.every((m) =>
       Number.isInteger(m?.id) && m.id < s.nextModifierId && typeof m.def === 'string' && Number.isInteger(m.start) &&

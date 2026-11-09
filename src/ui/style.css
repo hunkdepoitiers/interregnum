@@ -349,3 +349,11 @@ label.law.on { background: rgba(184, 137, 47, 0.18); }
   .treasury-panel { top: 56px; left: 8px; right: 8px; bottom: 108px; width: auto; z-index: 3; }
   .stat-tip { width: calc(100% - 16px); }
 }
+
+/* ---------- Events */
+.event-veil { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(30, 20, 10, 0.45); padding: 16px; }
+.event-window { width: min(520px, 100%); max-height: 90vh; overflow-y: auto; padding: 18px 22px; }
+.event-text { font-size: 17px; line-height: 1.4; margin: 8px 0 12px; }
+.event-options { display: flex; flex-direction: column; gap: 6px; }
+.event-options button { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 6px 10px; }
+.event-effects { font-size: 14px; color: var(--ink-soft); }

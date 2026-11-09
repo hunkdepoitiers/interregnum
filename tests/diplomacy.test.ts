@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyCommand } from '../src/sim/commands';
-import { emptyCharacters, emptyDiplomacy, emptyFaith, emptyMilitary, emptyWar, type Content, type StatDef } from '../src/sim/content';
+import { emptyCharacters, emptyDiplomacy, emptyEvents, emptyFaith, emptyMilitary, emptyWar, type Content, type StatDef } from '../src/sim/content';
 import { computeLedgers, type EconomyContext } from '../src/sim/economy';
 import { allied, answerDemand, cannotDiplo, doDiplo, monthlyDiplomacy, opinion, setContract } from '../src/sim/diplomacy';
 import { atWar } from '../src/sim/military';
@@ -32,7 +32,7 @@ const content: Content = {
     lawCooldownDays: 365, buildings: [], banks: [],
     credit: { base: 50, incomePerPoint: 100000, incomeCap: 25, debtRatioPenalty: 30, defaultPenalty: 35, defaultMemoryDays: 7300, rateSpread: 5, terms: [12] },
   },
-  characters: emptyCharacters(), faith: emptyFaith(), military: { ...emptyMilitary(), levyShare: 500 }, war: emptyWar(), diplomacy,
+  characters: emptyCharacters(), faith: emptyFaith(), military: { ...emptyMilitary(), levyShare: 500 }, war: emptyWar(), diplomacy, events: emptyEvents(),
 };
 
 const person = (id: number, name: string, female: boolean, dynasty: number): Character =>

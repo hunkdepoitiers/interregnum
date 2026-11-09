@@ -4,7 +4,7 @@ import type { Content } from '../sim/content';
 import type { Scenario } from '../sim/scenario';
 import type { Speed } from '../sim/state';
 import type { Notice } from '../sim/economy';
-import type { ArmyView, SiegeView, WarView, CharacterReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker, WorldView } from '../worker/protocol';
+import type { EventView, ArmyView, SiegeView, WarView, CharacterReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, ToWorker, WorldView } from '../worker/protocol';
 
 /**
  * Main-thread handle on the simulation worker. The UI reads this signal and never touches sim state.
@@ -22,6 +22,8 @@ export const economyEpoch = signal(0);
 export const armies = signal<ArmyView[]>([]);
 export const wars = signal<WarView[]>([]);
 export const sieges = signal<SiegeView[]>([]);
+/** The player's unanswered events. */
+export const pendingEvents = signal<EventView[]>([]);
 /** Called with what the player should hear about (set by the UI). */
 export let onNotices: (notices: Notice[]) => void = () => {};
 export function setNoticeHandler(fn: (notices: Notice[]) => void) {
@@ -40,6 +42,10 @@ worker.onmessage = (e: MessageEvent<FromWorker>) => {
   }
   if (msg.type === 'world') {
     world.value = { realms: msg.realms, owner: msg.owner, controller: msg.controller, modifiers: msg.modifiers, development: msg.development };
+    return;
+  }
+  if (msg.type === 'events') {
+    pendingEvents.value = msg.events;
     return;
   }
   if (msg.type === 'armies') {

@@ -1,5 +1,6 @@
 import type { ConditionSource, ModifiersSource, StatsSource } from '../src/content/content';
-import { emptyCharacters, emptyFaith, emptyDiplomacy, emptyMilitary, emptyWar, emptyEconomy, SCALE, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
+import type { EventsDef } from '../src/sim/content';
+import { emptyCharacters, emptyFaith, emptyDiplomacy, emptyEvents, emptyMilitary, emptyWar, emptyEconomy, SCALE, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
 import type { Action, Condition } from '../src/sim/script';
 
 const fixed = (v: number) => Math.round(v * SCALE);
@@ -9,7 +10,7 @@ export function compileContent(stats: StatsSource, modifiers: ModifiersSource): 
   const errors: string[] = [];
   const content: Content = {
     stats: {}, modifiers: {}, cultures: [], religions: [],
-    titles: { counties: [], duchies: [], kingdoms: [], empires: [], hegemonies: [] }, goods: [], economy: emptyEconomy(), characters: emptyCharacters(), faith: emptyFaith(), military: emptyMilitary(), war: emptyWar(), diplomacy: emptyDiplomacy(),
+    titles: { counties: [], duchies: [], kingdoms: [], empires: [], hegemonies: [] }, goods: [], economy: emptyEconomy(), characters: emptyCharacters(), faith: emptyFaith(), military: emptyMilitary(), war: emptyWar(), diplomacy: emptyDiplomacy(), events: emptyEvents(),
   };
   for (const scope of ['province', 'realm'] as const) {
     for (const s of stats[scope]) {
@@ -50,14 +51,24 @@ export function compileCondition(c: ConditionSource, content: Content, errors: s
   }
   if ('stat_at_least' in c) return { stat_at_least: stat(c.stat_at_least) };
   if ('stat_below' in c) return { stat_below: stat(c.stat_below) };
-  return { owner: sub(c.owner) };
+  if ('owner' in c) return { owner: sub(c.owner) };
+  return c;
 }
 
 /** Checks the modifier keys an action list uses. */
-export function checkActions(actions: Action[], content: Content, errors: string[], where: string): void {
+export function checkActions(actions: Action[], content: Content, errors: string[], where: string, events?: EventsDef, realmKeys?: Set<string>): void {
   for (const a of actions) {
     const k = 'add_modifier' in a ? a.add_modifier : 'remove_modifier' in a ? a.remove_modifier : null;
     if (k !== null && !content.modifiers[k]) errors.push(`${where}: unknown modifier ${k}`);
-    if ('owner' in a) checkActions(a.owner, content, errors, where);
+    if ('owner' in a) checkActions(a.owner, content, errors, where, events, realmKeys);
+    if ('region' in a) {
+      if (events && !events.regions[a.region.key]) errors.push(`${where}: unknown region ${a.region.key}`);
+      checkActions(a.region.actions, content, errors, where, events, realmKeys);
+    }
+    if ('on_realm' in a) {
+      if (realmKeys && !realmKeys.has(a.on_realm.realm)) errors.push(`${where}: unknown realm ${a.on_realm.realm}`);
+      checkActions(a.on_realm.actions, content, errors, where, events, realmKeys);
+    }
+    if ('take_place' in a && events && !events.places[a.take_place]) errors.push(`${where}: unknown place ${a.take_place}`);
   }
 }

@@ -12,6 +12,7 @@ import { EditorPanel } from './EditorPanel';
 import { ArmyPanel, menLabel, selectArmy, selectedArmy } from './ArmyPanel';
 import { CharacterPanel, selectedCharacter } from './CharacterPanel';
 import { DebugConsole } from './DebugConsole';
+import { EventWindow } from './EventWindow';
 import { MapModeBar } from './MapModeBar';
 import { ProvincePanel } from './ProvincePanel';
 import { RealmPanel } from './RealmPanel';
@@ -189,6 +190,7 @@ export function App() {
       <TreasuryPanel />
       <MapModeBar />
       <EditorPanel />
+      <EventWindow />
       <DebugConsole />
       <SaveMenu />
       <a

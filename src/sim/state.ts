@@ -4,7 +4,7 @@ import type { Character, Court, Dynasty, Scenario, ScenarioRealm } from './scena
 
 export type { Character, Court, Dynasty };
 
-export const SAVE_VERSION = 9;
+export const SAVE_VERSION = 10;
 
 /** Speed 1 (slowest) .. 5 (fastest). */
 export type Speed = 1 | 2 | 3 | 4 | 5;
@@ -214,6 +214,13 @@ export interface GameState {
   nextDemandId: number;
   /** Indexes into Content.diplomacy.timeline already done. */
   timelineDone: number[];
+  /** The player's unanswered events. */
+  pendingEvents: { id: number; key: string; realm: number }[];
+  nextEventId: number;
+  /** Keys of dated events already past. */
+  eventsDone: string[];
+  /** "key:realm" → day it may fire again. */
+  eventCooldowns: Record<string, number>;
 }
 
 export function provincesFromScenario(scenario: Scenario): ProvinceState[] {
@@ -291,5 +298,9 @@ export function newGame(seed: number, scenario: Scenario, bankCapitals: number[]
     demands: [],
     nextDemandId: 1,
     timelineDone: [],
+    pendingEvents: [],
+    nextEventId: 1,
+    eventsDone: [],
+    eventCooldowns: {},
   };
 }

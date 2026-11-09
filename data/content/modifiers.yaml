@@ -19,6 +19,62 @@
     - { stat: legitimacy, add: -15 }
     - { stat: levy_size, add: -2 }
 
+- key: league_triumphant
+  label: Victors of Morgarten
+  description: The Forest Cantons have shown that knights can be beaten.
+  days: 3650
+  effects:
+    - { stat: legitimacy, add: 10 }
+    - { stat: levy_size, add: 2 }
+
+- key: nation_of_arbroath
+  label: The Community of the Realm
+  description: The barons have declared that they will never submit.
+  days: 7300
+  effects:
+    - { stat: legitimacy, add: 10 }
+
+- key: pastoureaux
+  label: The Pastoureaux
+  description: Bands of the poor roam the country unchecked.
+  days: 365
+  effects:
+    - { stat: unrest, add: 4 }
+    - { stat: tax_efficiency, add: -5 }
+
+- key: dynastic_strife
+  label: Dynastic Strife
+  description: Two claimants of one house divide the realm.
+  days: 2190
+  effects:
+    - { stat: legitimacy, add: -15 }
+    - { stat: unrest, add: 3 }
+    - { stat: tax_efficiency, add: -10 }
+
+- key: flemish_revolt
+  label: Concessions to the Peasants
+  description: The countryside has won lighter dues.
+  days: 1825
+  effects:
+    - { stat: tax_efficiency, add: -10 }
+    - { stat: unrest, add: -2 }
+
+- key: horde_wrath
+  label: The Wrath of the Horde
+  description: The Khan has sworn vengeance.
+  days: 1825
+  effects:
+    - { stat: unrest, add: 4 }
+    - { stat: legitimacy, add: 5 }
+
+- key: noble_feud
+  label: Feuding Nobles
+  description: Great houses have left court in anger.
+  days: 730
+  effects:
+    - { stat: legitimacy, add: -5 }
+    - { stat: levy_size, add: -1 }
+
 - key: papal_vacancy
   label: Vacant See
   description: No pope has been elected since Clement V died in April 1314. John XXII will be chosen in August 1316.

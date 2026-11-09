@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyCommand } from '../src/sim/commands';
-import { emptyCharacters, emptyFaith, emptyDiplomacy, emptyMilitary, emptyWar, type Content, type StatDef } from '../src/sim/content';
+import { emptyCharacters, emptyFaith, emptyDiplomacy, emptyEvents, emptyMilitary, emptyWar, type Content, type StatDef } from '../src/sim/content';
 import { type EconomyContext } from '../src/sim/economy';
 import { hashState } from '../src/sim/hash';
 import { hireCompany, raiseLevies } from '../src/sim/military';
@@ -31,7 +31,7 @@ const content: Content = {
     lawCooldownDays: 365, buildings: [], banks: [],
     credit: { base: 50, incomePerPoint: 100000, incomeCap: 25, debtRatioPenalty: 30, defaultPenalty: 35, defaultMemoryDays: 7300, rateSpread: 5, terms: [12] },
   },
-  characters: emptyCharacters(), faith: emptyFaith(), war, diplomacy: emptyDiplomacy(),
+  characters: emptyCharacters(), faith: emptyFaith(), war, diplomacy: emptyDiplomacy(), events: emptyEvents(),
   military: {
     ...emptyMilitary(),
     levy: { name: 'Levies', description: '', strength: 100, wage: 0, lateWage: 0, serviceDays: 120 },

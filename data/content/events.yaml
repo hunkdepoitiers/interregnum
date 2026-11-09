@@ -1,0 +1,270 @@
+# Events (M10). Read by tools/build-data.ts (events-lib).
+# Scheduling, one of:
+#   date: [y, m, d] with realm: key, or all: true for every realm that meets `when` (fires once, on or after the date);
+#   pulse: monthly chance in basis points, per realm that meets `when`, at most once per `cooldown` days;
+#   on: ruler_death | siege_won | battle_won | war_declared, with chance (basis points, default always).
+# Options: ai is the weight a computer realm gives it. odds: { chance (basis points), skill and per_point (the ruler's
+# skill above 10 moves the chance), success, failure } is rolled when chosen and shown beforehand.
+# Dates and outcomes are history where the text says so; numbers are tuned for play: GUESS.
+
+places:
+  bursa: [40.19, 29.06]
+
+regions:
+  # The Great Famine: north-west Europe, from Ireland to Poland, north of the Alps.
+  north_europe: [47.5, -11, 60, 24]
+
+events:
+  - key: great_famine
+    title: The Great Famine
+    text: Rain has fallen since spring. The grain rots in the fields of the north, and bread is beyond the means of the poor.
+    date: [1315, 5, 15]
+    all: true
+    when: { in_region: north_europe }
+    options:
+      - { key: open, label: Open the royal granaries, ai: 1, actions: [{ add_gold: -300 }, { add_piety: 25 }] }
+      - { key: endure, label: Let the realm endure it, ai: 3, actions: [{ region: { key: north_europe, actions: [{ add_modifier: famine }] } }] }
+
+  - key: bruce_ireland
+    title: The Bruce in Ireland
+    text: Irish kings have offered Edward Bruce, brother of the King of Scots, the High Kingship. An expedition could open a second front against England.
+    date: [1315, 5, 26]
+    realm: scotland
+    options:
+      - key: sail
+        label: Send Edward Bruce to Ireland
+        ai: 3
+        actions: [{ add_gold: -400 }]
+        odds:
+          chance: 4500
+          skill: 2
+          per_point: 200
+          success: { text: Ulster rises for the Bruce., actions: [{ add_prestige: 80 }] }
+          failure: { text: Famine and English arms ruin the expedition., actions: [{ add_prestige: -30 }] }
+      - { key: stay, label: Keep our swords at home, ai: 1, actions: [] }
+
+  - key: morgarten
+    title: Morgarten
+    text: The men of the Forest Cantons wait above the pass at Morgarten, as Duke Leopold's knights ride along the lake.
+    date: [1315, 11, 15]
+    realm: swiss
+    options:
+      - key: ambush
+        label: Roll the logs and strike
+        ai: 1
+        actions: []
+        odds:
+          chance: 8000
+          skill: 2
+          per_point: 200
+          success: { text: The knights are cut down between the mountain and the water., actions: [{ add_prestige: 100 }, { add_modifier: league_triumphant }] }
+          failure: { text: The ambush is sprung too early., actions: [{ add_prestige: -20 }] }
+
+  - key: louis_x_dies
+    title: The Death of Louis the Quarreller
+    text: After a game of tennis and a draught of cold wine, the king has taken a fever and died. His queen is with child.
+    date: [1316, 6, 5]
+    realm: france
+    when: { ruler_is: Louis X }
+    options:
+      - { key: mourn, label: God rest the king, ai: 1, actions: [{ kill_ruler: true }] }
+
+  - key: john_xxii
+    title: Habemus Papam
+    text: After more than two years, the cardinals at Lyon have elected Jacques Duèze. He takes the name John XXII and will rule from Avignon.
+    date: [1316, 8, 7]
+    realm: papal_states
+    options:
+      - { key: rejoice, label: Te Deum laudamus, ai: 1, actions: [{ remove_modifier: papal_vacancy }, { add_piety: 50 }] }
+
+  - key: oljeitu_dies
+    title: The Death of Öljeitü
+    text: The Ilkhan has died at Soltaniyeh, and his young son Abu Sa'id is carried to the throne by the amirs.
+    date: [1316, 12, 16]
+    realm: ilkhanate
+    when: { ruler_is: Oljeitu }
+    options:
+      - { key: ok, label: The amirs will decide, ai: 1, actions: [{ kill_ruler: true }, { add_prestige: -20 }] }
+
+  - key: arbroath
+    title: The Declaration of Arbroath
+    text: The barons of Scotland ask their seal for a letter to the Pope, that never while a hundred remain will they submit to the English.
+    date: [1320, 4, 6]
+    realm: scotland
+    options:
+      - { key: send, label: Send the letter to Avignon, ai: 1, actions: [{ add_prestige: 40 }, { add_modifier: nation_of_arbroath }] }
+      - { key: quiet, label: Avoid provoking the Pope, ai: 0, actions: [{ add_piety: 10 }] }
+
+  - key: shepherds
+    title: The Shepherds' Crusade
+    text: Bands of young shepherds and the destitute march south through France under a promise of crusade, and the towns are afraid.
+    date: [1320, 4, 15]
+    realm: france
+    options:
+      - { key: suppress, label: Send the seneschals against them, ai: 2, actions: [{ add_gold: -300 }, { add_prestige: 15 }] }
+      - { key: ignore, label: Let them pass, ai: 1, actions: [{ add_piety: -20 }, { add_modifier: pastoureaux }] }
+
+  - key: civil_war_andronikoi
+    title: The War of the Two Andronikoi
+    text: The emperor has disinherited his grandson, and young Andronikos has raised Thrace against him.
+    date: [1321, 4, 20]
+    realm: byzantium
+    options:
+      - { key: fight, label: The old emperor will not yield, ai: 2, actions: [{ add_modifier: dynastic_strife }] }
+      - { key: treat, label: Divide the empire to save it, ai: 1, actions: [{ add_prestige: -40 }] }
+
+  - key: dante_dies
+    title: The Death of Dante
+    text: Dante Alighieri, exiled from this city for twenty years, has died at Ravenna. His Commedia is being copied in every town.
+    date: [1321, 9, 14]
+    realm: florence
+    options:
+      - { key: honour, label: Ask Ravenna for his bones, ai: 1, actions: [{ add_prestige: 15 }] }
+      - { key: spite, label: He died a banished man, ai: 1, actions: [] }
+
+  - key: muhldorf
+    title: Mühldorf
+    text: The two kings of the Romans have brought their hosts together on the Inn. This battle should decide the crown.
+    date: [1322, 9, 28]
+    realm: bavaria
+    when: { has_modifier: disputed_election }
+    options:
+      - key: battle
+        label: Give battle
+        ai: 1
+        actions: []
+        odds:
+          chance: 6500
+          skill: 2
+          per_point: 300
+          success: { text: Frederick the Fair is taken prisoner and the crown is secure., actions: [{ remove_modifier: disputed_election }, { add_prestige: 120 }, { on_realm: { realm: habsburg, actions: [{ remove_modifier: disputed_election }, { add_prestige: -80 }] } }] }
+          failure: { text: The field is lost; the dispute goes on., actions: [{ add_prestige: -50 }] }
+
+  - key: flanders_revolt
+    title: The Peasants of Flanders
+    text: Coastal Flanders refuses its taxes and has driven out the count's officers.
+    date: [1323, 11, 1]
+    realm: flanders
+    options:
+      - { key: repress, label: Ask the King of France for knights, ai: 2, actions: [{ add_gold: -300 }, { add_prestige: -10 }] }
+      - { key: concede, label: Lighten the burden, ai: 1, actions: [{ add_modifier: flemish_revolt }] }
+
+  - key: mansa_hajj
+    title: The Pilgrimage of Mansa Musa
+    text: The Mansa sets out for Mecca with thousands in his train and more gold than Cairo has ever seen.
+    date: [1324, 7, 1]
+    realm: mali
+    when: { ruler_is: Musa }
+    options:
+      - { key: spend, label: Let the gold flow, ai: 3, actions: [{ add_gold: -3000 }, { add_prestige: 150 }, { add_piety: 150 }] }
+      - { key: modest, label: Travel as a pilgrim should, ai: 1, actions: [{ add_piety: 60 }] }
+
+  - key: tver_uprising
+    title: The Rising at Tver
+    text: The people of Tver have fallen on the Horde's envoy and his men and burnt them in the palace.
+    date: [1327, 8, 15]
+    realm: tver
+    options:
+      - { key: stand, label: Stand with the people, ai: 1, actions: [{ add_prestige: 30 }, { add_modifier: horde_wrath }] }
+      - { key: flee, label: Flee before the Horde comes, ai: 1, actions: [{ add_prestige: -40 }] }
+
+  - key: bursa_falls
+    title: The Fall of Bursa
+    text: After years of blockade, the garrison of Bursa is starving, and it offers to give up the city to Orhan.
+    date: [1326, 4, 6]
+    realm: ottomans
+    when: { realm_holds: { realm: byzantium, place: bursa } }
+    options:
+      - { key: take, label: Make Bursa our capital in all but name, ai: 1, actions: [{ take_place: bursa }, { add_prestige: 100 }] }
+
+  - key: edward_deposed
+    title: The King Must Go
+    text: Queen Isabella and Roger Mortimer have landed. The barons have abandoned the king, and Parliament calls on him to give up his crown.
+    date: [1327, 1, 20]
+    realm: england
+    when: { ruler_is: Edward II }
+    options:
+      - { key: yield, label: Edward gives up the crown, ai: 1, actions: [{ kill_ruler: true }, { add_prestige: -60 }] }
+
+  - key: northampton
+    title: The Treaty of Northampton
+    text: England is ready at last to recognise Scotland as a kingdom and the Bruce as its king.
+    date: [1328, 5, 1]
+    realm: scotland
+    options:
+      - { key: seal, label: Seal the treaty, ai: 1, actions: [{ add_prestige: 80 }] }
+
+  # ---------- Every month, somewhere
+  - key: fine_harvest
+    title: A Fine Harvest
+    text: The summer has been kind and the barns of {realm} are full.
+    pulse: 25
+    cooldown: 1825
+    options:
+      - { key: sell, label: Sell the surplus, ai: 2, actions: [{ add_gold: 150 }] }
+      - { key: give, label: Give thanks and feed the poor, ai: 1, actions: [{ add_piety: 15 }] }
+
+  - key: noble_feud
+    title: A Feud Among the Nobles
+    text: Two great families of {realm} have come to blows over a marriage portion, and each asks {ruler} for justice.
+    pulse: 30
+    cooldown: 1825
+    options:
+      - key: judge
+        label: Judge between them
+        ai: 2
+        actions: []
+        odds:
+          chance: 5000
+          skill: 0
+          per_point: 300
+          success: { text: Both houses accept the judgement., actions: [{ add_prestige: 20 }] }
+          failure: { text: The losers leave court in a rage., actions: [{ add_modifier: noble_feud }] }
+      - { key: pay, label: Buy their peace, ai: 1, actions: [{ add_gold: -150 }] }
+
+  - key: relic
+    title: A Relic Offered
+    text: A traveller offers {ruler} a holy relic, for a price, and swears to its truth.
+    pulse: 15
+    cooldown: 3650
+    when: { family_is: christian }
+    options:
+      - { key: buy, label: Buy it for the cathedral, ai: 1, actions: [{ add_gold: -100 }, { add_piety: 30 }] }
+      - { key: refuse, label: Send the man away, ai: 2, actions: [] }
+
+  - key: court_scandal
+    title: Scandal at Court
+    text: A scandal has run through the court of {realm} and the whole country is laughing.
+    pulse: 15
+    cooldown: 3650
+    options:
+      - { key: hush, label: Pay for silence, ai: 2, actions: [{ add_gold: -100 }] }
+      - { key: brazen, label: Brazen it out, ai: 1, actions: [{ add_prestige: -20 }] }
+
+  # ---------- When things happen
+  - key: funeral
+    title: A Royal Funeral
+    text: The realm mourns its late ruler, and {ruler} must decide how grandly to bury the dead.
+    on: ruler_death
+    chance: 5000
+    options:
+      - { key: grand, label: A funeral fit for a monarch, ai: 1, actions: [{ add_gold: -200 }, { add_prestige: 25 }] }
+      - { key: plain, label: A simple burial, ai: 2, actions: [{ add_piety: 5 }] }
+
+  - key: sack
+    title: The City Is Ours
+    text: The fortress has fallen, and the soldiers of {realm} look to their commander.
+    on: siege_won
+    chance: 5000
+    options:
+      - { key: sack, label: Give them the town for three days, ai: 2, actions: [{ add_gold: 250 }, { add_piety: -25 }] }
+      - { key: spare, label: Spare the townsfolk, ai: 1, actions: [{ add_piety: 15 }] }
+
+  - key: war_sermons
+    title: Preachers for the War
+    text: War has come, and the clergy of {realm} offer to preach it from every pulpit, for a consideration.
+    on: war_declared
+    chance: 5000
+    options:
+      - { key: pay, label: Pay the preachers, ai: 1, actions: [{ add_gold: -100 }, { add_piety: 10 }, { add_prestige: 5 }] }
+      - { key: no, label: War is the crown's own business, ai: 1, actions: [] }

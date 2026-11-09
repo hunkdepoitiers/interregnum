@@ -1,3 +1,5 @@
+import type { Action, Condition } from './script';
+
 /**
  * Compiled game content (public/generated/content.json), built from data/content/*.yaml by tools/build-data.ts.
  * Lives in sim so the core can use it without importing content code. All numbers are fixed-point hundredths
@@ -403,6 +405,25 @@ export function emptyDiplomacy(): DiplomacyDef {
   };
 }
 
+export interface EventOutcome { text: string; actions: Action[] }
+export interface EventOption {
+  key: string; label: string; ai: number; when: Condition | null; actions: Action[];
+  /** Rolled when chosen. skill: 0 eminence, 1 statecraft, 2 warcraft, or null. */
+  odds: { chance: number; skill: number | null; perPoint: number; success: EventOutcome; failure: EventOutcome } | null;
+}
+export interface EventDef {
+  key: string; title: string; text: string;
+  /** Dated: the day, and realm key or all realms. */
+  day: number | null; realm: string | null; all: boolean;
+  /** Monthly chance in basis points. */
+  pulse: number | null;
+  on: 'ruler_death' | 'siege_won' | 'battle_won' | 'war_declared' | null;
+  chance: number; cooldown: number; when: Condition | null; options: EventOption[];
+}
+/** data/content/events.yaml. */
+export interface EventsDef { places: Record<string, number>; regions: Record<string, number[]>; list: EventDef[] }
+export function emptyEvents(): EventsDef { return { places: {}, regions: {}, list: [] }; }
+
 export interface Content {
   stats: Record<string, StatDef>;
   modifiers: Record<string, ModifierDef>;
@@ -418,4 +439,5 @@ export interface Content {
   military: MilitaryDef;
   war: WarDef;
   diplomacy: DiplomacyDef;
+  events: EventsDef;
 }

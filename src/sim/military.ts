@@ -1,5 +1,6 @@
 import { STRATA } from './content';
 import { add, type EconomyContext, type Notice } from './economy';
+import { fireOn } from './events';
 import { indexModifiers, statValue, type ModifierIndex } from './modifiers';
 import { nextInt } from './rng';
 import { changeStanding } from './standing';
@@ -412,6 +413,7 @@ function fight(state: GameState, ctx: EconomyContext, notices: Notice[]): void {
       changeStanding(state, ctx.content, win, { prestige: 10 }, 'Victory in battle');
       changeStanding(state, ctx.content, lose, { prestige: -10 }, 'Defeat in battle');
     }
+    fireOn(state, ctx, 'battle_won', win, notices);
     const text = `Battle of {province}: ${state.realms[win]?.name} defeated ${state.realms[lose]?.name}.`;
     notices.push({ realm: win, text, province: place }, { realm: lose, text, province: place });
   }

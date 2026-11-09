@@ -1,3 +1,4 @@
+import { fireOn } from './events';
 import { dynastyChangeStanding } from './faith';
 import type { Content } from './content';
 import { add as addToLedger, type EconomyContext, type Notice } from './economy';
@@ -298,6 +299,7 @@ function succeed(state: GameState, ctx: EconomyContext, realm: number, notices: 
     }
   }
   const name = state.realms[realm]?.name ?? 'the realm';
+  fireOn(state, ctx, 'ruler_death', realm, notices);
   notices.push({ realm, text: `${dead?.name ?? 'The ruler'} of ${name} has died. ${next.name}${court.regent ? `, a child under the regency of ${char(state, court.regent)?.name},` : ''} now rules.` });
 }
 

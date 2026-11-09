@@ -72,6 +72,7 @@ for (let y = 1; y <= years; y++) {
       if (n.text.includes('regency of')) tally.regencies++;
       if (n.text.includes('come of age')) tally.comingOfAge++;
       if (n.text.includes('helped himself')) tally.embezzled++;
+      if (/^(The Bruce|Morgarten|Mühldorf)/.test(n.text)) console.log(`  [y${y}] ${n.text}`);
       if (/risen in revolt|has invaded|forced you|formed a faction/.test(n.text)) console.log(`  [y${y}] ${n.realm ? state.realms[n.realm]?.key : 'all'}: ${n.text}`);
     }
   }
@@ -85,6 +86,7 @@ if (warPair) {
   console.log(`wars: ${state.wars.map((w) => `${w.name} ${JSON.stringify(warScore(state, ctx, w))}`).join('; ') || 'none left'}; sieges ${state.sieges.length}; forts ${Object.keys(state.forts).length}`);
   console.log(`occupied: ${[...by].map(([k, n]) => `${k}: ${n}`).join(', ')}`);
 }
+console.log(`events done: ${state.eventsDone.length}; pulses on cooldown: ${Object.keys(state.eventCooldowns).length}; ${state.realms.find((r) => r?.key === 'ottomans') ? `Bursa owner ${state.realms[state.provinces[content.events.places.bursa!]!.owner]?.key}` : ''}`);
 const ex = state.modifiers.filter((m) => m.def === 'excommunicated').length;
 console.log(`excommunicated now: ${ex}; prestige range ${Math.min(...state.standing.filter(Boolean).map((x) => x!.prestige))}..${Math.max(...state.standing.filter(Boolean).map((x) => x!.prestige))}, piety range ${Math.min(...state.standing.filter(Boolean).map((x) => x!.piety))}..${Math.max(...state.standing.filter(Boolean).map((x) => x!.piety))}`);
 tally.newHouses = state.modifiers.filter((m) => m.def === 'dynasty_change').length;

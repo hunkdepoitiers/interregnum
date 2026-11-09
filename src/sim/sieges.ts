@@ -1,5 +1,6 @@
 import type { WarDef } from './content';
 import { add, type EconomyContext, type Notice } from './economy';
+import { fireOn } from './events';
 import { allies, atWar, lootOnCapture, menOf, takeLosses } from './military';
 import { nextInt } from './rng';
 import { changeStanding } from './standing';
@@ -91,6 +92,7 @@ function fall(state: GameState, ctx: EconomyContext, s: Siege, how: string, noti
   fort.supply = fullStores(w, fort.level);
   changeStanding(state, ctx.content, s.realm, { prestige: w.siege.prestige }, 'A fortress taken');
   lootOnCapture(state, ctx, s.realm, s.province);
+  fireOn(state, ctx, 'siege_won', s.realm, notices);
   state.sieges = state.sieges.filter((x) => x !== s);
   for (const a of state.armies) if (a.location === s.province) a.siege = 0;
   const text = `${state.realms[s.realm]?.name} ${how} {province}.`;

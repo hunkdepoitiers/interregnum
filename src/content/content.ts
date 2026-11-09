@@ -43,7 +43,10 @@ const statTest = z.object({ stat: key, value: z.number() }).strict();
 export type ConditionSource =
   | { all: ConditionSource[] } | { any: ConditionSource[] } | { not: ConditionSource }
   | { has_modifier: string } | { stat_at_least: { stat: string; value: number } }
-  | { stat_below: { stat: string; value: number } } | { owner: ConditionSource };
+  | { stat_below: { stat: string; value: number } } | { owner: ConditionSource }
+  | { realm_is: string } | { ruler_is: string } | { religion_is: string } | { family_is: string } | { in_region: string }
+  | { holds: string } | { realm_holds: { realm: string; place: string } } | { at_war: boolean }
+  | { treasury_at_least: number } | { prestige_at_least: number } | { piety_at_least: number } | { ruler_trait: string };
 export const conditionSchema: z.ZodType<ConditionSource> = z.lazy(() => z.union([
   z.object({ all: z.array(conditionSchema) }).strict(),
   z.object({ any: z.array(conditionSchema) }).strict(),
@@ -52,11 +55,30 @@ export const conditionSchema: z.ZodType<ConditionSource> = z.lazy(() => z.union(
   z.object({ stat_at_least: statTest }).strict(),
   z.object({ stat_below: statTest }).strict(),
   z.object({ owner: conditionSchema }).strict(),
+  z.object({ realm_is: key }).strict(),
+  z.object({ ruler_is: z.string() }).strict(),
+  z.object({ religion_is: key }).strict(),
+  z.object({ family_is: key }).strict(),
+  z.object({ in_region: key }).strict(),
+  z.object({ holds: key }).strict(),
+  z.object({ realm_holds: z.object({ realm: key, place: key }).strict() }).strict(),
+  z.object({ at_war: z.boolean() }).strict(),
+  z.object({ treasury_at_least: z.number() }).strict(),
+  z.object({ prestige_at_least: z.number() }).strict(),
+  z.object({ piety_at_least: z.number() }).strict(),
+  z.object({ ruler_trait: key }).strict(),
 ]));
 export const actionSchema: z.ZodType<SimAction> = z.lazy(() => z.union([
   z.object({ add_modifier: key }).strict(),
   z.object({ remove_modifier: key }).strict(),
   z.object({ owner: z.array(actionSchema) }).strict(),
+  z.object({ add_gold: z.number().int() }).strict(),
+  z.object({ add_prestige: z.number().int() }).strict(),
+  z.object({ add_piety: z.number().int() }).strict(),
+  z.object({ kill_ruler: z.literal(true) }).strict(),
+  z.object({ take_place: key }).strict(),
+  z.object({ region: z.object({ key, actions: z.array(actionSchema) }).strict() }).strict(),
+  z.object({ on_realm: z.object({ realm: key, actions: z.array(actionSchema) }).strict() }).strict(),
 ]));
 
 export type { SimAction as Action, SimCondition as Condition };

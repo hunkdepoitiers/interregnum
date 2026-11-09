@@ -61,6 +61,7 @@ export const LEDGER: { key: string; label: string; kind: 'income' | 'expense' | 
   { key: 'gifts', label: 'Gifts for absolution', kind: 'oneOff' },
   { key: 'indemnity', label: 'War indemnities', kind: 'oneOff' },
   { key: 'loot', label: 'Plunder', kind: 'oneOff' },
+  { key: 'events', label: 'Events of the month', kind: 'oneOff' },
 ];
 
 /** Something a realm or the player should hear about. realm 0 = everyone. */

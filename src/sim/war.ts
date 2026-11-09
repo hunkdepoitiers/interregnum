@@ -1,6 +1,7 @@
 import { add, ledgerIncome, type EconomyContext, type Notice } from './economy';
 import { addTruce, allied, callToArms, marriageOf, truceUntil } from './diplomacy';
 import { declareWar, endWar } from './military';
+import { fireOn } from './events';
 import { realmFaith } from './faith';
 import { changeStanding } from './standing';
 import type { GameState, War } from './state';
@@ -72,6 +73,9 @@ export function declareFor(state: GameState, ctx: EconomyContext, attacker: numb
     changeStanding(state, ctx.content, attacker, { prestige: c.prestige, piety: c.piety }, c.name);
     const called = callToArms(state, ctx, war);
     notices?.push(...called);
+    const fired: Notice[] = [];
+    fireOn(state, ctx, 'war_declared', defender, fired);
+    notices?.push(...fired);
   }
   return war;
 }

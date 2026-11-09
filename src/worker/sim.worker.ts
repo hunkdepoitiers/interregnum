@@ -7,6 +7,8 @@ import {
   type EconomyContext, type Notice,
 } from '../sim/economy';
 import { cannotDeed, deedCost, deedIncome, excommunicationThreat, holySitesAt, realmFaith, startFaith, tiersOf } from '../sim/faith';
+import { oddsFor } from '../sim/events';
+import { check } from '../sim/script';
 import { hasModifier } from '../sim/modifiers';
 import { atWar, cannotHire, cannotHireCompany, levyPool } from '../sim/military';
 import { assaultChance, bribeChance, bribeCost, dailyProgress, fullGarrison, startForts } from '../sim/sieges';
@@ -211,6 +213,19 @@ function diplomacyReport(s: GameState, ctx: EconomyContext, realm: number): Dipl
   };
 }
 
+let eventsShown = 0;
+function postEvents(s: GameState, ctx: EconomyContext) {
+  if (!s.pendingEvents.length && !eventsShown) return;
+  eventsShown = s.pendingEvents.length;
+  post({ type: 'events', events: s.pendingEvents.map((p) => {
+    const def = ctx.content.events.list.find((e) => e.key === p.key);
+    return {
+      id: p.id, key: p.key, realm: p.realm, ruler: s.characters[s.courts[p.realm]?.ruler ?? 0]?.name ?? 'the ruler',
+      options: (def?.options ?? []).map((o) => ({ key: o.key, open: !o.when || check(s, ctx.content, o.when, { kind: 'realm', id: p.realm }), chance: oddsFor(s, o, p.realm) })),
+    };
+  }) });
+}
+
 function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport | ProvinceReport | CharacterReport | null {
   if (q.kind === 'character') return characterReport(s, ctx, q.id);
   if (q.kind === 'realm') {
@@ -260,10 +275,12 @@ function schedule() {
 
 function step() {
   if (!state) return;
+  if (state.pendingEvents.length) { state.paused = true; postStatus(state); if (economy) postEvents(state, economy); return; } // the player must answer first
   const r = tick(state, economy ?? undefined);
   if (r.modifiersChanged) postWorld(state);
   if (economy && (state.armies.length || state.wars.length || state.sieges.length || r.notices.length)) postArmies(state, economy);
   postNotices(state, r.notices);
+  if (economy) postEvents(state, economy);
   postStatus(state);
   schedule();
 }
@@ -292,6 +309,7 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
     if (applyCommand(state, msg.cmd, economy.content, economy.goods, notices, economy)) postWorld(state);
     postArmies(state, economy);
     postNotices(state, notices);
+    postEvents(state, economy);
   } else if (msg.type === 'requestSave') {
     post({ type: 'saveData', requestId: msg.requestId, text: serialize(state) });
     return;
@@ -306,6 +324,8 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
       state.paused = true;
       postWorld(state);
       postArmies(state, economy);
+      eventsShown = 1;
+      postEvents(state, economy);
       post({ type: 'loaded', requestId: msg.requestId, error: null });
     } catch (err) {
       post({ type: 'loaded', requestId: msg.requestId, error: err instanceof Error ? err.message : String(err) });
