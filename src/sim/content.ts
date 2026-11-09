@@ -372,6 +372,37 @@ export function emptyWar(): WarDef {
   };
 }
 
+export interface TimelineEntry { day: number; type: 'tribute' | 'invasion'; from: number; to: number; share: number; days: number; men: number; spawn: number }
+export interface ContractDef { key: string; name: string; description: string; dues: number; opinion: number; joinsWars: boolean }
+
+/** Opinion, pacts, vassals and the scripted powers (data/content/diplomacy.yaml). Opinion in whole points. */
+export interface DiplomacyDef {
+  opinion: { sameFaith: number; sameFamily: number; otherFamily: number; sameCultureGroup: number; alliance: number; marriage: number; truce: number; atWar: number; paysTribute: number };
+  alliance: { minOpinion: number; breakPrestige: number; callOpinion: number };
+  marriage: { minOpinion: number; age: number; warPrestige: number; callOpinion: number };
+  truceDays: number;
+  gift: { cost: number; costMonths: number; opinion: number; days: number; perEminence: number; cooldown: number };
+  tributeDemand: { share: number; days: number; power: number; opinion: number };
+  peaceTribute: { share: number; days: number; cost: number };
+  startAlliances: number[][];
+  vassals: { base: number; legitimacy: number; prestigeTier: number; unpaid: number; contractChange: number; contracts: ContractDef[] };
+  factions: { joinBelow: number; revoltPower: number; revoltDays: number };
+  replyDays: number;
+  timeline: TimelineEntry[];
+}
+
+/** Customary contracts and nothing else: for content built without data/content/diplomacy.yaml. */
+export function emptyDiplomacy(): DiplomacyDef {
+  return {
+    opinion: { sameFaith: 0, sameFamily: 0, otherFamily: 0, sameCultureGroup: 0, alliance: 30, marriage: 20, truce: -10, atWar: -50, paysTribute: -20 },
+    alliance: { minOpinion: 25, breakPrestige: -20, callOpinion: 20 }, marriage: { minOpinion: 0, age: 16, warPrestige: -25, callOpinion: 25 }, truceDays: 1826,
+    gift: { cost: 20000, costMonths: 0, opinion: 25, days: 1825, perEminence: 0, cooldown: 365 }, tributeDemand: { share: 10, days: 1826, power: 300, opinion: -30 },
+    peaceTribute: { share: 15, days: 1826, cost: 20 }, startAlliances: [],
+    vassals: { base: 10, legitimacy: 0, prestigeTier: 0, unpaid: -40, contractChange: -10, contracts: [{ key: 'normal', name: 'Customary', description: '', dues: 100, opinion: 0, joinsWars: true }] },
+    factions: { joinBelow: -10, revoltPower: 30, revoltDays: 180 }, replyDays: 60, timeline: [],
+  };
+}
+
 export interface Content {
   stats: Record<string, StatDef>;
   modifiers: Record<string, ModifierDef>;
@@ -386,4 +417,5 @@ export interface Content {
   faith: FaithDef;
   military: MilitaryDef;
   war: WarDef;
+  diplomacy: DiplomacyDef;
 }

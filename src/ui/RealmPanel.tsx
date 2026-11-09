@@ -7,6 +7,7 @@ import { dayToDate, formatDate } from '../sim/calendar';
 import { SKILL_NAMES } from '../sim/characters';
 import type { CourtReport, MilitaryReport, StandingReport } from '../worker/protocol';
 import { menLabel, selectArmy } from './ArmyPanel';
+import { DiplomacySection } from './DiplomacySection';
 import { WarBox } from './WarBox';
 import { CharLink, Medallion } from './CharacterPanel';
 import { Row, Section } from './folio';
@@ -78,6 +79,7 @@ export function RealmPanel() {
           {report && <Row label="People">{report.people.toLocaleString('en')}</Row>}
         </Section>
         {report?.court && <Crown court={report.court} />}
+        {report?.diplomacy && <DiplomacySection realm={realm.id} d={report.diplomacy} />}
         {report?.military && <Arms realm={realm.id} m={report.military} mine={status.value.player === realm.id} />}
         {report?.standing && <Standing realm={realm.id} s={report.standing} mine={status.value.player === realm.id} />}
         <Section title="Treasury">

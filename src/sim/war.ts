@@ -1,4 +1,5 @@
 import { add, ledgerIncome, type EconomyContext, type Notice } from './economy';
+import { addTruce, allied, callToArms, marriageOf, truceUntil } from './diplomacy';
 import { declareWar, endWar } from './military';
 import { realmFaith } from './faith';
 import { changeStanding } from './standing';
@@ -43,8 +44,11 @@ export function casusBelli(state: GameState, ctx: EconomyContext, attacker: numb
   const rel = ctx.content.religions;
   const fa = rel[realmFaith(state, ctx, attacker) - 1];
   const fd = rel[realmFaith(state, ctx, defender) - 1];
+  const dip = ctx.content.diplomacy;
+  const truce = truceUntil(state, attacker, defender);
   return ctx.content.war.casusBelli.map((c) => {
     let why: string | null = null;
+    const prestige = c.prestige + (marriageOf(state, attacker, defender) ? dip.marriage.warPrestige : 0);
     if (c.key === 'claim' && !claimProvince(state, ctx, attacker, defender)) why = 'You share no de jure kingdom.';
     if (c.key === 'holy_war' && (!fa || !fd || fa.family === fd.family)) why = 'They are of your own family of faiths.';
     if (c.key === 'raid' && (!fa || !fd || fa.key === fd.key)) why = 'They share your faith.';
@@ -52,18 +56,23 @@ export function casusBelli(state: GameState, ctx: EconomyContext, attacker: numb
     if (c.key !== 'independence' && a.overlord === defender) why = 'You may only rebel against your overlord.';
     if (c.governments.length && !c.governments.includes(a.government)) why = 'Your kind of realm does not wage this war.';
     if (s.piety < c.minPiety) why = `Needs ${c.minPiety} piety.`;
-    if (s.prestige + c.prestige < -100000) why = 'Not enough prestige.';
-    return { key: c.key, name: c.name, description: c.description, prestige: c.prestige, piety: c.piety, why };
+    if (allied(state, attacker, defender)) why = 'You are allied to them.';
+    if (truce) why = `A truce binds you for ${truce - state.day} days.`;
+    return { key: c.key, name: c.name, description: c.description, prestige, piety: c.piety, why };
   });
 }
 
 /** Goes to war for a stated reason, paying its cost in standing. */
-export function declareFor(state: GameState, ctx: EconomyContext, attacker: number, defender: number, key: string): War | null {
+export function declareFor(state: GameState, ctx: EconomyContext, attacker: number, defender: number, key: string, notices?: Notice[]): War | null {
   const c = casusBelli(state, ctx, attacker, defender).find((x) => x.key === key);
   if (!c || c.why) return null;
   const goal = key === 'claim' ? claimProvince(state, ctx, attacker, defender) : state.realms[defender]!.capital;
   const war = declareWar(state, attacker, defender, key, goal);
-  if (war) changeStanding(state, ctx.content, attacker, { prestige: c.prestige, piety: c.piety }, c.name);
+  if (war) {
+    changeStanding(state, ctx.content, attacker, { prestige: c.prestige, piety: c.piety }, c.name);
+    const called = callToArms(state, ctx, war);
+    notices?.push(...called);
+  }
   return war;
 }
 
@@ -88,6 +97,8 @@ export interface PeaceTerms {
   cede: number[];
   /** Months of the loser's gross income paid at once. */
   months: number;
+  /** The loser pays tribute for some years. */
+  tribute?: boolean;
 }
 
 /** The land the winning side could take: held by it, owned by the other side. */
@@ -108,7 +119,7 @@ export function peaceCost(state: GameState, ctx: EconomyContext, war: War, winne
     const taken = terms.cede.reduce((t, p) => t + value(state, p), 0);
     land = Math.max(1, Math.trunc((taken * w.land) / Math.max(1, total)));
   }
-  return land + terms.months * w.indemnityPerMonth;
+  return land + terms.months * w.indemnityPerMonth + (terms.tribute ? ctx.content.diplomacy.peaceTribute.cost : 0);
 }
 
 /** What the indemnity amounts to, in hundredths of a ducat. */
@@ -159,16 +170,22 @@ export function settle(state: GameState, ctx: EconomyContext, war: War, winnerAt
       le.treasury -= gold; add(le.oneOff, 'indemnity', -gold);
       we.treasury += gold; add(we.oneOff, 'indemnity', gold);
     }
-    if (winnerAttackers && cb?.key === 'independence') state.realms[attacker]!.overlord = 0;
+    if (terms.tribute) {
+      const t = ctx.content.diplomacy.peaceTribute;
+      state.tributes.push({ payer: lose, to: win, share: t.share, until: state.day + t.days });
+    }
+    if (winnerAttackers && war.cb === 'independence') for (const r of war.attackers) if (state.realms[r]?.overlord === defender) state.realms[r]!.overlord = 0;
     const iWon = winnerAttackers && cb;
     changeStanding(state, ctx.content, win, { prestige: peace.winPrestige + (iWon ? cb.winPrestige : 0), piety: iWon ? cb.winPiety : 0 }, 'Victory in war');
     changeStanding(state, ctx.content, lose, { prestige: peace.losePrestige }, 'Defeat in war');
     endWar(state, war.id);
+    addTruce(state, ctx, attacker, defender);
     for (const r of hurt) afterLosingLand(state, r);
     const text = `Peace: ${state.realms[win]?.name} has won its war with ${state.realms[lose]?.name}${terms.cede.length ? `, taking ${terms.cede.length} provinces` : ''}${gold ? ` and ${Math.trunc(gold / 100).toLocaleString('en')} ducats` : ''}.`;
     notices.push({ realm: attacker, text }, { realm: defender, text });
   } else {
     endWar(state, war.id);
+    addTruce(state, ctx, attacker, defender);
     const text = `White peace between ${state.realms[attacker]?.name} and ${state.realms[defender]?.name}.`;
     notices.push({ realm: attacker, text }, { realm: defender, text });
   }
@@ -186,7 +203,7 @@ export function proposePeace(state: GameState, ctx: EconomyContext, realm: numbe
   const amAttacker = leader(war, true) === realm;
   const score = amAttacker ? warScore(state, ctx, war).score : -warScore(state, ctx, war).score;
   const p = ctx.content.war.peace;
-  const white = !terms.cede.length && !terms.months;
+  const white = !terms.cede.length && !terms.months && !terms.tribute;
   if (white) {
     if (-score > p.aiWhite) return none;
     return { accepted: true, notices: settle(state, ctx, war, null, terms) };

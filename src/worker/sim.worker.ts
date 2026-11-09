@@ -10,6 +10,7 @@ import { cannotDeed, deedCost, deedIncome, excommunicationThreat, holySitesAt, r
 import { hasModifier } from '../sim/modifiers';
 import { atWar, cannotHire, cannotHireCompany, levyPool } from '../sim/military';
 import { assaultChance, bribeChance, bribeCost, dailyProgress, fullGarrison, startForts } from '../sim/sieges';
+import { allied, cannotDiplo, contractOf, factionPower, giftCost, opinion, startDiplomacy, truceUntil, type DiploAction } from '../sim/diplomacy';
 import { casusBelli, indemnity, landOnOffer, peaceCost, warScore } from '../sim/war';
 import { armyWage } from '../sim/economy';
 import { deserialize, serialize } from '../sim/save';
@@ -18,7 +19,7 @@ import type { Scenario } from '../sim/scenario';
 import { newGame, type GameState, type Speed } from '../sim/state';
 import { tick } from '../sim/tick';
 import type {
-  ArmyView, CharacterRef, PeaceOffer, SiegeView, WarView, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, StandingReport, ToWorker,
+  ArmyView, CharacterRef, DiplomacyReport, PeaceOffer, SiegeView, WarView, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, StandingReport, ToWorker,
 } from './protocol';
 
 /** Milliseconds per game day (speed 5 ≈ 100 days per second, if the tick keeps up). */
@@ -170,6 +171,7 @@ function postArmies(s: GameState, ctx: EconomyContext) {
       const land = war.cb === 'raid' ? [] : landOnOffer(s, war, winnerAttackers);
       return {
         land, landCost: land.length ? peaceCost(s, ctx, war, winnerAttackers, { cede: land, months: 0 }) : 0,
+        tributeCost: ctx.content.diplomacy.peaceTribute.cost, tributeShare: ctx.content.diplomacy.peaceTribute.share,
         gold: w.peace.indemnityMonths.map((months) => ({ months, amount: indemnity(s, war, winnerAttackers, months), cost: peaceCost(s, ctx, war, winnerAttackers, { cede: [], months }) })),
       };
     };
@@ -179,6 +181,34 @@ function postArmies(s: GameState, ctx: EconomyContext) {
     };
   });
   post({ type: 'armies', armies, wars, sieges });
+}
+
+function diplomacyReport(s: GameState, ctx: EconomyContext, realm: number): DiplomacyReport {
+  const d = ctx.content.diplomacy;
+  const p = s.player;
+  const other = p > 0 && p !== realm;
+  const partner = (x: { a: number; b: number }) => (x.a === realm ? x.b : x.b === realm ? x.a : 0);
+  const actions: DiplomacyReport['actions'] = [];
+  if (other) {
+    const add = (key: DiploAction, label: string, detail: string, cost = 0) => actions.push({ key, label, detail, cost, why: cannotDiplo(s, ctx, p, realm, key) });
+    add('gift', 'Send gifts', `They will think ${d.gift.opinion} better of you for ${Math.round(d.gift.days / 365)} years.`, giftCost(s, ctx, realm));
+    if (allied(s, p, realm)) add('breakAlliance', 'Break alliance', `Costs ${-d.alliance.breakPrestige} prestige.`);
+    else add('alliance', 'Propose alliance', 'Allies are called to each other’s wars.');
+    add('marriage', 'Arrange marriage', 'Weds your ruler or heir to their kin. Kin may join your wars, and war on them costs prestige.');
+    add('tribute', 'Demand tribute', `${d.tributeDemand.share}% of their income for ${Math.round(d.tributeDemand.days / 365)} years.`);
+  }
+  const f = realm === p ? s.factions.find((x) => x.overlord === realm) : undefined;
+  return {
+    opinion: other ? opinion(s, ctx, realm, p) : null,
+    truceDays: other ? Math.max(0, truceUntil(s, p, realm) - s.day) : 0,
+    allies: s.alliances.map(partner).filter(Boolean), kin: s.marriages.map(partner).filter(Boolean),
+    paysTo: s.tributes.filter((t) => t.payer === realm).map((t) => ({ realm: t.to, share: t.share })),
+    receivesFrom: s.tributes.filter((t) => t.to === realm).map((t) => ({ realm: t.payer, share: t.share })),
+    faction: f ? { members: f.members, power: factionPower(s, ctx, realm, f.members), needed: d.factions.revoltPower, days: s.day - f.start, needDays: d.factions.revoltDays } : null,
+    demands: realm === p ? s.demands.filter((x) => x.to === p).map((x) => ({ id: x.id, from: x.from, share: x.share, years: Math.round(x.days / 365), men: x.men, days: Math.max(0, x.expires - s.day) })) : [],
+    actions,
+    contract: other && s.realms[realm]?.overlord === p ? { current: contractOf(s, ctx, realm).key, options: d.vassals.contracts.map((c) => ({ key: c.key, name: c.name, description: c.description })) } : null,
+  };
 }
 
 function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport | ProvinceReport | CharacterReport | null {
@@ -202,6 +232,7 @@ function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport
       people,
       court: courtReport(s, ctx, q.id),
       standing: standingReport(s, ctx, q.id),
+      diplomacy: diplomacyReport(s, ctx, q.id),
       military: { ...levyPool(s, ctx, q.id), hireCost: Math.trunc(ctx.content.military.menAtArms.cost), cannotHire: cannotHire(s, ctx, q.id, 1000),
         companies: ctx.content.war.companies.map((c, index) => ({ index, name: c.name, description: c.description, men: c.men, cost: c.cost, wage: c.wage, why: cannotHireCompany(s, ctx, q.id, index) })),
         casusBelli: s.player && s.player !== q.id ? casusBelli(s, ctx, s.player, q.id) : [],
@@ -252,6 +283,7 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
     startEconomy(state, economy);
     startFaith(state, economy);
     startForts(state, economy);
+    startDiplomacy(state, economy);
     postWorld(state);
   } else if (!state || !scenario || !economy) {
     return; // nothing to act on before init

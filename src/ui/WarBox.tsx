@@ -8,6 +8,7 @@ import { RealmLink } from './RealmPanel';
 export function WarBox({ war, realm }: { war: WarView; realm: number }) {
   const [takeLand, setTakeLand] = useState(false);
   const [months, setMonths] = useState(0);
+  const [tribute, setTribute] = useState(false);
   const player = status.value.player;
   const amAttacker = war.attackers[0] === player;
   const leads = amAttacker || war.defenders[0] === player;
@@ -16,8 +17,8 @@ export function WarBox({ war, realm }: { war: WarView; realm: number }) {
   const demand = mine >= 0;
   const offer = demand ? war.demand : war.concede;
   const gold = offer?.gold.find((g) => g.months === months);
-  const cost = (takeLand && offer ? offer.landCost : 0) + (gold?.cost ?? 0);
-  const blank = !takeLand && !months;
+  const cost = (takeLand && offer ? offer.landCost : 0) + (gold?.cost ?? 0) + (tribute && offer ? offer.tributeCost : 0);
+  const blank = !takeLand && !months && !tribute;
   const allowed = demand ? cost <= mine : cost * 100 >= -mine * war.concedeShare;
   const title = `Occupation ${war.occupation}, battles ${war.battles}, goal ${war.ticking} (from the attackers' side)`;
   return (
@@ -30,6 +31,7 @@ export function WarBox({ war, realm }: { war: WarView; realm: number }) {
           {offer.land.length > 0 && (
             <label><input type="checkbox" checked={takeLand} onChange={(e) => setTakeLand((e.target as HTMLInputElement).checked)} /> {demand ? 'Take' : 'Give up'} {offer.land.length} occupied provinces <span class="muted">({offer.landCost})</span></label>
           )}
+          <label><input type="checkbox" checked={tribute} onChange={(e) => setTribute((e.target as HTMLInputElement).checked)} /> {demand ? 'Exact' : 'Pay'} tribute of {offer.tributeShare}% <span class="muted">({offer.tributeCost})</span></label>
           <div class="deeds">
             <button class={`small-btn${months === 0 ? ' on' : ''}`} onClick={() => setMonths(0)}>No gold</button>
             {offer.gold.map((g) => (
@@ -40,7 +42,7 @@ export function WarBox({ war, realm }: { war: WarView; realm: number }) {
           </div>
           <div class="deeds">
             <button class="small-btn" disabled={blank || !allowed} title={allowed ? '' : demand ? `Worth ${cost}; your score is ${mine}.` : `Offer at least ${Math.ceil((-mine * war.concedeShare) / 100)}.`}
-              onClick={() => command({ type: 'proposePeace', realm: player, war: war.id, demand, terms: { cede: takeLand ? offer.land : [], months } })}>
+              onClick={() => command({ type: 'proposePeace', realm: player, war: war.id, demand, terms: { cede: takeLand ? offer.land : [], months, tribute } })}>
               {demand ? 'Demand' : 'Offer'} ({cost})
             </button>
             <button class="small-btn" onClick={() => command({ type: 'proposePeace', realm: player, war: war.id, demand: false, terms: { cede: [], months: 0 } })}>Offer white peace</button>

@@ -12,6 +12,7 @@ import { startFaith, tiersOf } from '../src/sim/faith';
 import { declareWar } from '../src/sim/military';
 import { startForts } from '../src/sim/sieges';
 import { warScore } from '../src/sim/war';
+import { startDiplomacy } from '../src/sim/diplomacy';
 import { newGame } from '../src/sim/state';
 import { tick } from '../src/sim/tick';
 
@@ -28,6 +29,7 @@ startCharacters(state, ctx);
 startEconomy(state, ctx);
 startFaith(state, ctx);
 startForts(state, ctx);
+startDiplomacy(state, ctx);
 
 const warAt = process.argv.indexOf('--war');
 const warPair = warAt > 0 ? process.argv[warAt + 1]!.split(',') : null;
@@ -70,6 +72,7 @@ for (let y = 1; y <= years; y++) {
       if (n.text.includes('regency of')) tally.regencies++;
       if (n.text.includes('come of age')) tally.comingOfAge++;
       if (n.text.includes('helped himself')) tally.embezzled++;
+      if (/risen in revolt|has invaded|forced you|formed a faction/.test(n.text)) console.log(`  [y${y}] ${n.realm ? state.realms[n.realm]?.key : 'all'}: ${n.text}`);
     }
   }
   if (y % (years > 20 ? 10 : 1) === 0 || y === years) report(`Year ${y}, ${people()} million people`);

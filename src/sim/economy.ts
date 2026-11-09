@@ -40,12 +40,14 @@ export const LEDGER: { key: string; label: string; kind: 'income' | 'expense' | 
   { key: 'tithes', label: 'Tithes', kind: 'income' },
   { key: 'trade', label: 'Trade', kind: 'income' },
   { key: 'vassal_dues', label: 'Dues from vassals', kind: 'income' },
+  { key: 'tribute_received', label: 'Tribute received', kind: 'income' },
   { key: 'court', label: 'Court', kind: 'expense' },
   { key: 'administration', label: 'Administration', kind: 'expense' },
   { key: 'retinue', label: 'Household troops and garrisons', kind: 'expense' },
   { key: 'upkeep', label: 'Building upkeep', kind: 'expense' },
   { key: 'interest', label: 'Loan interest', kind: 'expense' },
   { key: 'dues_to_overlord', label: 'Dues to the overlord', kind: 'expense' },
+  { key: 'tribute_paid', label: 'Tribute paid', kind: 'expense' },
   { key: 'largesse', label: 'Largesse and display', kind: 'expense' },
   { key: 'council', label: 'Council salaries', kind: 'expense' },
   { key: 'armies', label: 'Army wages', kind: 'expense' },
@@ -183,10 +185,19 @@ export function computeLedgers(state: GameState, ctx: EconomyContext): Ledger[] 
     if (!r?.overlord || !ledgers[r.overlord]) return;
     const l = ledgers[id]!;
     const gross = (l.land_tax ?? 0) + (l.urban_tax ?? 0) + (l.tithes ?? 0) + (l.trade ?? 0);
-    const dues = Math.trunc((gross * e.vassalDues) / 10000);
+    const contract = content.diplomacy.vassals.contracts.find((c) => c.key === (state.contracts?.[id] ?? 'normal'));
+    const dues = Math.trunc((((gross * e.vassalDues) / 10000) * (contract?.dues ?? 100)) / 100);
     add(l, 'dues_to_overlord', -dues);
     add(ledgers[r.overlord]!, 'vassal_dues', dues);
   });
+  for (const t of state.tributes ?? []) {
+    const l = ledgers[t.payer];
+    if (!l || !ledgers[t.to]) continue;
+    const gross = (l.land_tax ?? 0) + (l.urban_tax ?? 0) + (l.tithes ?? 0) + (l.trade ?? 0);
+    const paid = Math.trunc((gross * t.share) / 100);
+    add(l, 'tribute_paid', -paid);
+    add(ledgers[t.to]!, 'tribute_received', paid);
+  }
   return ledgers;
 }
 

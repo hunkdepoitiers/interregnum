@@ -1,6 +1,7 @@
 import { startCharacters } from './characters';
 import { startFaith } from './faith';
 import { startForts } from './sieges';
+import { startDiplomacy } from './diplomacy';
 import { startEconomy, type EconomyContext } from './economy';
 import type { Scenario } from './scenario';
 import { charactersFromScenario, economyFromScenario, modifiersFromScenario, provincesFromScenario, realmsFromScenario, SAVE_VERSION, type GameState } from './state';
@@ -58,6 +59,12 @@ export const migrations: Record<number, Migration> = {
     const wars = (s.wars as Record<string, unknown>[]).map((w) => ({ ...w, cb: 'conquest', goal: 0, battles: 0, ticking: 0 }));
     const next = { ...s, armies, wars, forts: {}, sieges: [], levyLost: {} };
     if (economy) startForts(next as unknown as GameState, economy);
+    return next;
+  },
+  // v9 added diplomacy: no pacts but the historical ones.
+  8: (s, { economy }) => {
+    const next = { ...s, opinions: [], alliances: [], marriages: [], truces: [], tributes: [], contracts: {}, factions: [], demands: [], nextDemandId: 1, timelineDone: [] };
+    if (economy) startDiplomacy(next as unknown as GameState, economy);
     return next;
   },
 };
@@ -122,7 +129,7 @@ function validate(s: GameState): void {
     s.economy.slice(1).every((e) => Number.isInteger(e?.treasury)) && Array.isArray(s.banks) && Array.isArray(s.loans) &&
     s.loans.every((l) => Number.isInteger(l?.principal) && realmRef(l.realm) && s.banks[l.bank] !== undefined) &&
     Array.isArray(s.construction) && typeof s.buildings === 'object' && s.buildings !== null &&
-    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) && Array.isArray(s.standing) && Array.isArray(s.armies) && Array.isArray(s.wars) && Array.isArray(s.sieges) && typeof s.forts === 'object' && s.forts !== null && s.armies.every((a) => realmRef(a?.realm) && a.realm > 0 && s.provinces[a.location] !== undefined && Number.isInteger(a.levies) && Number.isInteger(a.menAtArms)) && s.standing.every((x) => x === null || (Number.isInteger(x.prestige) && Number.isInteger(x.piety))) &&
+    Array.isArray(s.characters) && s.characters[0] === null && Array.isArray(s.dynasties) && Array.isArray(s.courts) && Array.isArray(s.standing) && Array.isArray(s.armies) && Array.isArray(s.wars) && Array.isArray(s.sieges) && Array.isArray(s.alliances) && Array.isArray(s.tributes) && Array.isArray(s.factions) && typeof s.forts === 'object' && s.forts !== null && s.armies.every((a) => realmRef(a?.realm) && a.realm > 0 && s.provinces[a.location] !== undefined && Number.isInteger(a.levies) && Number.isInteger(a.menAtArms)) && s.standing.every((x) => x === null || (Number.isInteger(x.prestige) && Number.isInteger(x.piety))) &&
     s.courts.every((c) => c === null || (Number.isInteger(c.ruler) && Array.isArray(c.council))) &&
     s.modifiers.every((m) =>
       Number.isInteger(m?.id) && m.id < s.nextModifierId && typeof m.def === 'string' && Number.isInteger(m.start) &&

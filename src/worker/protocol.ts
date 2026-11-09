@@ -1,5 +1,6 @@
 import type { Command } from '../sim/commands';
 import type { Content } from '../sim/content';
+import type { DiploAction } from '../sim/diplomacy';
 import type { CreditRating, LoanOffer, Notice, ProvinceEconomy } from '../sim/economy';
 import type { Modifier } from '../sim/modifiers';
 import type { Scenario } from '../sim/scenario';
@@ -133,6 +134,8 @@ export interface PeaceOffer {
   land: number[];
   landCost: number;
   gold: { months: number; amount: number; cost: number }[];
+  tributeCost: number;
+  tributeShare: number;
 }
 
 export interface WarView {
@@ -168,6 +171,22 @@ export interface MilitaryReport {
   casusBelli: { key: string; name: string; description: string; prestige: number; piety: number; why: string | null }[];
 }
 
+export interface DiplomacyReport {
+  /** What this realm thinks of the player; null on the player's own realm or with no player. */
+  opinion: { value: number; lines: { label: string; value: number }[] } | null;
+  truceDays: number;
+  allies: number[];
+  kin: number[];
+  paysTo: { realm: number; share: number }[];
+  receivesFrom: { realm: number; share: number }[];
+  /** On the player's own realm. */
+  faction: { members: number[]; power: number; needed: number; days: number; needDays: number } | null;
+  demands: { id: number; from: number; share: number; years: number; men: number; days: number }[];
+  actions: { key: DiploAction; label: string; detail: string; cost: number; why: string | null }[];
+  /** For the player's vassal: its obligations and the choices. */
+  contract: { current: string; options: { key: string; name: string; description: string }[] } | null;
+}
+
 export interface RealmReport {
   treasury: number;
   /** Last month's settled ledger, and this month's as it stands (one-offs so far included). */
@@ -184,6 +203,7 @@ export interface RealmReport {
   court: CourtReport | null;
   standing: StandingReport | null;
   military: MilitaryReport;
+  diplomacy: DiplomacyReport;
 }
 
 export interface ProvinceReport {

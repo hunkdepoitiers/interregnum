@@ -1,0 +1,54 @@
+# Opinion, pacts, vassal contracts, factions and the scripted steppe powers (M9). Read by tools/build-data.ts
+# (diplomacy-lib). Money in ducats. Opinion in whole points. Numbers are tuned for play: GUESS.
+
+opinion:
+  same_faith: 10
+  same_family: 5
+  other_family: -15
+  same_culture_group: 5
+  alliance: 30
+  marriage: 20
+  truce: -10
+  at_war: -50
+  pays_tribute: -20
+
+alliance: { min_opinion: 25, break_prestige: -20, call_opinion: 20 }
+marriage: { min_opinion: 0, age: 16, war_prestige: -25, call_opinion: 25 }
+truce_years: 5
+gift: { cost: 200, cost_months: 0.5, opinion: 25, days: 1825, per_eminence: 5, cooldown: 365 }
+tribute_demand: { share: 10, years: 5, power: 300, opinion: -30 }
+# What a peace may impose: this share (%) of the loser's income for these years, at this cost in war score.
+peace_tribute: { share: 15, years: 5, cost: 20 }
+# Alliances that stand on 1 November 1314. The Auld Alliance dates from 1295.
+start_alliances: [[france, scotland]]
+
+vassals:
+  base: 10
+  # Per point of the overlord's legitimacy above 60, this many tenths of a point.
+  legitimacy: 5
+  # Per prestige tier above Known.
+  prestige_tier: 5
+  # While the overlord's treasury is empty.
+  unpaid: -40
+  contract_change: -10
+  contracts:
+    - { key: low, name: Light obligations, dues: 50, opinion: 15, joins_wars: false, description: Half dues and no duty to fight the overlord's wars. }
+    - { key: normal, name: Customary obligations, dues: 100, opinion: 0, joins_wars: true, description: Dues and service as they have always been. }
+    - { key: high, name: Heavy obligations, dues: 175, opinion: -25, joins_wars: true, description: The overlord takes much more than custom allows. }
+
+factions:
+  # A vassal below this opinion joins its overlord's faction.
+  join_below: -10
+  # A faction whose levies are this share (%) of the overlord's rises once it is this many days old.
+  revolt_power: 30
+  revolt_days: 180
+
+# The scripted steppe powers. tribute: a demand (refused or ignored within `reply_days`, the invasion goes ahead).
+# invasion: an army appears at `spawn` [lat, lon]. The Horde's raids on Thrace and Azerbaijan are history; the rest GUESS.
+reply_days: 60
+timeline:
+  - { date: [1316, 3, 1], type: tribute, from: golden_horde, to: bulgaria, share: 8, years: 10, men: 15000, spawn: [44.2, 28.6] }
+  - { date: [1319, 1, 15], type: invasion, from: golden_horde, to: ilkhanate, men: 30000, spawn: [41.5, 48.5] }
+  - { date: [1320, 6, 1], type: tribute, from: golden_horde, to: poland, share: 6, years: 10, men: 20000, spawn: [50.5, 24.5] }
+  - { date: [1324, 6, 1], type: invasion, from: golden_horde, to: byzantium, men: 12000, spawn: [41.7, 27.2] }
+  - { date: [1325, 5, 1], type: tribute, from: ilkhanate, to: trebizond, share: 10, years: 10, men: 15000, spawn: [40.2, 41.2] }

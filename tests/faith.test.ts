@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyCommand } from '../src/sim/commands';
-import { emptyCharacters, emptyMilitary, emptyWar, type Content, type FaithDef, type ModifierDef, type StatDef } from '../src/sim/content';
+import { emptyCharacters, emptyDiplomacy, emptyMilitary, emptyWar, type Content, type FaithDef, type ModifierDef, type StatDef } from '../src/sim/content';
 import { creditRating, defaultLoan, finishBuildings, startBuilding, startEconomy, takeLoan, type EconomyContext } from '../src/sim/economy';
 import { cannotDeed, doDeed, monthlyFaith, startFaith } from '../src/sim/faith';
 import { hashState } from '../src/sim/hash';
@@ -74,7 +74,7 @@ const content: Content = {
     banks: [{ key: 'local', name: 'Moneylenders', seat: 0, capital: 6000000, rate: 2500, risk: 100, local: true }],
     credit: { base: 55, incomePerPoint: 200000, incomeCap: 25, debtRatioPenalty: 30, defaultPenalty: 35, defaultMemoryDays: 7300, rateSpread: 5, terms: [12] },
   },
-  characters: emptyCharacters(), faith, military: emptyMilitary(), war: emptyWar(),
+  characters: emptyCharacters(), faith, military: emptyMilitary(), war: emptyWar(), diplomacy: emptyDiplomacy(),
 };
 
 /** Realm 1, a Catholic kingdom, holds provinces 1 and 2 (a shrine); realm 2, the Papacy, holds Rome (3). */

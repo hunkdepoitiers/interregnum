@@ -35,7 +35,8 @@ export function allies(state: GameState, realm: number): Set<number> {
 
 /** A realm and its direct vassals: who a declaration of war drags in. */
 function withVassals(state: GameState, realm: number): number[] {
-  return [realm, ...state.realms.filter((r) => r && r.overlord === realm).map((r) => r!.id)];
+  const free = (r: number) => state.contracts?.[r] === 'low';
+  return [realm, ...state.realms.filter((r) => r && r.overlord === realm && !free(r.id)).map((r) => r!.id)];
 }
 
 /** Debug and later casus belli: the attacker and its vassals against the defender, its vassals and its overlord. */
@@ -43,7 +44,7 @@ export function declareWar(state: GameState, attacker: number, defender: number,
   const a = state.realms[attacker];
   const d = state.realms[defender];
   if (!a || !d || attacker === defender || atWar(state, attacker, defender)) return null;
-  const defenders = withVassals(state, defender);
+  const defenders = withVassals(state, defender).filter((r) => r !== attacker);
   if (d.overlord && d.overlord !== attacker && state.realms[d.overlord]) defenders.push(d.overlord);
   const attackers = withVassals(state, attacker).filter((r) => !defenders.includes(r));
   const war: War = { id: state.nextWarId++, name: `${a.name}'s war on ${d.name}`, attackers, defenders, start: state.day, cb, goal: goal || d.capital, battles: 0, ticking: 0 };
@@ -186,6 +187,11 @@ export function hireCompany(state: GameState, ctx: EconomyContext, realm: number
   const army = newArmy(state, ctx, realm, 0, c.men);
   army.company = index + 1;
   return true;
+}
+
+/** An army that appears out of nowhere (the steppe's hosts): it needs no levies of the realm's and is ready at once. */
+export function placeArmy(state: GameState, realm: number, province: number, men: number): void {
+  state.armies.push({ id: state.nextArmyId++, realm, location: province, path: [], progress: 0, levies: men, menAtArms: 0, morale: MORALE_FULL, raised: state.day, ready: state.day, commander: 0, siege: 0, retreating: false, company: 0 });
 }
 
 export function disband(state: GameState, realm: number, armyId: number): boolean {

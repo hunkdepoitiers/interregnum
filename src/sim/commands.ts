@@ -3,6 +3,7 @@ import { doDeed } from './faith';
 import { declareWar, disband, endWar, hireCompany, hireMenAtArms, mergeArmies, moveArmy, raiseLevies, splitArmy } from './military';
 import { assault, bribe, hireEngineers } from './sieges';
 import { declareFor, proposePeace, type PeaceTerms } from './war';
+import { answerDemand, doDiplo, setContract, type DiploAction } from './diplomacy';
 import { ensureStanding } from './standing';
 import { ensureEconomy, repayLoan, repudiate, setTaxLaw, startBuilding, takeLoan, type EconomyContext, type Notice } from './economy';
 import { addModifier, removeModifiers, type ModifierTarget } from './modifiers';
@@ -41,6 +42,9 @@ export type Command =
   | { type: 'bribe'; realm: number; province: number; tier: number }
   | { type: 'hireEngineers'; realm: number; province: number }
   | { type: 'hireCompany'; realm: number; company: number }
+  | { type: 'diplomacy'; realm: number; target: number; action: DiploAction }
+  | { type: 'setContract'; realm: number; vassal: number; contract: string }
+  | { type: 'answerDemand'; demand: number; pay: boolean }
   | { type: 'raiseLevies'; realm: number }
   /** men: whole men, hired in thousands. */
   | { type: 'hireMenAtArms'; realm: number; men: number }
@@ -109,7 +113,7 @@ export function applyCommand(state: GameState, cmd: Command, content?: Content, 
       return n.length > 0;
     }
     case 'declareWar':
-      return cmd.cb && ctx ? !!declareFor(state, ctx, cmd.attacker, cmd.defender, cmd.cb) : !!declareWar(state, cmd.attacker, cmd.defender);
+      return cmd.cb && ctx ? !!declareFor(state, ctx, cmd.attacker, cmd.defender, cmd.cb, notices) : !!declareWar(state, cmd.attacker, cmd.defender);
     case 'makePeace':
       return endWar(state, cmd.war);
     case 'proposePeace': {
@@ -126,6 +130,13 @@ export function applyCommand(state: GameState, cmd: Command, content?: Content, 
     case 'hireEngineers':
       if (ctx) hireEngineers(state, ctx, cmd.realm, cmd.province);
       return false;
+    case 'diplomacy':
+      if (ctx) notices.push(...doDiplo(state, ctx, cmd.realm, cmd.target, cmd.action));
+      return false;
+    case 'setContract':
+      return !!ctx && setContract(state, ctx, cmd.realm, cmd.vassal, cmd.contract);
+    case 'answerDemand':
+      return answerDemand(state, cmd.demand, cmd.pay, notices);
     case 'hireCompany':
       if (ctx) hireCompany(state, ctx, cmd.realm, cmd.company);
       return false;

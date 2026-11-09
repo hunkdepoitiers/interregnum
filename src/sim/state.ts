@@ -4,7 +4,7 @@ import type { Character, Court, Dynasty, Scenario, ScenarioRealm } from './scena
 
 export type { Character, Court, Dynasty };
 
-export const SAVE_VERSION = 8;
+export const SAVE_VERSION = 9;
 
 /** Speed 1 (slowest) .. 5 (fastest). */
 export type Speed = 1 | 2 | 3 | 4 | 5;
@@ -126,6 +126,11 @@ export interface War {
   ticking: number;
 }
 
+export interface Marriage { a: number; b: number; husband: number; wife: number }
+
+/** A scripted power's demand on the player, to pay or refuse. */
+export interface Demand { id: number; from: number; to: number; share: number; days: number; men: number; spawn: number; expires: number }
+
 export interface Fort {
   level: number;
   garrison: number;
@@ -195,6 +200,20 @@ export interface GameState {
   sieges: Siege[];
   /** By realm id: levies killed and not yet replaced. */
   levyLost: Record<string, number>;
+  /** Timed reasons one realm thinks better or worse of another. */
+  opinions: { from: number; to: number; label: string; value: number; start: number; end: number }[];
+  alliances: { a: number; b: number; start: number }[];
+  marriages: Marriage[];
+  truces: { a: number; b: number; until: number }[];
+  /** share: percent of the payer's gross income each month. */
+  tributes: { payer: number; to: number; share: number; until: number }[];
+  /** By vassal realm id; missing = normal. */
+  contracts: Record<string, string>;
+  factions: { overlord: number; members: number[]; start: number }[];
+  demands: Demand[];
+  nextDemandId: number;
+  /** Indexes into Content.diplomacy.timeline already done. */
+  timelineDone: number[];
 }
 
 export function provincesFromScenario(scenario: Scenario): ProvinceState[] {
@@ -262,5 +281,15 @@ export function newGame(seed: number, scenario: Scenario, bankCapitals: number[]
     forts: {},
     sieges: [],
     levyLost: {},
+    opinions: [],
+    alliances: [],
+    marriages: [],
+    truces: [],
+    tributes: [],
+    contracts: {},
+    factions: [],
+    demands: [],
+    nextDemandId: 1,
+    timelineDone: [],
   };
 }
