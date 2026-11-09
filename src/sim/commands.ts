@@ -1,6 +1,8 @@
 import type { Content } from './content';
 import { doDeed } from './faith';
-import { declareWar, disband, hireMenAtArms, makePeace, mergeArmies, moveArmy, raiseLevies, splitArmy } from './military';
+import { declareWar, disband, endWar, hireCompany, hireMenAtArms, mergeArmies, moveArmy, raiseLevies, splitArmy } from './military';
+import { assault, bribe, hireEngineers } from './sieges';
+import { declareFor, proposePeace, type PeaceTerms } from './war';
 import { ensureStanding } from './standing';
 import { ensureEconomy, repayLoan, repudiate, setTaxLaw, startBuilding, takeLoan, type EconomyContext, type Notice } from './economy';
 import { addModifier, removeModifiers, type ModifierTarget } from './modifiers';
@@ -30,9 +32,15 @@ export type Command =
   | { type: 'repudiate'; realm: number }
   /** A deed for prestige or piety (data/content/faith.yaml deeds). */
   | { type: 'deed'; realm: number; deed: string }
-  /** Debug for now: war between two realms (and their vassals), and white peace. */
-  | { type: 'declareWar'; attacker: number; defender: number }
+  /** War for a stated reason; without one, a free debug conquest. */
+  | { type: 'declareWar'; attacker: number; defender: number; cb?: string }
+  /** Debug: white peace at once. */
   | { type: 'makePeace'; war: number }
+  | { type: 'proposePeace'; realm: number; war: number; terms: PeaceTerms; demand: boolean }
+  | { type: 'assault'; realm: number; province: number }
+  | { type: 'bribe'; realm: number; province: number; tier: number }
+  | { type: 'hireEngineers'; realm: number; province: number }
+  | { type: 'hireCompany'; realm: number; company: number }
   | { type: 'raiseLevies'; realm: number }
   /** men: whole men, hired in thousands. */
   | { type: 'hireMenAtArms'; realm: number; men: number }
@@ -101,9 +109,26 @@ export function applyCommand(state: GameState, cmd: Command, content?: Content, 
       return n.length > 0;
     }
     case 'declareWar':
-      return !!declareWar(state, cmd.attacker, cmd.defender);
+      return cmd.cb && ctx ? !!declareFor(state, ctx, cmd.attacker, cmd.defender, cmd.cb) : !!declareWar(state, cmd.attacker, cmd.defender);
     case 'makePeace':
-      return makePeace(state, cmd.war);
+      return endWar(state, cmd.war);
+    case 'proposePeace': {
+      if (!ctx) return false;
+      const r = proposePeace(state, ctx, cmd.realm, cmd.war, cmd.terms, cmd.demand);
+      if (!r.accepted) notices.push({ realm: cmd.realm, text: 'Your peace offer was refused.' });
+      notices.push(...r.notices);
+      return r.accepted;
+    }
+    case 'assault':
+      return !!ctx && assault(state, ctx, cmd.realm, cmd.province, notices);
+    case 'bribe':
+      return !!ctx && bribe(state, ctx, cmd.realm, cmd.province, cmd.tier, notices);
+    case 'hireEngineers':
+      if (ctx) hireEngineers(state, ctx, cmd.realm, cmd.province);
+      return false;
+    case 'hireCompany':
+      if (ctx) hireCompany(state, ctx, cmd.realm, cmd.company);
+      return false;
     case 'raiseLevies':
       if (ctx) raiseLevies(state, ctx, cmd.realm);
       return false;

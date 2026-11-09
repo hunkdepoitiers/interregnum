@@ -84,6 +84,7 @@ buildings:
   - { key: mill, name: Mills, cost: 180, days: 150, upkeep: 1, modifier: building_mill, description: Water mills grind grain and full cloth. }
   - { key: granary, name: Granary, cost: 150, days: 120, upkeep: 1, modifier: building_granary, description: Stores against lean years and passing armies. }
   - { key: church, name: Church, cost: 200, days: 200, upkeep: 1, modifier: building_church, description: A stone church calms the people and draws pilgrims. }
+  - { key: castle, name: Castle, cost: 800, days: 730, upkeep: 5, modifier: building_castle, description: Stone walls make the province one fort level stronger. }
   - { key: cathedral, name: Cathedral, cost: 1200, days: 1095, upkeep: 4, modifier: building_cathedral, description: A great cathedral glorifies the faith and the ruler who raised it. }
 
 # Banking houses. capital is what they can lend; rate is their yearly base interest (%); risk (0-100) is how far

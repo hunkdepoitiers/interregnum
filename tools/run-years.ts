@@ -10,6 +10,8 @@ import type { Scenario } from '../src/sim/scenario';
 import { ageOf, startCharacters } from '../src/sim/characters';
 import { startFaith, tiersOf } from '../src/sim/faith';
 import { declareWar } from '../src/sim/military';
+import { startForts } from '../src/sim/sieges';
+import { warScore } from '../src/sim/war';
 import { newGame } from '../src/sim/state';
 import { tick } from '../src/sim/tick';
 
@@ -19,12 +21,13 @@ const content = JSON.parse(readFileSync('public/generated/content.json', 'utf8')
 const ctx: EconomyContext = {
   content, goods: scenario.good ?? [], centres: scenario.tradeCentre ?? [], seats: scenario.seats ?? [],
   culture: scenario.culture ?? [], religion: scenario.religion ?? [],
-  graph: scenario.graph, pos: scenario.pos, kmPerPx: scenario.kmPerPx, terrain: scenario.terrain,
+  county: scenario.county ?? [], graph: scenario.graph, pos: scenario.pos, kmPerPx: scenario.kmPerPx, terrain: scenario.terrain,
 };
 const state = newGame(1314, scenario, content.economy.banks.map((b) => b.capital));
 startCharacters(state, ctx);
 startEconomy(state, ctx);
 startFaith(state, ctx);
+startForts(state, ctx);
 
 const warAt = process.argv.indexOf('--war');
 const warPair = warAt > 0 ? process.argv[warAt + 1]!.split(',') : null;
@@ -76,6 +79,7 @@ if (warPair) {
   const by = new Map<string, number>();
   for (const p of occupied) { const k = `${state.realms[p.controller]?.key} holds ${state.realms[p.owner]?.key}`; by.set(k, (by.get(k) ?? 0) + 1); }
   console.log(`armies: ${state.armies.map((a) => `${state.realms[a.realm]?.key} ${a.levies}+${a.menAtArms} @${a.location} m${Math.trunc(a.morale / 100)}`).join('; ')}`);
+  console.log(`wars: ${state.wars.map((w) => `${w.name} ${JSON.stringify(warScore(state, ctx, w))}`).join('; ') || 'none left'}; sieges ${state.sieges.length}; forts ${Object.keys(state.forts).length}`);
   console.log(`occupied: ${[...by].map(([k, n]) => `${k}: ${n}`).join(', ')}`);
 }
 const ex = state.modifiers.filter((m) => m.def === 'excommunicated').length;

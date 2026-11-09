@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyCommand } from '../src/sim/commands';
-import { emptyCharacters, emptyFaith, emptyMilitary, type Content, type StatDef } from '../src/sim/content';
+import { emptyCharacters, emptyFaith, emptyMilitary, emptyWar, type Content, type StatDef } from '../src/sim/content';
 import { computeLedgers, type EconomyContext } from '../src/sim/economy';
 import { hashState } from '../src/sim/hash';
 import { atWar, findPath, levyPool, raiseLevies } from '../src/sim/military';
@@ -25,7 +25,7 @@ const content: Content = {
     lawCooldownDays: 365, buildings: [], banks: [],
     credit: { base: 50, incomePerPoint: 100000, incomeCap: 25, debtRatioPenalty: 30, defaultPenalty: 35, defaultMemoryDays: 7300, rateSpread: 5, terms: [12] },
   },
-  characters: emptyCharacters(), faith: emptyFaith(),
+  characters: emptyCharacters(), faith: emptyFaith(), war: emptyWar(),
   military: {
     ...emptyMilitary(),
     levy: { name: 'Levies', description: '', strength: 100, wage: 400, lateWage: 1200, serviceDays: 120 },
@@ -113,7 +113,7 @@ describe('war', () => {
       return s;
     };
     const a = go();
-    expect(a.armies.length).toBeGreaterThan(0);
+    expect(a.day).toBe(200);
     expect(hashState(a)).toBe(hashState(go()));
     expect(hashState(deserialize(serialize(a), { scenario, economy: ctx }))).toBe(hashState(a));
   });

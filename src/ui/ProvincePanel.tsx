@@ -25,7 +25,6 @@ const STRATUM_LABEL: Record<(typeof STRATA)[number], string> = {
 
 /** When a field that has no simulation yet arrives (docs/ROADMAP.md). */
 const EVENTS = 'events (M10)';
-const SIEGES = 'sieges (M8)';
 
 function areaKm2(map: MapData, p: MapProvince): number {
   // Equirectangular pixels cover less ground away from the standard parallel; scale by latitude.
@@ -118,7 +117,6 @@ export function ProvincePanel() {
               <StatRow stat="supply_limit" scope="province" id={p.id} />
               <Row label="Control">{controller && controller !== owner ? <span class="warn">Occupied by <RealmLink id={controller} /></span> : 'Held by its owner'}</Row>
               <Pending label="Prosperity" when={EVENTS} />
-              <Pending label="Fortifications" when={SIEGES} />
             </Section>
             <Section title="The People">
               {culture && <Row label="Culture">{culture.name} <span class="muted">({culture.groupName})</span></Row>}
@@ -150,7 +148,7 @@ export function ProvincePanel() {
                 </Row>
               ))}
               {p.coastal && <Pending label="Sailors" when="navies (later)" />}
-              <Pending label="Garrison" when={SIEGES} />
+              {report?.fort ? <Row label="Fort">Level {report.fort.level} <span class="muted">· {report.fort.garrison.toLocaleString('en')} of {report.fort.maxGarrison.toLocaleString('en')} men</span></Row> : <Row label="Fort"><span class="muted">None</span></Row>}
             </Section>
             <DeJure id={p.id} />
             <StatList scope="province" id={p.id} skip={PLACED} />

@@ -209,6 +209,9 @@ ul.columns li { break-inside: avoid; }
 p.small { margin: 3px 0; }
 button.small-btn { padding: 0 8px; font-size: 14px; }
 .deeds { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.war-box { margin-top: 6px; padding-top: 4px; border-top: 1px solid rgba(155, 42, 28, 0.3); }
+.peace { margin-top: 4px; font-size: 14px; }
+button.small-btn.on { background: rgba(184, 137, 47, 0.35); }
 .deeds-log { font-size: 14px; margin: 4px 0; }
 .has-tip { cursor: help; border-bottom: 1px dotted var(--ink-soft); }
 button:disabled { opacity: 0.5; cursor: not-allowed; }

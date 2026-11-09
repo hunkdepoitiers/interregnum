@@ -329,6 +329,49 @@ export function emptyMilitary(): MilitaryDef {
   };
 }
 
+export interface CompanyDef { key: string; name: string; description: string; men: number; cost: number; wage: number; strength: number }
+export interface CasusBelliDef { key: string; name: string; description: string; prestige: number; piety: number; winPrestige: number; winPiety: number; minPiety: number; governments: string[] }
+
+/** Forts, sieges, companies, casus belli, war score and peace (data/content/war.yaml). Chances in basis points. */
+export interface WarDef {
+  forts: {
+    capital: Record<'empire' | 'kingdom' | 'duchy' | 'county', number>; development: number[][]; tradeCentre: number; maxLevel: number;
+    garrisonPerLevel: number; supplyBase: number; supplyPerLevel: number; capturedGarrison: number; refill: number; castleBuilding: string;
+  };
+  siege: {
+    progress: number; menMin: number; menMax: number; warcraft: number; engineerBonus: number; maxEngineers: number; engineerCost: number;
+    starvingProgress: number; starvingLoss: number; prestige: number; eventChance: number;
+    events: Record<'disease' | 'sally' | 'breach' | 'stores_lost' | 'traitor', { weight: number; text: string }>;
+    diseaseLoss: number; sallyLoss: number; sallyGarrisonLoss: number; breachProgress: number; storesLostDays: number; traitorStores: number;
+  };
+  assault: { base: number; perProgress: number; breach: number; perRatio: number; ratioCap: number; perLevel: number; min: number; max: number; lossesWon: number; lossesLost: number; garrisonLost: number; moraleLost: number; cooldown: number };
+  bribe: { cost: number; chances: number[]; unpaidBonus: number; perEminence: number; perLevel: number; cooldown: number };
+  desertion: { share: number; morale: number };
+  /** Share (%) of the full levy pool that returns each month after losses. */
+  levyRecovery: number;
+  battlePrestigeMen: number;
+  companies: CompanyDef[];
+  casusBelli: CasusBelliDef[];
+  raidLoot: number;
+  score: { battleCap: number; battleMen: number; battleMax: number; tickingCap: number; ticking: number };
+  peace: { land: number; indemnityPerMonth: number; indemnityMonths: number[]; winPrestige: number; losePrestige: number; aiScore: number; aiDays: number; aiWhite: number; concede: number };
+}
+
+/** No forts, companies or reasons for war beyond conquest: for content built without data/content/war.yaml. */
+export function emptyWar(): WarDef {
+  const ev = { weight: 0, text: '' };
+  return {
+    forts: { capital: { empire: 0, kingdom: 0, duchy: 0, county: 0 }, development: [], tradeCentre: 0, maxLevel: 5, garrisonPerLevel: 500, supplyBase: 90, supplyPerLevel: 30, capturedGarrison: 25, refill: 20, castleBuilding: 'castle' },
+    siege: { progress: 166, menMin: 50, menMax: 150, warcraft: 0, engineerBonus: 25, maxEngineers: 3, engineerCost: 15000, starvingProgress: 200, starvingLoss: 2, prestige: 0, eventChance: 0, events: { disease: ev, sally: ev, breach: ev, stores_lost: ev, traitor: ev }, diseaseLoss: 2, sallyLoss: 1, sallyGarrisonLoss: 3, breachProgress: 1500, storesLostDays: 15, traitorStores: 30 },
+    assault: { base: 1000, perProgress: 50, breach: 2000, perRatio: 300, ratioCap: 2000, perLevel: 500, min: 500, max: 9500, lossesWon: 2, lossesLost: 4, garrisonLost: 30, moraleLost: 25, cooldown: 30 },
+    bribe: { cost: 20000, chances: [1500, 3000, 4500], unpaidBonus: 1500, perEminence: 150, perLevel: 200, cooldown: 60 },
+    desertion: { share: 0, morale: 0 }, levyRecovery: 3, battlePrestigeMen: 1000, companies: [],
+    casusBelli: [{ key: 'conquest', name: 'Conquest', description: '', prestige: 0, piety: 0, winPrestige: 0, winPiety: 0, minPiety: -1000000, governments: [] }], raidLoot: 0,
+    score: { battleCap: 40, battleMen: 2000, battleMax: 8, tickingCap: 25, ticking: 1 },
+    peace: { land: 150, indemnityPerMonth: 3, indemnityMonths: [3, 6, 12], winPrestige: 0, losePrestige: 0, aiScore: 50, aiDays: 1095, aiWhite: 10, concede: 80 },
+  };
+}
+
 export interface Content {
   stats: Record<string, StatDef>;
   modifiers: Record<string, ModifierDef>;
@@ -342,4 +385,5 @@ export interface Content {
   characters: CharactersDef;
   faith: FaithDef;
   military: MilitaryDef;
+  war: WarDef;
 }

@@ -8,7 +8,9 @@ import {
 } from '../sim/economy';
 import { cannotDeed, deedCost, deedIncome, excommunicationThreat, holySitesAt, realmFaith, startFaith, tiersOf } from '../sim/faith';
 import { hasModifier } from '../sim/modifiers';
-import { atWar, cannotHire, levyPool } from '../sim/military';
+import { atWar, cannotHire, cannotHireCompany, levyPool } from '../sim/military';
+import { assaultChance, bribeChance, bribeCost, dailyProgress, fullGarrison, startForts } from '../sim/sieges';
+import { casusBelli, indemnity, landOnOffer, peaceCost, warScore } from '../sim/war';
 import { armyWage } from '../sim/economy';
 import { deserialize, serialize } from '../sim/save';
 import { ensureStanding } from '../sim/standing';
@@ -16,7 +18,7 @@ import type { Scenario } from '../sim/scenario';
 import { newGame, type GameState, type Speed } from '../sim/state';
 import { tick } from '../sim/tick';
 import type {
-  ArmyView, CharacterRef, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, StandingReport, ToWorker,
+  ArmyView, CharacterRef, PeaceOffer, SiegeView, WarView, CharacterReport, CourtReport, EconomyQuery, FromWorker, ProvinceReport, RealmReport, StandingReport, ToWorker,
 } from './protocol';
 
 /** Milliseconds per game day (speed 5 ≈ 100 days per second, if the tick keeps up). */
@@ -141,11 +143,42 @@ function postArmies(s: GameState, ctx: EconomyContext) {
       path: [...a.path], levies: a.levies, menAtArms: a.menAtArms, morale: Math.trunc(a.morale / 100), commander: ref(s, a.commander), ready: a.ready,
       fighting: !a.retreating && s.armies.some((x) => x.location === a.location && !x.retreating && atWar(s, a.realm, x.realm)),
       retreating: a.retreating,
-      siege: enemyHolds ? a.siege : 0, siegeNeed: enemyHolds ? Math.max(m.occupyMin, Math.trunc((m.occupyDays * 1000) / Math.max(1, men))) : 0,
+      company: ctx.content.war.companies[a.company - 1]?.name ?? null,
+      siege: enemyHolds && !s.forts[a.location] ? a.siege : 0, siegeNeed: enemyHolds && !s.forts[a.location] ? Math.max(m.occupyMin, Math.trunc((m.occupyDays * 1000) / Math.max(1, men))) : 0,
       wage: armyWage(ctx.content, a, s.day),
     };
   });
-  post({ type: 'armies', armies, wars: s.wars });
+  const w = ctx.content.war;
+  const sieges: SiegeView[] = s.sieges.flatMap((x) => {
+    const fort = s.forts[x.province];
+    const controller = s.provinces[x.province]!.controller;
+    if (!fort) return [];
+    const here = s.armies.filter((a) => a.location === x.province && !a.path.length && !a.retreating && atWar(s, a.realm, controller));
+    return [{
+      province: x.province, realm: x.realm, progress: Math.trunc(x.progress / 100), level: fort.level, garrison: fort.garrison, supply: fort.supply,
+      engineers: x.engineers, maxEngineers: w.siege.maxEngineers, engineerCost: w.siege.engineerCost, breach: x.breach,
+      assaultChance: assaultChance(s, w, x, fort, here), assaultWon: fort.garrison * w.assault.lossesWon, assaultLost: fort.garrison * w.assault.lossesLost,
+      assaultWait: Math.max(0, x.nextAssault - s.day), bribeWait: Math.max(0, x.nextBribe - s.day),
+      bribes: w.bribe.chances.map((_, tier) => ({ cost: bribeCost(w, fort, tier), chance: bribeChance(s, w, x, fort, tier, controller) })),
+      daily: dailyProgress(s, w, x, fort, here.length ? here : s.armies.filter((a) => a.realm === x.realm).slice(0, 1)), log: x.log,
+    }];
+  });
+  const wars: WarView[] = s.wars.map((war) => {
+    const lead = war.attackers[0] === s.player || war.defenders[0] === s.player;
+    const iAttack = war.attackers[0] === s.player;
+    const offer = (winnerAttackers: boolean): PeaceOffer => {
+      const land = war.cb === 'raid' ? [] : landOnOffer(s, war, winnerAttackers);
+      return {
+        land, landCost: land.length ? peaceCost(s, ctx, war, winnerAttackers, { cede: land, months: 0 }) : 0,
+        gold: w.peace.indemnityMonths.map((months) => ({ months, amount: indemnity(s, war, winnerAttackers, months), cost: peaceCost(s, ctx, war, winnerAttackers, { cede: [], months }) })),
+      };
+    };
+    return {
+      id: war.id, name: war.name, cbName: w.casusBelli.find((c) => c.key === war.cb)?.name ?? war.cb, attackers: war.attackers, defenders: war.defenders, start: war.start,
+      ...warScore(s, ctx, war), demand: lead ? offer(iAttack) : null, concede: lead ? offer(!iAttack) : null, concedeShare: w.peace.concede,
+    };
+  });
+  post({ type: 'armies', armies, wars, sieges });
 }
 
 function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport | ProvinceReport | CharacterReport | null {
@@ -169,7 +202,10 @@ function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport
       people,
       court: courtReport(s, ctx, q.id),
       standing: standingReport(s, ctx, q.id),
-      military: { ...levyPool(s, ctx, q.id), hireCost: Math.trunc(ctx.content.military.menAtArms.cost), cannotHire: cannotHire(s, ctx, q.id, 1000) },
+      military: { ...levyPool(s, ctx, q.id), hireCost: Math.trunc(ctx.content.military.menAtArms.cost), cannotHire: cannotHire(s, ctx, q.id, 1000),
+        companies: ctx.content.war.companies.map((c, index) => ({ index, name: c.name, description: c.description, men: c.men, cost: c.cost, wage: c.wage, why: cannotHireCompany(s, ctx, q.id, index) })),
+        casusBelli: s.player && s.player !== q.id ? casusBelli(s, ctx, s.player, q.id) : [],
+      },
     };
   }
   const p = s.provinces[q.id];
@@ -182,6 +218,7 @@ function answer(s: GameState, ctx: EconomyContext, q: EconomyQuery): RealmReport
     construction: s.construction.filter((c) => c.province === q.id),
     canBuild,
     holySites: holySitesAt(ctx, q.id),
+    fort: s.forts[q.id] ? { ...s.forts[q.id]!, maxGarrison: fullGarrison(ctx.content.war, s.forts[q.id]!.level) } : null,
   };
 }
 
@@ -194,7 +231,7 @@ function step() {
   if (!state) return;
   const r = tick(state, economy ?? undefined);
   if (r.modifiersChanged) postWorld(state);
-  if (economy && (state.armies.length || state.wars.length || r.notices.length)) postArmies(state, economy);
+  if (economy && (state.armies.length || state.wars.length || state.sieges.length || r.notices.length)) postArmies(state, economy);
   postNotices(state, r.notices);
   postStatus(state);
   schedule();
@@ -208,12 +245,13 @@ self.onmessage = (e: MessageEvent<ToWorker>) => {
     economy = {
       content, goods: scenario.good ?? [], centres: scenario.tradeCentre ?? [], seats: scenario.seats ?? [],
       culture: scenario.culture ?? [], religion: scenario.religion ?? [],
-      graph: scenario.graph, pos: scenario.pos, kmPerPx: scenario.kmPerPx, terrain: scenario.terrain,
+      county: scenario.county ?? [], graph: scenario.graph, pos: scenario.pos, kmPerPx: scenario.kmPerPx, terrain: scenario.terrain,
     };
     state = newGame(msg.seed, scenario, content.economy.banks.map((b) => b.capital));
     startCharacters(state, economy);
     startEconomy(state, economy);
     startFaith(state, economy);
+    startForts(state, economy);
     postWorld(state);
   } else if (!state || !scenario || !economy) {
     return; // nothing to act on before init

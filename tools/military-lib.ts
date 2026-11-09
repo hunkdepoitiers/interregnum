@@ -24,6 +24,14 @@ export function compileMilitary(src: MilitarySource): MilitaryDef {
 /** The march graph between land provinces (straits included) and every province's centroid. */
 export function compileGraph(src: MilitarySource, provinces: MapProvince[], ctx: MapContext): Pick<Scenario, 'graph' | 'pos' | 'kmPerPx' | 'terrain'> {
   const byId = new Map(provinces.map((p) => [p.id, p]));
+  const byKey = new Map(provinces.map((p) => [p.key, p]));
+  const extra = new Map<number, number[]>();
+  for (const [a, b] of src.crossings) {
+    const [pa, pb] = [byKey.get(a), byKey.get(b)];
+    if (!pa || !pb) throw new Error(`military.yaml crossings: unknown province ${pa ? b : a}`);
+    extra.set(pa.id, [...(extra.get(pa.id) ?? []), pb.id]);
+    extra.set(pb.id, [...(extra.get(pb.id) ?? []), pa.id]);
+  }
   const maxId = provinces.reduce((m, p) => Math.max(m, p.id), 0);
   const { width } = projectionSize(ctx.projection);
   const kmPerPx = (40075 * Math.cos((ctx.projection.standardParallel * Math.PI) / 180)) / width;
@@ -43,7 +51,7 @@ export function compileGraph(src: MilitarySource, provinces: MapProvince[], ctx:
     pos.push(p ? Math.round(p.centroid[0]) : 0, p ? Math.round(p.centroid[1]) : 0);
     terrain.push(p?.terrain ?? '');
     if (!p || p.kind !== 'land') continue;
-    for (const a of p.adjacency) {
+    for (const a of [...p.adjacency, ...(extra.get(id) ?? []).map((q) => ({ id: q, strait: true as const }))]) {
       const q = byId.get(a.id);
       if (!q || q.kind !== 'land') continue;
       const speed = (src.march_km * (src.terrain_speed[q.terrain ?? 'plains'] ?? 100)) / 100;

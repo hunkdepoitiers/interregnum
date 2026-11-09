@@ -319,3 +319,9 @@
     - { stat: unrest, add: -3 }
     - { stat: development, add: 1 }
     - { stat: trade_efficiency, add: 2 }
+
+- key: building_castle
+  label: Castle
+  description: Stone walls overlook the province.
+  effects:
+    - { stat: unrest, add: -1 }

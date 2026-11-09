@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { heirOf, monthlyCharacters, skillsOf, startCharacters } from '../src/sim/characters';
-import { emptyCharacters, emptyFaith, emptyMilitary, emptyEconomy, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
+import { emptyCharacters, emptyFaith, emptyMilitary, emptyWar, emptyEconomy, type Content, type ModifierDef, type StatDef } from '../src/sim/content';
 import type { EconomyContext } from '../src/sim/economy';
 import { hashState } from '../src/sim/hash';
 import { explain, hasModifier } from '../src/sim/modifiers';
@@ -34,6 +34,7 @@ const content: Content = {
   },
   faith: emptyFaith(),
   military: emptyMilitary(),
+  war: emptyWar(),
 };
 
 const Y = 365.25;

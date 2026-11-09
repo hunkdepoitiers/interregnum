@@ -7,6 +7,7 @@ import { dayToDate, formatDate } from '../sim/calendar';
 import { SKILL_NAMES } from '../sim/characters';
 import type { CourtReport, MilitaryReport, StandingReport } from '../worker/protocol';
 import { menLabel, selectArmy } from './ArmyPanel';
+import { WarBox } from './WarBox';
 import { CharLink, Medallion } from './CharacterPanel';
 import { Row, Section } from './folio';
 import { content } from './StatList';
@@ -265,22 +266,23 @@ function Arms({ realm, m, mine }: { realm: number; m: MilitaryReport; mine: bool
             <span class="muted"> {a.retreating ? 'retreating' : a.fighting ? 'in battle' : a.next ? 'marching' : 'encamped'}</span>
           </Row>
         ))}
-        {myWars.map((w) => (
-          <Row key={w.id} label="At war">
-            <span>{(w.attackers.includes(realm) ? w.defenders : w.attackers).filter((r, i) => i === 0 || r === player).map((r) => <RealmLink key={r} id={r} />)}</span>
-            {mine && <button class="small-btn" title="Debug: white peace, occupied land returns" onClick={() => command({ type: 'makePeace', war: w.id })}>Make peace</button>}
-          </Row>
-        ))}
       </dl>
+      {myWars.map((w) => <WarBox key={w.id} war={w} realm={realm} />)}
       {mine && (
         <div class="deeds">
           <button class="small-btn" disabled={m.raised >= m.total} onClick={() => command({ type: 'raiseLevies', realm })}>Raise levies</button>
           <button class="small-btn" disabled={!!m.cannotHire} title={m.cannotHire ?? `Hire 1,000 men-at-arms for ${money(m.hireCost)} ducats.`} onClick={() => command({ type: 'hireMenAtArms', realm, men: 1000 })}>Hire 1,000 men-at-arms</button>
+          {m.companies.map((c) => (
+            <button key={c.index} class="small-btn" disabled={!!c.why} title={`${c.description}\n${c.men.toLocaleString('en')} men. ${money(c.cost)} ducats to sign, ${money(c.wage)} a month per 1,000.${c.why ? `\n${c.why}` : ''}`} onClick={() => command({ type: 'hireCompany', realm, company: c.index })}>{c.name}</button>
+          ))}
         </div>
       )}
       {!mine && player > 0 && !atWarWithPlayer && (
         <div class="deeds">
-          <button class="small-btn" title="Debug until diplomacy: no reason needed" onClick={() => command({ type: 'declareWar', attacker: player, defender: realm })}>Declare war (debug)</button>
+          {m.casusBelli.map((c) => {
+            const price = [c.prestige && `${c.prestige} prestige`, c.piety && `${c.piety} piety`].filter(Boolean).join(', ');
+            return <button key={c.key} class="small-btn" disabled={!!c.why} title={`${c.description}${price ? `\nCosts ${price}.` : ''}${c.why ? `\n${c.why}` : ''}`} onClick={() => command({ type: 'declareWar', attacker: player, defender: realm, cb: c.key })}>{c.name}</button>;
+          })}
         </div>
       )}
     </section>

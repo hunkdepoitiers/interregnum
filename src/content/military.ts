@@ -16,6 +16,7 @@ export const militarySourceSchema = z.object({
   muster_days: z.number().int().min(0),
   march_km: z.number().positive(),
   strait_days: nonNeg,
+  crossings: z.array(z.tuple([z.string(), z.string()])).default([]),
   terrain_speed: byTerrain,
   terrain_defence: byTerrain,
   attrition: nonNeg,

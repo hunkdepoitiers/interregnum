@@ -1,0 +1,124 @@
+# Forts, sieges, mercenaries and the making of war and peace (M8). Read by tools/build-data.ts (war-lib). Money in
+# ducats. Chances in basis points (100 = 1%). Numbers are tuned for play: GUESS.
+
+forts:
+  capital: { empire: 4, kingdom: 3, duchy: 2, county: 1 }
+  # [development at least, level]; the highest that applies.
+  development: [[9, 1], [12, 2]]
+  trade_centre: 1
+  max_level: 5
+  garrison_per_level: 500
+  supply_base: 90
+  supply_per_level: 30
+  # A captured fort starts with this share (%) of its garrison.
+  captured_garrison: 25
+  # Share (%) of a fort's garrison that returns each month while it is not besieged.
+  refill: 20
+  castle_building: castle
+
+siege:
+  # Hundredths of a percent of progress a day against a level 1 fort; divided by the fort's level.
+  progress: 166
+  # Besiegers' men against 3 × the garrison scale the progress between these percentages.
+  men_min: 50
+  men_max: 150
+  warcraft: 4
+  engineer_bonus: 25
+  max_engineers: 3
+  engineer_cost: 150
+  # Once the stores are gone: progress is this percent, and the garrison loses this share (%) a day.
+  starving_progress: 200
+  starving_loss: 2
+  prestige: 15
+  # Chance each day that something happens, and how likely each thing is.
+  event_chance: 200
+  events:
+    disease: { weight: 4, text: "Disease spreads through the besiegers' camp." }
+    sally: { weight: 3, text: The garrison sallies out and burns part of the siege lines. }
+    breach: { weight: 2, text: A section of the wall collapses. }
+    stores_lost: { weight: 2, text: "Fire ruins part of the garrison's stores." }
+    traitor: { weight: 1, text: A traitor opens a gate in the night. }
+  disease_loss: 2
+  sally_loss: 1
+  sally_garrison_loss: 3
+  breach_progress: 1500
+  stores_lost_days: 15
+  # Traitors only open gates once the stores are this low (days).
+  traitor_stores: 30
+
+assault:
+  base: 1000
+  # Chance added per 1% of progress, for a breach, per besieger above 3 for each defender (capped), and lost per level.
+  per_progress: 50
+  breach: 2000
+  per_ratio: 300
+  ratio_cap: 2000
+  per_level: 500
+  min: 500
+  max: 9500
+  # Besiegers lost per defender on success and on failure, and share (%) of the garrison lost on failure.
+  losses_won: 2
+  losses_lost: 4
+  garrison_lost: 30
+  morale_lost: 25
+  cooldown: 30
+
+bribe:
+  # Ducats per fort level for the smallest offer; offers are this × 1, 2 and 3.
+  cost: 200
+  chances: [1500, 3000, 4500]
+  unpaid_bonus: 1500
+  per_eminence: 150
+  per_level: 200
+  cooldown: 60
+
+# Unpaid (treasury below zero): each month, levies and men-at-arms desert (%) and morale falls (points of 100);
+# companies walk out.
+desertion: { share: 5, morale: 10 }
+# Levies killed are gone from the realm's pool; this share (%) of the full pool returns each month.
+levy_recovery: 3
+# Smaller beaten armies bring no prestige.
+battle_prestige_men: 1000
+
+# Mercenary companies for hire. cost: ducats to sign; wage: ducats a month per 1,000 men; strength per 1,000 men.
+companies:
+  - { key: catalan, name: The Catalan Company, men: 3000, cost: 1500, wage: 45, strength: 3.5, description: Almogavars who carved a duchy out of Greece and fear no one. }
+  - { key: genoese, name: Genoese Crossbowmen, men: 2000, cost: 900, wage: 40, strength: 3, description: The finest crossbowmen in Christendom. }
+  - { key: brabancons, name: The Brabançons, men: 2500, cost: 900, wage: 35, strength: 2.5, description: Pikemen of the Low Countries who follow the coin. }
+  - { key: alans, name: The Alan Horse, men: 2000, cost: 800, wage: 35, strength: 2.5, description: Steppe riders who took service with Constantinople. }
+  - { key: turcopoles, name: Turcopole Riders, men: 1500, cost: 600, wage: 35, strength: 2.5, description: Light horse archers who sell their bows east and west. }
+  - { key: free_lances, name: The Free Lances of Lombardy, men: 4000, cost: 1400, wage: 32, strength: 2.2, description: Unemployed soldiers of the Italian cities. }
+
+# Reasons for war. prestige and piety: paid to declare. win_prestige, win_piety: gained on a victorious peace.
+casus_belli:
+  conquest: { name: War of conquest, prestige: -50, win_prestige: 30, description: No claim but the sword. Peers will talk. }
+  claim: { name: De jure claim, win_prestige: 40, description: Both realms hold land of the same de jure kingdom. }
+  holy_war: { name: Holy war, piety: -30, win_prestige: 30, win_piety: 60, min_piety: 100, description: War against those of another family of faiths. }
+  independence: { name: War of independence, win_prestige: 60, description: A vassal throws off its overlord. Winning frees it. }
+  raid: { name: Raid for plunder, win_prestige: 10, win_piety: 10, governments: [beylik, steppe_horde], description: No land is taken but every province taken pays. }
+# Ducats looted per point of development when a raider takes a province.
+raid_loot: 10
+
+score:
+  # Most war score (of 100) from battles; each won battle adds the loser's men / battle_men, within 1 to battle_max.
+  battle_cap: 40
+  battle_men: 2000
+  battle_max: 8
+  # Most from holding the goal, per month while the attacker holds it (or the defender, a year in).
+  ticking_cap: 25
+  ticking: 1
+
+peace:
+  # Land costs its share of the loser's value (%) × this / 100, at least 1. Gold costs this per month of gross income.
+  land: 150
+  indemnity_per_month: 3
+  indemnity_months: [3, 6, 12]
+  win_prestige: 30
+  lose_prestige: -30
+  # AI: leaders settle when the winner has this much, or the war is this many days old.
+  ai_score: 50
+  ai_days: 1095
+  # AI accepts a white peace from a player unless it is ahead by more than this.
+  ai_white: 10
+  # A beaten player's offer is taken if it is worth this share (%) of the score against them.
+  concede: 80

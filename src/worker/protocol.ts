@@ -3,7 +3,7 @@ import type { Content } from '../sim/content';
 import type { CreditRating, LoanOffer, Notice, ProvinceEconomy } from '../sim/economy';
 import type { Modifier } from '../sim/modifiers';
 import type { Scenario } from '../sim/scenario';
-import type { Construction, Ledger, Loan, Realm, Speed, War } from '../sim/state';
+import type { Construction, Ledger, Loan, Realm, Speed } from '../sim/state';
 
 /** Questions the UI asks the worker about money and people. */
 export type EconomyQuery = { kind: 'realm'; id: number } | { kind: 'province'; id: number } | { kind: 'character'; id: number };
@@ -93,6 +93,8 @@ export interface ArmyView {
   /** 0-100. */
   morale: number;
   commander: CharacterRef | null;
+  /** Name of its mercenary company; null = the realm's own. */
+  company: string | null;
   /** Mustering until this day. */
   ready: number;
   fighting: boolean;
@@ -101,6 +103,55 @@ export interface ArmyView {
   siege: number;
   siegeNeed: number;
   wage: number;
+}
+
+export interface SiegeView {
+  province: number;
+  realm: number;
+  /** 0-100. */
+  progress: number;
+  level: number;
+  garrison: number;
+  supply: number;
+  engineers: number;
+  maxEngineers: number;
+  engineerCost: number;
+  breach: boolean;
+  /** Basis points; men lost if it succeeds or fails; days until it may be tried. */
+  assaultChance: number;
+  assaultWon: number;
+  assaultLost: number;
+  assaultWait: number;
+  bribes: { cost: number; chance: number }[];
+  bribeWait: number;
+  /** Progress a day, hundredths of a percent. */
+  daily: number;
+  log: { day: number; text: string }[];
+}
+
+export interface PeaceOffer {
+  land: number[];
+  landCost: number;
+  gold: { months: number; amount: number; cost: number }[];
+}
+
+export interface WarView {
+  id: number;
+  name: string;
+  cbName: string;
+  attackers: number[];
+  defenders: number[];
+  start: number;
+  /** From the attackers' side, -100..100. */
+  score: number;
+  occupation: number;
+  battles: number;
+  ticking: number;
+  /** For the player's wars: what the player could demand if ahead, or give if behind. */
+  demand: PeaceOffer | null;
+  concede: PeaceOffer | null;
+  /** Share (%) of the score against it that a beaten side's offer must be worth. */
+  concedeShare: number;
 }
 
 export interface MilitaryReport {
@@ -112,6 +163,9 @@ export interface MilitaryReport {
   /** Cost of hiring 1,000 men-at-arms, and why the realm cannot now (null = it can). */
   hireCost: number;
   cannotHire: string | null;
+  companies: { index: number; name: string; description: string; men: number; cost: number; wage: number; why: string | null }[];
+  /** For another realm: the player's reasons to attack it. */
+  casusBelli: { key: string; name: string; description: string; prestige: number; piety: number; why: string | null }[];
 }
 
 export interface RealmReport {
@@ -140,6 +194,7 @@ export interface ProvinceReport {
   canBuild: Record<string, string | null>;
   /** Holy sites here, by religion id. */
   holySites: { name: string; religion: number }[];
+  fort: { level: number; garrison: number; maxGarrison: number; supply: number } | null;
 }
 
 export type ToWorker =
@@ -163,7 +218,7 @@ export interface WorldView {
 export type FromWorker =
   | { type: 'status'; day: number; speed: Speed; paused: boolean; player: number; treasury: number | null; net: number | null }
   | { type: 'notices'; notices: Notice[] }
-  | { type: 'armies'; armies: ArmyView[]; wars: War[] }
+  | { type: 'armies'; armies: ArmyView[]; wars: WarView[]; sieges: SiegeView[] }
   | { type: 'queryResult'; requestId: number; result: RealmReport | ProvinceReport | CharacterReport | null }
   | ({ type: 'world' } & WorldView)
   | { type: 'saveData'; requestId: number; text: string }

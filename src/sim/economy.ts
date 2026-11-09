@@ -29,6 +29,8 @@ export interface EconomyContext {
   kmPerPx?: number;
   /** Per province id: terrain key ('' for none). */
   terrain?: string[];
+  /** Per province id: its de jure county (scenario.county). */
+  county?: number[];
 }
 
 /** Ledger categories in display order. Income is positive, spending negative. */
@@ -55,6 +57,8 @@ export const LEDGER: { key: string; label: string; kind: 'income' | 'expense' | 
   { key: 'deeds', label: 'Alms, feasts and pilgrimages', kind: 'oneOff' },
   { key: 'church_lands', label: 'Church lands seized', kind: 'oneOff' },
   { key: 'gifts', label: 'Gifts for absolution', kind: 'oneOff' },
+  { key: 'indemnity', label: 'War indemnities', kind: 'oneOff' },
+  { key: 'loot', label: 'Plunder', kind: 'oneOff' },
 ];
 
 /** Something a realm or the player should hear about. realm 0 = everyone. */
@@ -189,6 +193,8 @@ export function computeLedgers(state: GameState, ctx: EconomyContext): Ledger[] 
 /** An army's monthly wages: levies cost little until their service is up, then more; men-at-arms always. */
 export function armyWage(content: Content, a: Army, day: number): number {
   const m = content.military;
+  const company = content.war.companies[a.company - 1];
+  if (company) return Math.trunc((a.menAtArms * company.wage) / 1000);
   const levyWage = day - a.raised > m.levy.serviceDays ? m.levy.lateWage : m.levy.wage;
   return Math.trunc((a.levies * levyWage + a.menAtArms * m.menAtArms.wage) / 1000);
 }
@@ -421,6 +427,12 @@ export function startBuilding(state: GameState, ctx: EconomyContext, realm: numb
 }
 
 /** Daily: finishes buildings whose time has come (if the builder still holds the province). */
+/** A finished castle: the fort one level stronger, fully manned. */
+function raiseCastle(state: GameState, w: Content['war'], province: number): void {
+  const level = Math.min(w.forts.maxLevel, (state.forts[province]?.level ?? 0) + 1);
+  state.forts[province] = { level, garrison: level * w.forts.garrisonPerLevel, supply: w.forts.supplyBase + level * w.forts.supplyPerLevel };
+}
+
 export function finishBuildings(state: GameState, ctx: EconomyContext): { changed: boolean; notices: Notice[] } {
   const notices: Notice[] = [];
   let changed = false;
@@ -433,6 +445,7 @@ export function finishBuildings(state: GameState, ctx: EconomyContext): { change
       notices.push({ realm: c.realm, text: `${def.name} finished.` });
       const gain = ctx.content.faith.buildings[c.building];
       if (gain) changeStanding(state, ctx.content, c.realm, gain, `Built a ${def.name.toLowerCase()}`);
+      if (c.building === ctx.content.war.forts.castleBuilding) raiseCastle(state, ctx.content.war, c.province);
     }
   }
   if (state.construction.some((x) => x.done <= state.day)) state.construction = state.construction.filter((x) => x.done > state.day);

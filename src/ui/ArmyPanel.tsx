@@ -1,5 +1,5 @@
 import { effect, signal } from '@preact/signals';
-import { armies, command, status } from '../bridge/client';
+import { armies, command, sieges, status } from '../bridge/client';
 import { dayToDate, formatDate } from '../sim/calendar';
 import { mapData, selectProvince, selectRealm } from './App';
 import { CharLink, selectedCharacter } from './CharacterPanel';
@@ -32,6 +32,7 @@ function ProvinceLink({ id }: { id: number }) {
 export function ArmyPanel() {
   const a = armies.value.find((x) => x.id === selectedArmy.value);
   const realm = a ? world.value?.realms[a.realm] : null;
+  const siege = a ? sieges.value.find((s) => s.province === a.location) : undefined;
   if (!a || !realm) return null;
   const mine = status.value.player === a.realm;
   const day = status.value.day;
@@ -41,7 +42,7 @@ export function ArmyPanel() {
       <header class="folio-head realm-head">
         <CoatOfArms realm={realm} size={64} />
         <div class="cartouche">
-          <h2>Army of {realm.name.replace(/^(Kingdom|Duchy|County|Empire|Crown) of /, '')}</h2>
+          <h2>{a.company ?? `Army of ${realm.name.replace(/^(Kingdom|Duchy|County|Empire|Crown) of /, '')}`}</h2>
           <p class="sub">{(a.levies + a.menAtArms).toLocaleString('en')} men · {state}</p>
         </div>
         <button class="close" aria-label="Close" onClick={() => (selectedArmy.value = 0)}>×</button>
@@ -60,6 +61,27 @@ export function ArmyPanel() {
           {a.destination > 0 && <Row label="Bound for"><ProvinceLink id={a.destination} /> <span class="muted">({a.eta} days)</span></Row>}
           {a.siegeNeed > 0 && <Row label="Occupying">{a.siege} of {a.siegeNeed} days</Row>}
         </Section>
+        {siege && (
+          <Section title="The Siege">
+            <Row label="Fort level">{siege.level}</Row>
+            <Row label="Progress"><span class="has-tip" title={`${(siege.daily / 100).toFixed(2)}% a day`}>{siege.progress}%{siege.breach ? ' · breached' : ''}</span></Row>
+            <Row label="Garrison">{siege.garrison.toLocaleString('en')}</Row>
+            <Row label="Stores"><span class={siege.supply <= 0 ? 'warn' : ''}>{siege.supply <= 0 ? 'Starving' : `${siege.supply} days`}</span></Row>
+            <Row label="Engineers">{siege.engineers} of {siege.maxEngineers}</Row>
+            {mine && (
+              <div class="deeds">
+                <button class="small-btn" disabled={siege.assaultWait > 0} title={siege.assaultWait > 0 ? `Not for ${siege.assaultWait} days.` : `Lose ${siege.assaultWon.toLocaleString('en')} men if it succeeds, ${siege.assaultLost.toLocaleString('en')} if it fails.`}
+                  onClick={() => command({ type: 'assault', realm: a.realm, province: siege.province })}>Assault ({(siege.assaultChance / 100).toFixed(0)}%)</button>
+                <button class="small-btn" disabled={siege.engineers >= siege.maxEngineers} title="Speeds the siege." onClick={() => command({ type: 'hireEngineers', realm: a.realm, province: siege.province })}>Engineers · {money(siege.engineerCost)}</button>
+                {siege.bribes.map((b, tier) => (
+                  <button key={tier} class="small-btn" disabled={siege.bribeWait > 0} title={siege.bribeWait > 0 ? `Not for ${siege.bribeWait} days.` : 'The gold is gone whether it works or not.'}
+                    onClick={() => command({ type: 'bribe', realm: a.realm, province: siege.province, tier })}>Bribe {money(b.cost)} ({(b.chance / 100).toFixed(0)}%)</button>
+                ))}
+              </div>
+            )}
+            {siege.log.length > 0 && <ul class="plain deeds-log">{siege.log.slice(-4).reverse().map((l) => <li key={`${l.day}-${l.text}`}><span class="muted">{formatDate(dayToDate(l.day))}</span> {l.text}</li>)}</ul>}
+          </Section>
+        )}
         {mine && (
           <>
             <p class="muted small hint">Right-click a province on the map to march there.</p>

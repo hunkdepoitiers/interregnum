@@ -4,7 +4,7 @@ import type { Character, Court, Dynasty, Scenario, ScenarioRealm } from './scena
 
 export type { Character, Court, Dynasty };
 
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 
 /** Speed 1 (slowest) .. 5 (fastest). */
 export type Speed = 1 | 2 | 3 | 4 | 5;
@@ -107,6 +107,8 @@ export interface Army {
   siege: number;
   /** Fleeing a lost battle: it cannot be caught or give battle until it stops. */
   retreating: boolean;
+  /** Mercenary company it is (index in Content.war.companies + 1); 0 = the realm's own. */
+  company: number;
 }
 
 export interface War {
@@ -115,6 +117,35 @@ export interface War {
   attackers: number[];
   defenders: number[];
   start: number;
+  /** Key into Content.war.casusBelli. */
+  cb: string;
+  /** Province whose holding ticks the score. */
+  goal: number;
+  /** War score from battles and from the goal, from the attackers' side. */
+  battles: number;
+  ticking: number;
+}
+
+export interface Fort {
+  level: number;
+  garrison: number;
+  /** Days of stores left. */
+  supply: number;
+}
+
+export interface Siege {
+  province: number;
+  /** Realm conducting it. */
+  realm: number;
+  start: number;
+  /** 0..10000. */
+  progress: number;
+  engineers: number;
+  breach: boolean;
+  /** Days before another assault or bribe may be tried. */
+  nextAssault: number;
+  nextBribe: number;
+  log: { day: number; text: string }[];
 }
 
 export interface GameState {
@@ -159,6 +190,11 @@ export interface GameState {
   nextArmyId: number;
   wars: War[];
   nextWarId: number;
+  /** By province id; provinces without a fort are absent. */
+  forts: Record<string, Fort>;
+  sieges: Siege[];
+  /** By realm id: levies killed and not yet replaced. */
+  levyLost: Record<string, number>;
 }
 
 export function provincesFromScenario(scenario: Scenario): ProvinceState[] {
@@ -223,5 +259,8 @@ export function newGame(seed: number, scenario: Scenario, bankCapitals: number[]
     nextArmyId: 1,
     wars: [],
     nextWarId: 1,
+    forts: {},
+    sieges: [],
+    levyLost: {},
   };
 }

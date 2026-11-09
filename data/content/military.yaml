@@ -17,6 +17,8 @@ muster_days: 20
 # Movement: km a day on open ground, times a terrain factor (percent). Straits take extra days.
 march_km: 20
 strait_days: 3
+# Sea crossings for armies beyond the map's straits: pairs of province keys, usable both ways.
+crossings: [[canterbury, guines]]
 terrain_speed: { farmlands: 100, plains: 100, steppe: 110, hills: 75, highlands: 60, forest: 70, jungle: 50, marsh: 55, desert: 70, tundra: 60 }
 # Defenders fight better on hard ground (percent of strength).
 terrain_defence: { farmlands: 100, plains: 100, steppe: 100, hills: 120, highlands: 130, forest: 115, jungle: 120, marsh: 120, desert: 105, tundra: 105 }

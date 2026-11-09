@@ -27,7 +27,7 @@ export function atWar(state: GameState, a: number, b: number): boolean {
 }
 
 /** Realms that fight on a realm's side in any war, itself included. */
-function allies(state: GameState, realm: number): Set<number> {
+export function allies(state: GameState, realm: number): Set<number> {
   const out = new Set([realm]);
   for (const w of warsOf(state, realm)) for (const r of w.attackers.includes(realm) ? w.attackers : w.defenders) out.add(r);
   return out;
@@ -39,20 +39,20 @@ function withVassals(state: GameState, realm: number): number[] {
 }
 
 /** Debug and later casus belli: the attacker and its vassals against the defender, its vassals and its overlord. */
-export function declareWar(state: GameState, attacker: number, defender: number): War | null {
+export function declareWar(state: GameState, attacker: number, defender: number, cb = 'conquest', goal = 0): War | null {
   const a = state.realms[attacker];
   const d = state.realms[defender];
   if (!a || !d || attacker === defender || atWar(state, attacker, defender)) return null;
   const defenders = withVassals(state, defender);
   if (d.overlord && d.overlord !== attacker && state.realms[d.overlord]) defenders.push(d.overlord);
   const attackers = withVassals(state, attacker).filter((r) => !defenders.includes(r));
-  const war: War = { id: state.nextWarId++, name: `${a.name}'s war on ${d.name}`, attackers, defenders, start: state.day };
+  const war: War = { id: state.nextWarId++, name: `${a.name}'s war on ${d.name}`, attackers, defenders, start: state.day, cb, goal: goal || d.capital, battles: 0, ticking: 0 };
   state.wars.push(war);
   return war;
 }
 
 /** White peace: every occupied province goes back to its owner, armies stand where they are. */
-export function makePeace(state: GameState, warId: number): boolean {
+export function endWar(state: GameState, warId: number): boolean {
   const war = state.wars.find((w) => w.id === warId);
   if (!war) return false;
   state.wars = state.wars.filter((w) => w.id !== warId);
@@ -78,11 +78,12 @@ function realmPeople(state: GameState, realm: number): number {
 export function levyPool(state: GameState, ctx: EconomyContext, realm: number, index?: ModifierIndex): { total: number; raised: number; menAtArms: number; maxMenAtArms: number } {
   const m = ctx.content.military;
   const size = ctx.content.stats.levy_size ? statValue(state, ctx.content, 'levy_size', { kind: 'realm', id: realm }, index) : 0;
-  const total = Math.trunc((realmPeople(state, realm) * size * m.levyShare) / 100000000);
+  const full = Math.trunc((realmPeople(state, realm) * size * m.levyShare) / 100000000);
+  const total = Math.max(0, full - (state.levyLost[realm] ?? 0));
   let raised = 0;
   let menAtArms = 0;
   for (const a of state.armies) if (a.realm === realm) { raised += a.levies; menAtArms += a.menAtArms; }
-  return { total, raised, menAtArms, maxMenAtArms: Math.trunc((total * m.menAtArmsPerThousandLevies) / 1000) };
+  return { total, raised, menAtArms, maxMenAtArms: Math.trunc((full * m.menAtArmsPerThousandLevies) / 1000) };
 }
 
 /** The realm's best general: its marshal, else the ruler if grown, else no one. */
@@ -98,7 +99,7 @@ function newArmy(state: GameState, ctx: EconomyContext, realm: number, levies: n
   const army: Army = {
     id: state.nextArmyId++, realm, location: state.realms[realm]!.capital, path: [], progress: 0, levies, menAtArms,
     morale: MORALE_FULL, raised: state.day, ready: state.day + ctx.content.military.musterDays, commander: commanderFor(state, ctx, realm),
-    siege: 0, retreating: false,
+    siege: 0, retreating: false, company: 0,
   };
   state.armies.push(army);
   return army;
@@ -142,7 +143,7 @@ export function hireMenAtArms(state: GameState, ctx: EconomyContext, realm: numb
 /** Splits an army in two halves standing together (to spread out over more provinces' supply). */
 export function splitArmy(state: GameState, realm: number, armyId: number): boolean {
   const a = state.armies.find((x) => x.id === armyId && x.realm === realm);
-  if (!a || a.retreating || menOf(a) < 2 * SCATTERED) return false;
+  if (!a || a.retreating || a.company || menOf(a) < 2 * SCATTERED) return false;
   const half: Army = { ...a, id: state.nextArmyId++, path: [], progress: 0, levies: Math.trunc(a.levies / 2), menAtArms: Math.trunc(a.menAtArms / 2) };
   a.levies -= half.levies;
   a.menAtArms -= half.menAtArms;
@@ -153,13 +154,37 @@ export function splitArmy(state: GameState, realm: number, armyId: number): bool
 /** Joins every army of the realm standing in the province, idle, into one. */
 export function mergeArmies(state: GameState, realm: number, armyId: number): boolean {
   const a = state.armies.find((x) => x.id === armyId && x.realm === realm);
-  if (!a) return false;
-  const others = state.armies.filter((x) => x !== a && x.realm === realm && x.location === a.location && !x.retreating && !x.path.length);
+  if (!a || a.company) return false;
+  const others = state.armies.filter((x) => x !== a && !x.company && x.realm === realm && x.location === a.location && !x.retreating && !x.path.length);
   if (!others.length) return false;
   const men = menOf(a) + others.reduce((t, x) => t + menOf(x), 0);
   a.morale = Math.trunc((a.morale * menOf(a) + others.reduce((t, x) => t + x.morale * menOf(x), 0)) / Math.max(1, men));
   for (const x of others) { a.levies += x.levies; a.menAtArms += x.menAtArms; a.raised = Math.min(a.raised, x.raised); a.ready = Math.max(a.ready, x.ready); }
   state.armies = state.armies.filter((x) => !others.includes(x));
+  return true;
+}
+
+/** Why this company cannot be hired now, or null. */
+export function cannotHireCompany(state: GameState, ctx: EconomyContext, realm: number, index: number): string | null {
+  const c = ctx.content.war.companies[index];
+  const r = state.realms[realm];
+  if (!c || !r) return 'No such company.';
+  const holder = state.armies.find((a) => a.company === index + 1);
+  if (holder) return `In the pay of ${state.realms[holder.realm]?.name}.`;
+  if (state.provinces[r.capital]?.controller !== realm) return 'The capital is occupied.';
+  if ((state.economy[realm]?.treasury ?? 0) < c.cost) return 'Not enough in the treasury.';
+  return null;
+}
+
+/** Signs a company: it arrives at the capital and is paid month by month. */
+export function hireCompany(state: GameState, ctx: EconomyContext, realm: number, index: number): boolean {
+  if (cannotHireCompany(state, ctx, realm, index)) return false;
+  const c = ctx.content.war.companies[index]!;
+  const ec = state.economy[realm]!;
+  ec.treasury -= c.cost;
+  add(ec.oneOff, 'recruitment', -c.cost);
+  const army = newArmy(state, ctx, realm, 0, c.men);
+  army.company = index + 1;
   return true;
 }
 
@@ -292,7 +317,8 @@ function warcraft(state: GameState, ctx: EconomyContext, a: Army): number {
 /** Fighting strength in hundredths: men by type, the commander's warcraft, and the ground for its holder. */
 export function armyStrength(state: GameState, ctx: EconomyContext, a: Army, defending = false): number {
   const m = ctx.content.military;
-  let s = Math.trunc((a.levies * m.levy.strength + a.menAtArms * m.menAtArms.strength) / 1000);
+  const company = ctx.content.war.companies[a.company - 1];
+  let s = Math.trunc((a.levies * m.levy.strength + a.menAtArms * (company?.strength ?? m.menAtArms.strength)) / 1000);
   s = Math.trunc((s * (100 + (warcraft(state, ctx, a) - 10) * m.warcraftStrength)) / 100);
   if (defending) {
     const terrain = ctx.terrain?.[a.location];
@@ -301,14 +327,15 @@ export function armyStrength(state: GameState, ctx: EconomyContext, a: Army, def
   return Math.max(0, s);
 }
 
-const menOf = (a: Army) => a.levies + a.menAtArms;
+export const menOf = (a: Army) => a.levies + a.menAtArms;
 
-function takeLosses(a: Army, dead: number): void {
+export function takeLosses(state: GameState, a: Army, dead: number): void {
   const men = menOf(a);
   if (men <= 0) return;
   const lost = Math.min(men, dead);
   const fromLevies = Math.min(a.levies, Math.trunc((lost * a.levies) / men));
   a.levies -= fromLevies;
+  if (fromLevies) state.levyLost[a.realm] = (state.levyLost[a.realm] ?? 0) + fromLevies;
   a.menAtArms = Math.max(0, a.menAtArms - (lost - fromLevies));
 }
 
@@ -352,7 +379,7 @@ function fight(state: GameState, ctx: EconomyContext, notices: Notice[]): void {
       const dead = Math.trunc((strength[1 - i]! * m.casualties * (80 + nextInt(state.rng, 41))) / 10000);
       for (const a of side) {
         const share = Math.trunc((dead * menOf(a)) / men);
-        takeLosses(a, share);
+        takeLosses(state, a, share);
         a.morale = Math.max(0, a.morale - Math.trunc((share * MORALE_FULL * m.moraleLoss) / Math.max(1, menOf(a) + share) / 100));
       }
     });
@@ -369,8 +396,16 @@ function fight(state: GameState, ctx: EconomyContext, notices: Notice[]): void {
     }
     const win = winners[0]!.realm;
     const lose = losers[0]!.realm;
-    changeStanding(state, ctx.content, win, { prestige: 10 }, 'Victory in battle');
-    changeStanding(state, ctx.content, lose, { prestige: -10 }, 'Defeat in battle');
+    const sc = ctx.content.war.score;
+    const swing = Math.max(1, Math.min(sc.battleMax, Math.trunc(menBefore[loser]! / sc.battleMen)));
+    for (const w of state.wars) {
+      if (w.attackers.includes(win) && w.defenders.includes(lose)) w.battles = Math.min(sc.battleCap, w.battles + swing);
+      else if (w.defenders.includes(win) && w.attackers.includes(lose)) w.battles = Math.max(-sc.battleCap, w.battles - swing);
+    }
+    if (menBefore[loser]! >= ctx.content.war.battlePrestigeMen) {
+      changeStanding(state, ctx.content, win, { prestige: 10 }, 'Victory in battle');
+      changeStanding(state, ctx.content, lose, { prestige: -10 }, 'Defeat in battle');
+    }
     const text = `Battle of {province}: ${state.realms[win]?.name} defeated ${state.realms[lose]?.name}.`;
     notices.push({ realm: win, text, province: place }, { realm: lose, text, province: place });
   }
@@ -379,12 +414,20 @@ function fight(state: GameState, ctx: EconomyContext, notices: Notice[]): void {
 
 // ---------- Occupation
 
+/** In a raid, each province taken pays the raider in gold. */
+export function lootOnCapture(state: GameState, ctx: EconomyContext, realm: number, province: number): void {
+  if (!warsOf(state, realm).some((w) => w.cb === 'raid' && w.attackers.includes(realm))) return;
+  const gold = Math.trunc(((state.provinceBase.development?.[province] ?? 0) * ctx.content.war.raidLoot) / 100);
+  const ec = state.economy[realm];
+  if (ec && gold) { ec.treasury += gold; add(ec.oneOff, 'loot', gold); }
+}
+
 function occupy(state: GameState, ctx: EconomyContext, notices: Notice[]): void {
   const m = ctx.content.military;
   for (const a of state.armies) {
     if (a.path.length || a.retreating || state.day < a.ready) continue;
     const p = state.provinces[a.location];
-    if (!p || !p.owner) continue;
+    if (!p || !p.owner || state.forts[a.location]) continue;
     const side = allies(state, a.realm);
     const enemyHolds = atWar(state, a.realm, p.controller);
     if (!enemyHolds) { a.siege = 0; continue; }
@@ -395,6 +438,7 @@ function occupy(state: GameState, ctx: EconomyContext, notices: Notice[]): void 
     const before = p.controller;
     p.controller = side.has(p.owner) ? p.owner : a.realm;
     for (const x of state.armies) if (x.location === a.location) x.siege = 0;
+    lootOnCapture(state, ctx, a.realm, p.id);
     const text = `${state.realms[a.realm]?.name} has occupied {province}.`;
     notices.push({ realm: before, text, province: p.id }, { realm: a.realm, text, province: p.id });
   }
@@ -402,9 +446,20 @@ function occupy(state: GameState, ctx: EconomyContext, notices: Notice[]): void 
 
 // ---------- The month
 
-function attrition(state: GameState, ctx: EconomyContext, index: ModifierIndex): void {
+function attrition(state: GameState, ctx: EconomyContext, index: ModifierIndex, notices: Notice[]): void {
   const m = ctx.content.military;
-  for (const a of state.armies) {
+  const d = ctx.content.war.desertion;
+  for (const a of [...state.armies]) {
+    if ((state.economy[a.realm]?.treasury ?? 0) < 0) {
+      const company = ctx.content.war.companies[a.company - 1];
+      if (company) {
+        state.armies = state.armies.filter((x) => x !== a);
+        notices.push({ realm: a.realm, text: `${company.name}, unpaid, has walked out.` });
+        continue;
+      }
+      takeLosses(state, a, Math.trunc((menOf(a) * d.share) / 100));
+      a.morale = Math.max(0, a.morale - d.morale * 100);
+    }
     const men = menOf(a);
     const p = state.provinces[a.location];
     if (!p || !men) continue;
@@ -414,12 +469,18 @@ function attrition(state: GameState, ctx: EconomyContext, index: ModifierIndex):
     else if (allies(state, a.realm).has(p.controller)) limit = Math.trunc((limit * m.homeSupply) / 100);
     if (men > limit && m.attrition) {
       const pct = Math.min(m.attritionMax * 100, Math.trunc(((men - limit) * m.attrition * 100) / Math.max(1, limit)));
-      takeLosses(a, Math.max(1, Math.trunc((men * pct) / 10000)));
+      takeLosses(state, a, Math.max(1, Math.trunc((men * pct) / 10000)));
     }
     a.morale = Math.min(MORALE_FULL, a.morale + m.moraleRegain * 100);
     if (a.commander && state.characters[a.commander]?.died !== null) a.commander = commanderFor(state, ctx, a.realm);
   }
   state.armies = state.armies.filter((x) => menOf(x) >= SCATTERED || x.retreating);
+  for (const key of Object.keys(state.levyLost)) {
+    const realm = Number(key);
+    const back = Math.max(100, Math.trunc((levyPool(state, ctx, realm, index).total + state.levyLost[key]!) * ctx.content.war.levyRecovery / 100));
+    state.levyLost[key] = state.levyLost[key]! - back;
+    if (state.levyLost[key]! <= 0) delete state.levyLost[key];
+  }
 }
 
 /** Every day: march, fight, occupy. At month start, supply and morale. Then the realms that are not the player's act. */
@@ -429,7 +490,11 @@ export function dailyMilitary(state: GameState, ctx: EconomyContext, monthStart:
   march(state, ctx);
   fight(state, ctx, notices);
   occupy(state, ctx, notices);
-  if (monthStart) attrition(state, ctx, indexModifiers(state.modifiers));
+  if (monthStart) {
+    attrition(state, ctx, indexModifiers(state.modifiers), notices);
+    // At peace, realms the player does not rule send their men home.
+    state.armies = state.armies.filter((a) => a.realm === state.player || warsOf(state, a.realm).length > 0);
+  }
   warAi(state, ctx);
   return notices;
 }
